@@ -7,7 +7,7 @@
 ## 1. Clonar o Repositório
 
 ```bash
-git clone <URL_DO_REPOSITÓRIO>
+git clone https://github.com/SarahBarbosa/HWO-PSG-Generator.git
 ```
 
 ## 2. Criar um Ambiente Virtual (Linux)
