@@ -1,4 +1,4 @@
-## Habitable Worlds Observatory (HWO): Gerador de Espectros de Reflexão com PSG
+## Habitable Worlds Observatory (HWO): Gerador de Espectros de Reflexão de Exoplanetas Tipo Terra com PSG
 
 (Documentação em Desenvolvimento)
 
