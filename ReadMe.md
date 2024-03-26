@@ -10,14 +10,7 @@
 git clone https://github.com/SarahBarbosa/HWO-PSG-Generator.git
 ```
 
-## 2. Criar um Ambiente Virtual (Linux)
-
-```bash
-python3 -m venv psg-venv
-source psg-venv/bin/activate
-```
-
-## 3. Instalar Dependências
+## 2. Criar um Ambiente Virtual e Instalar Dependências
 
 ```bash
 pip install -r requirements.txt
@@ -28,8 +21,8 @@ pip install -r requirements.txt
 Crie um arquivo `.env` na raiz do projeto e adicione as seguintes linhas:
 
 ```plaintext
-habex_config=/CAMINHO/PARA/scr/config/default_habex.config
-funcoes_path=/CAMINHO/PARA/scr
+habex_config=/CAMINHO/PARA/HWO-PSG-Generator/scr/config/default_habex.config
+funcoes_path=/CAMINHO/PARA/HWO-PSG-Generator/scr
 ```
 
 Substitua `/CAMINHO/PARA/` pelo caminho real onde os arquivos estão localizados.
