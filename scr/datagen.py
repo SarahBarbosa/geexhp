@@ -630,7 +630,7 @@ def gera_config(nome_planeta, quer_nuvem):
 
 ## Aqui para baixo são funções que vão utilizar os resultados do config no PSG
 
-def obter_dados_psg(psg, nome_planeta):
+def obter_dados_psg(psg, config, nome_planeta):
     """
     Esta função retorna um dicionário contendo as chaves 'header', 'spectrum' e 
     'duration_seconds' diretamente do PSG para um único planeta com parâmetros 
@@ -640,6 +640,8 @@ def obter_dados_psg(psg, nome_planeta):
     ----------
     psg : PSG
         Instância do PSG do pacote pypsg.
+    config : OrderedDict
+        Dados de configuração.
     nome_planeta : str
         Nome do planeta.
 
@@ -648,8 +650,6 @@ def obter_dados_psg(psg, nome_planeta):
     dict
         Um dicionário contendo as informações do PSG para o planeta especificado.
     """
-    config = gera_config(nome_planeta, quer_nuvem=False)
-
     ## Aqui vamos inserir esses dados no PSG
     sucesso = False # Bandeira para calcular os erros
     try:
@@ -681,7 +681,7 @@ def config_dict_to_str(config_dict):
     return '\n'.join(ret)
 
 
-def gerar_conjunto_dados(psg, n_planetas, datagen_dir, quer_nuvem, arq_nome = 'datagen', verbose = True):
+def gerar_conjunto_dados(psg, n_planetas, datagen_dir, nome_arquivo, quer_nuvem = False, verbose = True):
     """
     Esta função gera um conjunto de dados usando o PSG para um número especificado de planetas.
 
@@ -693,10 +693,10 @@ def gerar_conjunto_dados(psg, n_planetas, datagen_dir, quer_nuvem, arq_nome = 'd
         Número de planetas a serem gerados.
     datagen_dir : str
         Diretório onde os dados serão salvos.
-    arq_nome : srt
-        Nome do arquivo que será salvo.
+    nome_arquivo : str
+        Nome do arquivo que será salvo
     quer_nuvem : bool
-        Indica se a nuvem deve ser incluída na simulação.
+        Indica se a nuvem deve ser incluída na simulação. O padrão é False.
     verbose : bool, opcional
         Indica se mensagens de saída devem ser impressas ou não. O padrão é True.
  
@@ -705,13 +705,10 @@ def gerar_conjunto_dados(psg, n_planetas, datagen_dir, quer_nuvem, arq_nome = 'd
     Esta função não retorna nenhum valor, mas gera e salva os dados dos planetas no formato Parquet.
     """
     if verbose:
-        print("\n***** MODO DE GERAÇÃO DE DADOS *****n")
+        print("\n***** MODO DE GERAÇÃO DE DADOS *****")
     
     # Inicializa o contador de planetas gerados
     planetas = 0
-
-    # Marca o tempo de início do processo
-    tempo_inicio = time.time()
 
     # DataFrame vazio para armazenar os dados
     dados_planetas = pd.DataFrame()
@@ -721,11 +718,18 @@ def gerar_conjunto_dados(psg, n_planetas, datagen_dir, quer_nuvem, arq_nome = 'd
         planeta_id = f'exo{i}'  # Gera um identificador único para cada planeta
         
         if verbose:
-            print(f'Gerando arquivo {i+1}/{n_planetas}...')
+            print(f'> Gerando exoplaneta {i+1}/{n_planetas}...')
 
         try:
             # Gera as configurações para o planeta atual
             config = gera_config(planeta_id, quer_nuvem=quer_nuvem)
+                    
+            # Chama a função para obter os dados do PSG para o planeta atual
+            dicionario = obter_dados_psg(psg, config, planeta_id)
+            espectro = dicionario['spectrum']   
+            header = ['Wave/freq [um]', 'Total [I/F apparent albedo]', 'Noise', 'Stellar', 'Planet']
+            espectro_df =  pd.DataFrame(espectro, columns=header)
+
             config = config_dict_to_str(config)
 
             # Convertendo os dados de configuração em um dicionário
@@ -734,55 +738,34 @@ def gerar_conjunto_dados(psg, n_planetas, datagen_dir, quer_nuvem, arq_nome = 'd
                 if line.strip():
                     key, value = line.split('>', 1)
                     key = key.strip('<')
-                    config_dict[key] = [value.strip()]  
-                    
-            # Chama a função para obter os dados do PSG para o planeta atual
-            dicionario = obter_dados_psg(psg, planeta_id)
-            espectro = dicionario['spectrum']   
-            header = ['Wave/freq [um]', 'Total [I/F apparent albedo]', 'Noise', 'Stellar', 'Planet']
-            espectro_df =  pd.DataFrame(espectro, columns=header)
+                    config_dict[key] = [value.strip()] 
 
-            # Adicionando as colunas do dicionário de espectro
-            for key, value in espectro_df.items():
-                config_dict[key] = [value.tolist()]
-            
             # Convertendo o dicionário em um DataFrame
-            config_df = pd.DataFrame(config_dict)
+            config_df = pd.DataFrame(config_dict) 
 
-            # Adiciona os dados do planeta ao DataFrame principal
-            dados_planetas = pd.concat([dados_planetas, config_df], ignore_index=True)
+            # Cria o diretório se não existir
+            if not os.path.exists(os.path.join(datagen_dir, 'data/')):
+                os.makedirs(os.path.join(datagen_dir, 'data/'))
+
+            # Juntando os dois dataframes
+            dados_planetas = pd.concat([dados_planetas, pd.concat([config_df, espectro_df.apply(lambda col: [list(col)], axis=0)], axis=1)])
 
             # Atualiza o contador de planetas gerados
             planetas += 1
 
-            # Calcula a duração até o momento
-            duracao = time.time() - tempo_inicio
-            
-            # Calcula a taxa média de geração de planetas por segundo
-            planeta_por_segundo = planetas / duracao
-            
-            if verbose:
-                print(f'Planeta/segundo (média): {planeta_por_segundo:.3f}')
-
         except Exception as e:
-            print('Erro no PSG:', e)
-            print('Pulando esse planeta...')
-            print()
+            print('> Erro no PSG:', e)
+            print('> Pulando esse planeta...\n')
             continue
+    
+    if verbose:
+      print('> Salvando arquivo...')
 
-    # Salva o DataFrame em um arquivo Parquet
-    arquivo_nome = f'{arq_nome}.parquet'
-    planeta_arquivo_caminho = os.path.join(datagen_dir, 'data/', arquivo_nome)
+    # Salvando o arquivo!   
+    dados_planetas.to_parquet(os.path.join(datagen_dir, 'data/', f'{nome_arquivo}.parquet'))
 
     if verbose:
-        print(f'Salvando o arquivo: {planeta_arquivo_caminho}')
-
-    # Cria os diretórios se não existirem
-    if not os.path.exists(os.path.join(datagen_dir, 'data/')):
-        os.makedirs(os.path.join(datagen_dir, 'data/'))
-
-    # Salva o DataFrame em um arquivo Parquet
-    dados_planetas.to_parquet(planeta_arquivo_caminho)
+      print('***** Arquivo salvo com sucesso! *****')
 
             
 
