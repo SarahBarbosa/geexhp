@@ -1,7 +1,6 @@
 import sys
 import os
 import PT
-import time
 import msgpack
 import numpy as np
 import pandas as pd
