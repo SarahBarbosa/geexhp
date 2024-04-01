@@ -1,6 +1,6 @@
 import sys
 import os
-import PT
+from gerador import PT
 import msgpack
 import numpy as np
 import pandas as pd
@@ -8,8 +8,6 @@ import scipy.stats as ss
 import scipy.interpolate as si
 import astropy.constants as const
 from collections import OrderedDict
-from dotenv import load_dotenv
-load_dotenv()
 
 # Os códigos a seguir são versões atualizadas e modificadas do INARA proposto 
 # por Soboczenski, Frank, et al. (2018) https://arxiv.org/abs/1811.03390
@@ -547,7 +545,7 @@ def gera_config(nome_planeta, quer_nuvem):
     """
 
     # HabEx default config
-    habex = os.getenv('habex_config')
+    habex = '../gerador/config/default_habex.config'
 
     # Abre o arquivo e carrega o objeto OrderedDict
     with open(habex, 'rb') as f:
@@ -765,28 +763,3 @@ def gerar_conjunto_dados(psg, n_planetas, datagen_dir, nome_arquivo, quer_nuvem 
 
     if verbose:
       print('***** Arquivo salvo com sucesso! *****')
-
-            
-
-    
-
-
-
-
-
-
-
-
-
-
-
-    
-
-
-
-
-
-
-
-
-
