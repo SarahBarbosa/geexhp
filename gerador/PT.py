@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import scipy.constants as sc
 import scipy.special   as sp
 from scipy.ndimage import gaussian_filter1d
-import reader as rd
+from gerador import reader as rd
 
 
 """
