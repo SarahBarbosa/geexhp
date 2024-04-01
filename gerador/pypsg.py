@@ -1,4 +1,3 @@
-
 # Copyright (c) 2018, Frontier Development Lab / Astrobiology. All rights reserved.
 # pypsg is under an open-source, reproducible-research license (see LICENSE).
 # https://github.com/gbaydin/pypsg
