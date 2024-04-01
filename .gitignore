@@ -1,4 +1,4 @@
 psg-venv/
 .vscode/
 __pycache__/
-.env/
+.env
