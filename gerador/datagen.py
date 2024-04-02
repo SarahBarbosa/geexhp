@@ -18,6 +18,8 @@ def gerar_PT(log10kappa, log10gamma1, log10gamma2, alpha, beta, pmin, pmax, Rsta
     Gera um perfil pressão-temperatura (PT) para os parâmetros de entrada fornecidos 
     usando o modelo de Line et al. (2013).
 
+    > https://iopscience.iop.org/article/10.1088/0004-637X/775/2/137/pdf
+
     Observação: Isso utiliza PT.py e reader.py do BART, o código Bayesian 
     Atmospheric Radiative Transfer, que possui uma licença de pesquisa 
     reproduzível de código aberto.
