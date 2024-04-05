@@ -1,3 +1,1 @@
-## Habitable Worlds Observatory (HWO): Gerador de Espectros de Reflexão de Exoplanetas Tipo Terra com PSG
-
 Em construção...
