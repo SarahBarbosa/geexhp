@@ -1,3 +1,3 @@
-from .espectro import EspectroAnalise
+from .EspectroAnalise import EspectroAnalise
 
 __all__ = ["EspectroAnalise"]
