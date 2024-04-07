@@ -1,4 +1,14 @@
+# Diretório do ambiente virtual Python
 psg-venv/
+
+# Configurações do Visual Studio Code
 .vscode/
+
+# Bytecode Python
 __pycache__/
+
+# Variáveis de ambiente
 .env
+
+# Informações do pacote egg
+geexhp.egg-info/

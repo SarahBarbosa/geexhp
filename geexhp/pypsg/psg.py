@@ -15,7 +15,7 @@ class PSG():
         self._server_url = server_url
         self._timeout_seconds = timeout_seconds
         self._api_key = api_key
-        self.default_config_str = resource_string(__name__, 'config/default.config').decode('utf-8')
+        self.default_config_str = resource_string(__name__, 'resources/default.config').decode('utf-8')
         self.default_config = self.config_str_to_dict(self.default_config_str)
 
         print('Testing connection to PSG at {} ...'.format(self._server_url))
