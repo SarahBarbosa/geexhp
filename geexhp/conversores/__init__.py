@@ -1,3 +1,3 @@
-from .conf_df_str import converter_configuracao
+from .converter_configuracao import converter_configuracao
 
 __all__ = ["converter_configuracao"]
