@@ -1,11 +1,14 @@
 import os
+from multiprocessing import Pool
+from functools import partial
 from collections import OrderedDict
-from typing import Union, Dict
+from typing import Union, Dict, List
 import msgpack
 import pandas as pd
-from tqdm import tqdm
+import tqdm
 from pypsg import PSG
 import geexhp.util._mod as mod
+from tqdm import tqdm
 
 
 class DataGen:
@@ -27,11 +30,6 @@ class DataGen:
     def _conecta_psg(self) -> PSG:
         """
         Conecta-se ao servidor PSG.
-
-        Retorna:
-        --------
-        PSG
-            Objeto PSG conectado.
         """
         try:
             psg = PSG(server_url=self.url, timeout_seconds=200)
@@ -42,16 +40,6 @@ class DataGen:
     def _set_config(self, config: str) -> Dict[str, Union[str, int, float]]:
         """
         Define a configuração do PSG.
-
-        Parâmetros:
-        -----------
-        config : str
-            Caminho para o arquivo de configuração PSG.
-
-        Retorna:
-        --------
-        Dict[str, Union[str, int, float]]
-            Configuração do PSG.
         """
         with open(config, "rb") as f:
             config = OrderedDict(msgpack.unpack(f, raw=False))
@@ -60,37 +48,17 @@ class DataGen:
     def _para_dataframe(self, resultado) -> pd.DataFrame:
         """
         Converte o resultado em um DataFrame pandas.
-
-        Parâmetros:
-        -----------
-        resultado : any
-            Resultado do cálculo do PSG.
-
-        Retorna:
-        --------
-        pd.DataFrame
-            DataFrame contendo os dados do resultado.
         """
         try:
-            espectro = resultado.get("spectrum", [])
-            colunas = ["Wave/freq [um]", "Total [I/F apparent albedo]", "Noise", "Stellar", "Planet"]
+            espectro = resultado["spectrum"][:, :2]
+            colunas = ["Wave/freq", "Total"]
             return pd.DataFrame(espectro, columns=colunas)
-        except Exception:
-            print("O número de colunas excedeu o necessário!")
+        except Exception as e:
+            print(f"Houve um erro ao gerar o DataFrame: {e}")
 
     def _converte_config(self, configuracao: Union[str, Dict[str, Union[str, int, float]]]) -> pd.DataFrame:
         """
         Converte a configuração PSG para DataFrame.
-
-        Parâmetros:
-        -----------
-        configuracao : Union[str, Dict[str, Union[str, int, float]]]
-            Configuração PSG como string ou dicionário.
-
-        Retorna:
-        --------
-        pd.DataFrame
-            DataFrame contendo a configuração PSG.
         """
         if isinstance(configuracao, str):
             config_dict = {chave.strip("<"): [valor.strip()] 
@@ -127,28 +95,27 @@ class DataGen:
         if instrumento not in ["HWC", "SS-NIR", "SS-UV", "SS-Vis"]:
             raise ValueError("O instrumento deve ser 'HWC', 'SS-NIR', 'SS-UV' ou 'SS-Vis'.")
         
-        planetas = 0
-        df_planetas = pd.DataFrame()
+        dfs_planetas = [None] * nplanetas
+        DATA_DIR = "../data/"
 
-        with tqdm(total=nplanetas, desc="Gerando planetas", unit=" planeta", disable=not verbose) as barra:
+        # Verifica se o diretório de dados existe
+        os.makedirs(DATA_DIR, exist_ok=True)
+        
+        with tqdm(total=nplanetas, desc="Gerando planetas", unit=" planeta", disable=not verbose, colour="green") as barra:
             for i in range(nplanetas):
                 try:
-                    mod.rnd(self.config)
+                    configuracao = self.config
+                    mod.rnd(configuracao)
 
                     if instrumento != "SS-Vis":
-                        mod.instrumento(self.config, instrumento)
+                        mod.instrumento(configuracao, instrumento)
                     
-                    resultado = self.psg.run(self.config)
+                    resultado = self.psg.run(configuracao)
                     espectro_df = self._para_dataframe(resultado)                
-                    config_df = self._converte_config(self.config)
+                    config_df = self._converte_config(configuracao)
 
-                    if not os.path.exists("../data/"):
-                        os.makedirs("../data/")
-
-                    df_dados = pd.concat([config_df, espectro_df.apply(lambda col: [list(col)], axis=0)], axis=1)     
-                    df_planetas = pd.concat([df_planetas, df_dados], axis=0)
-
-                    planetas += 1
+                    df_planeta = pd.concat([config_df, espectro_df.apply(lambda col: [list(col)], axis=0)], axis=1)
+                    dfs_planetas[i] = df_planeta
 
                 except Exception:
                     print("> Erro ao processar esse planeta. Pulando...")
@@ -156,5 +123,6 @@ class DataGen:
 
                 finally:
                     barra.update(1)
-        
-        df_planetas.to_parquet(f"../data/{arq}.parquet", index=False)
+
+        df_final = pd.concat(dfs_planetas)
+        df_final.to_parquet(f"../data/{arq}.parquet", index=False)      
