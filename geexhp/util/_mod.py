@@ -186,7 +186,7 @@ def rnd(dicionario: dict) -> None:
 
         multiplicador = np.random.uniform(0, valor_max)               # Intervalo aleatório de multiplicadores
         
-        if np.random.random() < 0.3:                                  # Probabilidade de 30% de definir o multiplicador como zero
+        if np.random.random() < 0.2:                                  # Probabilidade de 20% de definir o multiplicador como zero
             multiplicador = 0.0
             
         _gas(dicionario, gas, multiplicador)
