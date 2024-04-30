@@ -109,10 +109,7 @@ def _gas(dicionario: dict, gas: str, multiplicador: float) -> None:
         if key.startswith("ATMOSPHERE-LAYER-"):
             values = value.split(',')
             valor_gas = float(values[indice_gas + 2])
-            if multiplicador == 0:
-                novo_valor = 0
-            else:
-                novo_valor = valor_gas * multiplicador
+            novo_valor = valor_gas * multiplicador
             
             values[indice_gas + 2] = str(novo_valor)
             dicionario[key] = ','.join(values)
@@ -170,6 +167,7 @@ def rnd(dicionario: dict) -> None:
 
     # Modificando os mixings ratio
     gases_simulados = ['H2O','CO2','O3','N2O','CO','CH4','O2','N2']
+    # CO2 , N2 , O2 , H2 O, CO, H2 , C2 H6 , HCN, H2 S, SO2 , O3 , CH4 , N2 O, NH3 , CH3 Cl
     elementos = ['H2O', 'CO2', 'O3', 'N2O', 'CO', 'CH4', 'O2', 'NO', 'SO2', 'NO2', 'NH3', 'HNO3', 'OH', 
                  'HF', 'HCl', 'HBr', 'HI', 'ClO', 'OCS', 'H2CO', 'HOCl', 'N2', 'HCN', 'CH3Cl', 'H2O2', 
                  'C2H2', 'C2H6', 'PH3']
