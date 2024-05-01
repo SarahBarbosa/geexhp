@@ -74,8 +74,10 @@ class DataGen:
         # Verifica se o diretório de dados existe
         os.makedirs(DATA_DIR, exist_ok=True)
         
-        with tqdm(total=nplanetas, desc="Gerando planetas", unit=" planeta", disable=not verbose, colour="green") as barra:
-            for _ in range(nplanetas):
+        with tqdm(total=nplanetas, desc="Gerando planetas", disable=not verbose, colour="green", 
+                  bar_format="{l_bar}{bar}| {n_fmt}/{total_fmt} [ tempo restante: {remaining}, tempo gasto: {elapsed}]") as barra:
+
+            for _ in range(nplanetas):              
                 try:
                     configuracao = self.config.copy()
 
