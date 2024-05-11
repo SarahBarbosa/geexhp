@@ -41,6 +41,7 @@ class DataGen:
         """
         with open(config, "rb") as f:
             config = OrderedDict(msgpack.unpack(f, raw=False))
+            mod.moleculas_simuladas(config)
             return config
     
     def gerador(self, nplanetas: int, verbose: bool, instrumento: str = "HWC", arq: str = "dados") -> None:
@@ -75,12 +76,11 @@ class DataGen:
         os.makedirs(DATA_DIR, exist_ok=True)
         
         with tqdm(total=nplanetas, desc="Gerando planetas", disable=not verbose, colour="green", 
-                  bar_format="{l_bar}{bar}| {n_fmt}/{total_fmt} [ tempo restante: {remaining}, tempo gasto: {elapsed}]") as barra:
+                  bar_format="{l_bar}{bar}| {n_fmt}/{total_fmt} [tempo restante: {remaining}, tempo gasto: {elapsed}]") as barra:
 
             for _ in range(nplanetas):              
                 try:
                     configuracao = self.config.copy()
-
                     mod.rnd(configuracao)
 
                     if instrumento != "SS-Vis":
@@ -106,4 +106,7 @@ class DataGen:
                     barra.update(1)
 
         df_final = pd.DataFrame(d)
-        df_final.to_parquet(f"../data/{arq}.parquet", index=False)      
+        df_final.to_parquet(f"../data/{arq}.parquet", index=False)
+
+        if not verbose:
+            print("Concluído.")      
