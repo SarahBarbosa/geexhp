@@ -12,3 +12,6 @@ __pycache__/
 
 # Informações do pacote egg
 geexhp.egg-info/
+
+# Ignorando o arquivo
+data/moderna10k.parquet
