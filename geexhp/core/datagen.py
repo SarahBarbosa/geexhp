@@ -5,12 +5,13 @@ import msgpack
 import pandas as pd
 import tqdm
 from pypsg import PSG
-import geexhp.util.mod as mod
+from geexhp.utils import mod, estagios
 from tqdm import tqdm
 
 
 class DataGen:
-    def __init__(self, url: str, config: str = "../geexhp/config/default_habex.config") -> None:
+    def __init__(self, url: str, config: str = "../geexhp/config/default_habex.config", 
+                 estagio: str = "moderna") -> None:
         """
         Inicializa a classe DataGen.
 
@@ -20,10 +21,12 @@ class DataGen:
             URL do servidor PSG.
         config : str, opcional
             Caminho para o arquivo de configuração PSG. O padrão é "../geexhp/config/default_habex.config".
+        estagio : str, opcional
+            Estágio geológico da Terra a ser considerado. Opções: "moderna", "hadeano"
         """
         self.url = url
         self.psg = self._conecta_psg()
-        self.config = self._set_config(config)
+        self.config = self._set_config(config, estagio)
     
     def _conecta_psg(self) -> PSG:
         """
@@ -35,13 +38,14 @@ class DataGen:
         except:
             raise ConnectionError("Erro de conexão. Tente novamente.")
         
-    def _set_config(self, config: str) -> Dict[str, Union[str, int, float]]:
+    def _set_config(self, config: str, estagio: str) -> Dict[str, Union[str, int, float]]:
         """
         Define a configuração do PSG.
         """
         with open(config, "rb") as f:
             config = OrderedDict(msgpack.unpack(f, raw=False))
-            mod.moleculas_simuladas(config)
+            if estagio == "moderna":
+                estagios.terra_moderna(config)
             return config
     
     def gerador(self, nplanetas: int, verbose: bool, instrumento: str = "HWC", arq: str = "dados") -> None:
