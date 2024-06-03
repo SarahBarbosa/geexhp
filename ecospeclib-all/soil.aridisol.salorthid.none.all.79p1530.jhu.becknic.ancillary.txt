@@ -1,0 +1,17 @@
+Name: Dark brown interior moist clay loam
+Type: soil
+Class: Aridisol
+Subclass: Salorthid
+Particle Size: none
+Sample No.: 79P1530
+Owner: JHU
+Wavelength Range: All
+Origin: Mrayia Dair El zor, Syria via USDA Soil Conservation service.
+Collection Date: N/A
+Description:  The parent material is alluvium from terracettes in lake plains; nonreclaimed salt-affected soil, barren land runoff.  Dark brown interior moist clay loam, surface crust of 0.5 cm formed by salt deposition in microdepressions (fine-loamy, mixed, thermic typic salorthid). Original ASTER Spectral Library name was jhu.becknic.soil.aridisol.salorthid.coarse.79P1530.spectrum.txt
+Massive, friable, slightly sticky and plastic and strongly effervescent.  1.03% 
+organic carbon, 11.1% clay, 50.5% silt, 38.4% sand.  0.5% extractable Fe.  
+
+Clay mineralogy: none.
+
+Coarse mineralogy: none.  15.5% CaCO3, 3.5% CaSO4. 

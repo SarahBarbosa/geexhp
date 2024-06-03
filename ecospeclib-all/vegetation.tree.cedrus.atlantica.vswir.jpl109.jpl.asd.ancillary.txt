@@ -1,0 +1,10 @@
+Name: Cedrus atlantica
+Type: vegetation
+Class: Tree
+Genus: Cedrus
+Species: atlantica
+Sample No.: JPL109
+Owner: JPL
+Chemistry: Water Content: 37.13%
+Biophysical Properties: 
+

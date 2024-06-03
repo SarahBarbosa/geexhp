@@ -1,0 +1,16 @@
+Name: Scheelite CaWO_4
+Type: Mineral
+Class: Tungstate
+Subclass: None
+Particle Size: Coarse
+Sample No.: T-1A
+Owner: JPL
+Wavelength Range: VSWIR
+Origin: USA, California, Kern County, Atolia.
+Collection Date: N/A
+Description: Particle size was 125-500um. Collected by: Burminco. Original ASTER Spectral Library name was jpl.perkin.mineral.tungstate.none.coarse.t01a.spectrum.txt
+Mineral:  Scheelite CaWO_4
+
+File Name:  t01a.txt
+
+XRD Analysis:  Scheelite(A), Quartz(M)

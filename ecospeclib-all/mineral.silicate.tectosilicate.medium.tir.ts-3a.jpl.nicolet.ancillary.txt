@@ -1,0 +1,19 @@
+Name: Oligoclase (Feldspar) (NaSi,CaAl)AlSi_2O_8
+Type: Mineral
+Class: Silicate
+Subclass: Tectosilicate
+Particle Size: Medium
+Sample No.: TS-3A
+Owner: JPL
+Wavelength Range: TIR
+Origin: N/A
+Collection Date: N/A
+Description: Oligoclase. Particle size was 45-125um.Collected by JPL Original ASTER Spectral Library name was jpl.nicolet.mineral.silicate.tectosilicate.medium.ts03a.spectrum.txt
+Mineral:  Oligoclase (Feldspar) (NaSi,CaAl)AlSi_2O_8
+
+File Name:  ts03a.txt
+
+XRD Analysis:  Oligoclase(A)
+
+Chemical Analysis:
+from electron microprobe (Na_0.75K_0.03Ca_0.22)Si_2.78(Al_1.21Fe_0.01^3+)O_8

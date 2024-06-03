@@ -1,0 +1,34 @@
+Name: Basalt
+Type: Rock
+Class: Igneous
+Subclass: Mafic
+Particle Size: Solid
+Sample No.: ba1b1f2
+Owner: Larry Rowan, USGS
+Wavelength Range: All
+Origin: Sweimah, Jordan
+Collection Date: N/A
+Description:  dark gray basalt Sample was Whole rock chips. Original ASTER Spectral Library name was usgs.perknic.rock.igneous.mafic.solid.ba1b1f2.spectrum.txt
+Rock Type:  Basalt
+
+Mineral:  
+
+Sample No.:  ba1b1f2
+
+XRF Analysis in %
+
+Chemistry:
+
+Al        7.3
+Ca        6.1
+Fe        7.9
+K         1.7
+Mg        5.0
+Na        2.9
+P         0.29
+Ti        1.5
+
+              
+            
+ 
+

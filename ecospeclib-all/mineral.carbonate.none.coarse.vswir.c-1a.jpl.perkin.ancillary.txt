@@ -1,0 +1,17 @@
+Name: Strontianite SrCO_3
+Type: Mineral
+Class: Carbonate
+Subclass: None
+Particle Size: Coarse
+Sample No.: C-1A
+Owner: JPL
+Wavelength Range: VSWIR
+Origin: Germany, Westphalia, Hamm.
+Collection Date: N/A
+Description: Particle size was 125-500um.Collected by:  Ward's Original ASTER Spectral Library name was jpl.perkin.mineral.carbonate.none.coarse.c01a.spectrum.txt
+Mineral:  Strontianite SrCO_3  
+
+File Name:  c01a.txt  
+
+XRD Analysis:  Strontianite(A)
+

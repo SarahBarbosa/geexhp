@@ -1,0 +1,16 @@
+Name: Chalcopyrite CuFeS_2
+Type: Mineral
+Class: Sulfide
+Subclass: None
+Particle Size: Coarse
+Sample No.: S-4A
+Owner: JPL
+Wavelength Range: VSWIR
+Origin: Canada, Quebec, Rouyn District
+Collection Date: N/A
+Description: Particle size was 125-500um.Collected by JPL Original ASTER Spectral Library name was jpl.beckman.mineral.sulfide.none.coarse.s04a.spectrum.txt
+Mineral:  Chalcopyrite CuFeS_2  
+
+File Name:  s04a.txt
+
+XRD Analysis:  Chalcopyrite(A), Pyrrhotite(M)

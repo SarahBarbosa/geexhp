@@ -1,0 +1,21 @@
+Name: Dark yellowish brown silty clay
+Type: soil
+Class: Aridisol
+Subclass: Salorthid
+Particle Size: none
+Sample No.: 89P1805
+Owner: JHU
+Wavelength Range: All
+Origin: San Bernadino Co., Ca.,China Lake via USDA Soil Conservationservice.
+Collection Date: N/A
+Description: Parent material: alluvium over lacustrine material.  Physiography: playa.  Dark yellowish brown silty clay  (Clayey over loamy, mixed thermic Typic Salorthid). Original ASTER Spectral Library name was jhu.becknic.soil.aridisol.salorthid.coarse.89P1805.spectrum.txt
+Friable, very sticky and plastic, violently effervescent and strongly alkaline 
+(pH 10.0)  0.4% organic carbon; 58.1% clay; 15.3% silt,; 26.6% sand.  6% 
+CaCO3 and a trace of CaSO4.
+
+Clay mineralogy: medium analcime peak, small montmorillonite and mica 
+peaks, and weak kaolinite and calcite peaks.
+
+Coarse mineralogy (CNZG1 horizon at 46 cm): 43% quartz, 25% biotite, 
+12% potassic feldspar, 9% hornblende, 5% other, 3% opaque, 2% 
+plagioclase feldspar, 2% zircon, and traces of glass, chlorite, and muscovite.

@@ -200,6 +200,9 @@ def rnd(dicionario: dict) -> None:
             # Se não houver valores para normalizar, mantenha os valores originais
             dicionario[f"ATMOSPHERE-LAYER-{i+1}"] = ','.join(valores)
 
+    
+    # Aqui precisamos modificar futuramente: precisamos pegar a média da molécula em todas as camas e ai sim multipĺicar pelo peso
+    # molecular médio
     peso_molecular = np.array([44.0095, 28.01340, 31.99880, 18.01528, 28.0101, 2.01588, 30.0690, 27.0253, 34.0809, 64.0638, 47.99820, 
                       16.0425, 44.01280, 17.03052, 50.4875])
     valores = np.array(dicionario["ATMOSPHERE-LAYER-1"].split(',')[2:], dtype=float)

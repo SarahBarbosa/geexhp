@@ -1,0 +1,17 @@
+Name: Atacamite Cu_2Cl(OH)_3
+Type: Mineral
+Class: Halide
+Subclass: None
+Particle Size: Coarse
+Sample No.: H-4A
+Owner: JPL
+Wavelength Range: TIR
+Origin: Chile, Atacama, Copiapo
+Collection Date: N/A
+Description: Particle size was 125-500um.Collected by Grieger's Inc. Original ASTER Spectral Library name was jpl.nicolet.mineral.halide.none.coarse.h04a.spectrum.txt
+Mineral:  Atacamite Cu_2Cl(OH)_3
+
+File Name:  h04a.txt
+
+XRD Analysis:  Atacamite(A), Chrysocolla(M)
+

@@ -1,0 +1,10 @@
+Name: Ehretia austin-smithii
+Type: vegetation
+Class: Tree
+Genus: Ehretia
+Species: austin-smithii
+Sample No.: JPL210
+Owner: JPL
+Chemistry: Water Content: 36.83%
+Biophysical Properties: 
+

@@ -1,0 +1,31 @@
+Name: Olivine (Fo88) (Fe+2,Mg)2SiO4
+Type: Mineral
+Class: Silicate
+Subclass: Nesosilicate
+Particle Size: Fine
+Sample No.: olivine_8
+Owner: JHU
+Wavelength Range: TIR
+Origin: Brenham, Kansas (location of meteorite fall) via Trude King#10L (from the Center for Meteorite Studies, Arizona St. University)
+Collection Date: N/A
+Description: Olivine obtained from the Brenham meteorite was optically examined using a petrographic microscope prior to spectral measurements to insure purity of the olivine.  Olivine then hand ground and wet sieved to less than 30 micrometers.  Sample preparation by Trude King, USGS, Denver. Particle size was Less than 2 Micrometers.(Isolated tetrahedra); (Olivine Group) Original ASTER Spectral Library name was jhu.nicolet.mineral.silicate.nesosilicate.powder.olivin8.spectrum.txt
+Mineral:  Olivine (Fo88) (Fe+2,Mg)2SiO4
+
+Sample No.:  olivine.8
+
+XRD Analysis:  None.
+
+Chemistry:  Microprobe analysis by W.I. Ridley, USGS, showed good 
+Fo88 composition:
+
+SiO2	40.100
+TiO2	0.002
+Al2O3	0.007
+Cr2O3	0.027
+MnO	0.216
+NiO	0.003
+FeO 	11.800
+MgO 	47.800
+CaO	0.009
+	_____
+Total	99.964

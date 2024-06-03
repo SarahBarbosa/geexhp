@@ -1,0 +1,10 @@
+Name: Magnolia grandiflora
+Type: vegetation
+Class: Tree
+Genus: Magnolia
+Species: grandiflora
+Sample No.: JPL230
+Owner: JPL
+Chemistry: Water Content: 38.7%
+Biophysical Properties: 
+

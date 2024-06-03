@@ -1,0 +1,17 @@
+Name: Smithsonite PbCO_3
+Type: Mineral
+Class: Carbonate
+Subclass: None
+Particle Size: Medium
+Sample No.: C-11A
+Owner: JPL
+Wavelength Range: VSWIR
+Origin: 
+Collection Date: N/A
+Description: Particle size was 45-125um.Collected by JPL Original ASTER Spectral Library name was jpl.beckman.mineral.carbonate.none.medium.c11a.spectrum.txt
+Mineral:  Smithsonite ZnCO_3
+
+File Name:  c11a.txt
+
+XRD Analysis:  Smithsonite(A)
+

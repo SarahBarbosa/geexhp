@@ -1,0 +1,10 @@
+Name: Acacia caven
+Type: vegetation
+Class: Tree
+Genus: Acacia
+Species: caven
+Sample No.: JPL139
+Owner: JPL
+Chemistry: Water Content: 37.61%
+Biophysical Properties: 
+

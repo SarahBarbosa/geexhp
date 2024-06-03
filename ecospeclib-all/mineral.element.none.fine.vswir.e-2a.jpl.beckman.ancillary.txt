@@ -1,0 +1,17 @@
+Name: Sulphur S
+Type: Mineral
+Class: Element
+Subclass: None
+Particle Size: Fine
+Sample No.: E-2A
+Owner: JPL
+Wavelength Range: VSWIR
+Origin: 
+Collection Date: N/A
+Description: Particle size was 0-45um.Collected by JPL Original ASTER Spectral Library name was jpl.beckman.mineral.element.none.fine.e02a.spectrum.txt
+Mineral:  Sulfur S
+
+File Name:  e02a.txt
+
+XRD Analysis:  Sulfur(A)
+

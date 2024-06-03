@@ -1,0 +1,17 @@
+Name: Hematite alpha Fe_2O_3
+Type: Mineral
+Class: Oxide
+Subclass: None
+Particle Size: Fine
+Sample No.: O-1B
+Owner: JPL
+Wavelength Range: VSWIR
+Origin: Baker, J.T.
+Collection Date: N/A
+Description: Synthetic hematite.Particle size was 0-45um.Collected by:  JPL Original ASTER Spectral Library name was jpl.perkin.mineral.oxide.none.fine.o01b.spectrum.txt
+Mineral: Hematite alpha Fe_2O_3
+
+File Name:  O01b.txt  
+
+XRD Analysis:  Hematite(A)  
+

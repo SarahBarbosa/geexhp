@@ -1,0 +1,11 @@
+Name: Salvia leucophylla 3
+Type: vegetation
+Class: Shrub
+Genus: Salvia
+Species: leucophylla
+Sample No.: VH096
+Owner: UCSB
+Chemistry: Nitrogen: 2.29%; Carbon: 55.06%; Cellulose: 9.82%; Lignin: 14.5%; Water Content:52.12%
+Biophysical Properties: Leaf Mass per Area: 14 g/m^2; Leaf Thickness: 0.4 mm
+Reference: Meerdink; Roberts; King; Roth; Dennison; Amaral; & Hook (2016). Linking seasonal foliar traits to VSWIR-TIR spectroscopy across California ecosystems. Remote Sensing of Environment; 186; 322-338.
+

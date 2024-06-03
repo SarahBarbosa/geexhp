@@ -1,0 +1,10 @@
+Name: Citharexylum montevidense
+Type: vegetation
+Class: Tree
+Genus: Citharexylum
+Species: montevidense
+Sample No.: JPL200
+Owner: JPL
+Chemistry: Water Content: 36.3%
+Biophysical Properties: 
+

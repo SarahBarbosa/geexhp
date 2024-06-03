@@ -1,0 +1,20 @@
+Name: Pale brown dry silty clay loam
+Type: soil
+Class: Inceptisol
+Subclass: Ustocrept
+Particle Size: none
+Sample No.: 82P2671
+Owner: JHU
+Wavelength Range: All
+Origin: Diar Alla Experiment Station.  Jordon, via USDA Soil Conservationservice
+Collection Date: N/A
+Description:  Parent material is irrigated cropland.  Pale brown dry silty clay loam (fine, illitic calcareous hyperthermic fluventic). Original ASTER Spectral Library name was jhu.becknic.soil.inceptisol.ustocrept.coarse.82P2671.spectrum.txt
+Moderate fine and medium subangular blocky structure, hard and firm, but 
+very sticky and plastic, strongly effervescent.  0.95% organic carbon, 36.5% 
+clay, 47.4% silt, 16.1% sand.
+
+Chemical analyses gave 29% CaCO3.
+
+Clay mineralogy: none.
+
+Coarse mineralogy: none. 

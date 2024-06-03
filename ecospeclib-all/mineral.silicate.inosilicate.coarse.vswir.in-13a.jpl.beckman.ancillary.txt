@@ -1,0 +1,16 @@
+Name: Spodumene LiAlS_2O_6
+Type: Mineral
+Class: Silicate
+Subclass: Inosilicate
+Particle Size: Coarse
+Sample No.: IN-13A
+Owner: JPL
+Wavelength Range: VSWIR
+Origin: Brazil, Minas Gerais
+Collection Date: N/A
+Description: Particle size was 125-500um.Collected by Ward's Original ASTER Spectral Library name was jpl.beckman.mineral.silicate.inosilicate.coarse.in13a.spectrum.txt
+Mineral:  Spodumene LiAlS_2O_6
+
+File Name:  in13a.txt
+
+XRD Analysis:  Spodumene(A)

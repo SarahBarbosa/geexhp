@@ -1,0 +1,16 @@
+Name: Wollastonite CaSiO_3
+Type: Mineral
+Class: Silicate
+Subclass: Inosilicate
+Particle Size: Fine
+Sample No.: IN-2A
+Owner: JPL
+Wavelength Range: TIR
+Origin: USA, California, Inyo County, Panamint Mountains
+Collection Date: N/A
+Description: Particle size was 0-45um.Collected by Burminco Original ASTER Spectral Library name was jpl.nicolet.mineral.silicate.inosilicate.fine.in02a.spectrum.txt
+Mineral:   Wollastonite CaSiO_3
+
+File Name:  in02a.txt
+
+XRD Analysis:  Wollastonite(A), Calcite(T), Quartz(T)

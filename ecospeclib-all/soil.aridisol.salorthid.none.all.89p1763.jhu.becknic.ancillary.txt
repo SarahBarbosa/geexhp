@@ -1,0 +1,22 @@
+Name: Light yellowish brown clay
+Type: soil
+Class: Aridisol
+Subclass: Salorthid
+Particle Size: none
+Sample No.: 89P1763
+Owner: JHU
+Wavelength Range: All
+Origin: San Bernadino Co., Ca.  China Lake via USDA Soil Conservationservice.
+Collection Date: N/A
+Description: The parent material is alluvium over lacustrine material from  playa.  Light yellowish brown clay, (fine-loamy, mixed calcareous, thermic typic). Original ASTER Spectral Library name was jhu.becknic.soil.aridisol.salorthid.coarse.89P1763.spectrum.txt
+Weak medium subangular blocky structure, hard, friable, very sticky and 
+plastic, with few fine salt crystals; strongly effervescent and strongly 
+alkaline (pH 9.7).   0.68% organic carbon, 51.5% clay, 18.8% silt, 29.7% 
+sand.
+
+Clay mineralogy: (CNZ1 horizon at 25 cm), weak calcite and mica peaks.  
+
+Coarse mineralogy: (same horizon as for the clay), 37% quartz, 36% carb-
+aggregate, 10% potassic feldspar, 5% other, 4% opaque, 3% hornblende, 2% 
+biotite, 1% calcite, and traces of chlorite, muscovite, glass, smectite, 
+diatoms, plagioclase feldspar and zircon.

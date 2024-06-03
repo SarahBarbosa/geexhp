@@ -1,0 +1,17 @@
+Name: Fluorite CaF_2
+Type: Mineral
+Class: Halide
+Subclass: None
+Particle Size: Coarse
+Sample No.: H-2A
+Owner: JPL
+Wavelength Range: VSWIR
+Origin: USA, Illinois, Hardin County, Rosiclare.
+Collection Date: N/A
+Description: Purple fluorite.Particle size was 125-500um.Collected by:  Ward's Original ASTER Spectral Library name was jpl.perkin.mineral.halide.none.coarse.h02a.spectrum.txt
+Mineral:  Fluorite CaF_2
+
+File Name:  h02a.txt
+
+XRD Analysis:  Fluorite(A)
+

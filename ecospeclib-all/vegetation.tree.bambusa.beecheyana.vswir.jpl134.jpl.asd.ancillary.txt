@@ -1,0 +1,10 @@
+Name: Bambusa beecheyana
+Type: vegetation
+Class: Tree
+Genus: Bambusa
+Species: beecheyana
+Sample No.: JPL134
+Owner: JPL
+Chemistry: Water Content: 42.3%
+Biophysical Properties: 
+

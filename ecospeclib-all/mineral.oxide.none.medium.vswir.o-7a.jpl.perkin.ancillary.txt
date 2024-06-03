@@ -1,0 +1,17 @@
+Name: Columbite Fe^2+Nb_2O_6
+Type: Mineral
+Class: Oxide
+Subclass: None
+Particle Size: Medium
+Sample No.: O-7A
+Owner: JPL
+Wavelength Range: VSWIR
+Origin: USA, South Dakota, Pennington County, Keystone.
+Collection Date: N/A
+Description: Particle size was 45-125um.Collected by:  Burminco Original ASTER Spectral Library name was jpl.perkin.mineral.oxide.none.medium.o07a.spectrum.txt
+Mineral:  Columbite Fe^2+Nb_2O_6
+
+File Name:  O07a.txt 
+
+XRD Analysis:  Columbite(A)
+

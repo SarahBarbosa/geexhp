@@ -1,0 +1,16 @@
+Name: Galena PbS
+Type: Mineral
+Class: Sulfide
+Subclass: None
+Particle Size: Fine
+Sample No.: S-7A
+Owner: JPL
+Wavelength Range: VSWIR
+Origin: USA, Kansas, Cherokee County, Galena
+Collection Date: N/A
+Description: Particle size was 0-45um.Collected by Grieger's Inc. Original ASTER Spectral Library name was jpl.beckman.mineral.sulfide.none.fine.s07a.spectrum.txt
+Mineral:  Galena PbS
+
+File Name:  s07a.txt
+
+XRD Analysis:  Galena(A)

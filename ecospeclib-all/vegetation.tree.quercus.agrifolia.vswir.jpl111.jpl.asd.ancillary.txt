@@ -1,0 +1,10 @@
+Name: Quercus agrifolia
+Type: vegetation
+Class: Tree
+Genus: Quercus
+Species: agrifolia
+Sample No.: JPL111
+Owner: JPL
+Chemistry: Water Content: 51.51%
+Biophysical Properties: 
+

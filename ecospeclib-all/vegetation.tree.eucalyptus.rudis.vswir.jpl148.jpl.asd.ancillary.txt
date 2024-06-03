@@ -1,0 +1,10 @@
+Name: Eucalyptus rudis
+Type: vegetation
+Class: Tree
+Genus: Eucalyptus
+Species: rudis
+Sample No.: JPL148
+Owner: JPL
+Chemistry: Water Content: 45.54%
+Biophysical Properties: 
+

@@ -1,0 +1,16 @@
+Name: Glauconite (K,Na)(Fe^3+,Al,Mg)_2(Si,Al)_4O_10(OH)_2
+Type: Mineral
+Class: Silicate
+Subclass: Phyllosilicate
+Particle Size: Medium
+Sample No.: PS-19A
+Owner: JPL
+Wavelength Range: VSWIR
+Origin: USA, New Jersey
+Collection Date: N/A
+Description: Particle size was 45-125um.Collected by Ward's Original ASTER Spectral Library name was jpl.beckman.mineral.silicate.phyllosilicate.medium.ps19a.spectrum.txt
+Mineral: Glauconite (K,Na)(Fe^3+,Al,Mg)_2(Si,Al)_4O_10(OH)_2 
+
+File Name:  ps19a.txt
+
+XRD Analysis:  Glauconite(A)

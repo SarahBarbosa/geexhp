@@ -1,0 +1,34 @@
+Name: Acmite NaFe+3Si2O6
+Type: Mineral
+Class: Silicate
+Subclass: Inosilicate
+Particle Size: Fine
+Sample No.: acmite_2
+Owner: JHU
+Wavelength Range: TIR
+Origin: Sample from Kangerdluarssuk, near Narssaq, Greenland viathe Smithsonian (sample no. NMNH 133746).
+Collection Date: N/A
+Description: The sample consisted of large (up to 2 cm long and almost as wide), very dark green prismatic crystals of acmite intergrown with albite (?).  The material was crushed and hand-picked for single crystal measurements and grinding.  The concentrate appeared pure under microscopic examination.  Particle size was less than 2 Micrometers.(Pyroxene Group - single chain) Original ASTER Spectral Library name was jhu.nicolet.mineral.silicate.inosilicate.powder.acmite2.spectrum.txt
+Sample No.: Acmite.2
+
+XRD Analysis:  Relatively large (75-250 µm) grains were X-rayed.  
+The resulting pattern showed acmite peaks and an unidentified peak 
+of trace proportions at 4.48 angstroms.
+
+Chemistry:  Microprobe analysis showed that one grain out of four 
+examined had about 2 wt % more CaO and correspondingly less Na2O.  
+Otherwise the sample appeared homogeneous, especially within 
+grains.  An average of 13 analyses, which indicates close to end 
+member composition, is: 
+
+SiO2 	 52.08
+Al2O3	0.98
+FeO 	 29.22
+MgO	0.06
+CaO 	3.84
+K2O	0.02
+Na2O	 11.87
+TiO2	 0.56
+MnO 	0.24
+	_____
+Total 	98.87

@@ -1,0 +1,16 @@
+Name: Sodalite Na_8Al_6Si_6O_24Cl_2
+Type: Mineral
+Class: Silicate
+Subclass: Tectosilicate
+Particle Size: Medium
+Sample No.: TS-10A
+Owner: JPL
+Wavelength Range: VSWIR
+Origin: Canada, Ontario, Hastings County, Bancroft
+Collection Date: N/A
+Description: Particle size was 45-125um.Collected by JPL Original ASTER Spectral Library name was jpl.beckman.mineral.silicate.tectosilicate.medium.ts10a.spectrum.txt
+Mineral:  Sodalite Na_8Al_6Si_6O_24Cl_2
+
+File Name:  ts10a.txt
+
+XRD Analysis:  Sodalite(A), Calcite(M)

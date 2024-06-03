@@ -1,0 +1,10 @@
+Name: Caesalpina cacalaco
+Type: vegetation
+Class: Tree
+Genus: Caesalpina
+Species: cacalaco
+Sample No.: JPL138
+Owner: JPL
+Chemistry: Water Content: 28.65%
+Biophysical Properties: 
+

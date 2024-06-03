@@ -1,0 +1,19 @@
+Name: Fayalite Fe_2SiO_4
+Type: Mineral
+Class: Silicate
+Subclass: Nesosilicate
+Particle Size: Fine
+Sample No.: NS-1A
+Owner: JPL
+Wavelength Range: TIR
+Origin: 
+Collection Date: N/A
+Description: Particle size was 0-45um.Collected by JPL Original ASTER Spectral Library name was jpl.nicolet.mineral.silicate.nesosilicate.fine.ns01a.spectrum.txt
+Mineral:  Fayalite Fe_2SiO_4
+
+File Name:  ns01a.txt
+
+XRD Analysis:  Fayalite(A)
+
+Chemical Analysis:
+from electron microprobe (Fe_1.89Mn_0.08Ca_0.03)SiO_4

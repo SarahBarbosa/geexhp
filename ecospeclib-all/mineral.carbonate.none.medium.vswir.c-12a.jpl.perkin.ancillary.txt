@@ -1,0 +1,17 @@
+Name: Azurite Cu_3(CO_3)_2(OH)_2
+Type: Mineral
+Class: Carbonate
+Subclass: None
+Particle Size: Medium
+Sample No.: C-12A
+Owner: JPL
+Wavelength Range: VSWIR
+Origin: USA, California, San Bernadino County, Near Valley Wells
+Collection Date: N/A
+Description: Particle size was 45-125um.Collected by:  Burminco Original ASTER Spectral Library name was jpl.perkin.mineral.carbonate.none.medium.c12a.spectrum.txt
+Mineral:  Azurite Cu_3(CO_3)_2(OH)_2
+
+File Name:  c12a.txt
+
+XRD Analysis:  Malachite(A), Azurite(M), possible Chrysocholla(M)
+

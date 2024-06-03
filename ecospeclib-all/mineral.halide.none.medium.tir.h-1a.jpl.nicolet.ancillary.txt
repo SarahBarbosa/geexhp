@@ -1,0 +1,17 @@
+Name: Cryolite Na_3AlF_6
+Type: Mineral
+Class: Halide
+Subclass: None
+Particle Size: Medium
+Sample No.: H-1A
+Owner: JPL
+Wavelength Range: TIR
+Origin: Denmark, Greenland, Ivigtut
+Collection Date: N/A
+Description: Particle size was 45-125um.Collected by Ward's Original ASTER Spectral Library name was jpl.nicolet.mineral.halide.none.medium.h01a.spectrum.txt
+Mineral:  Cryolite Na_3AlF_6
+
+File Name:  h01a.txt
+
+XRD Analysis:  Cryolite(A)
+

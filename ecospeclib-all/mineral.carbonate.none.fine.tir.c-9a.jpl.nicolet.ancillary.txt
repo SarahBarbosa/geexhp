@@ -1,0 +1,17 @@
+Name: Siderite Fe^2+CO_3
+Type: Mineral
+Class: Carbonate
+Subclass: None
+Particle Size: Fine
+Sample No.: C-9A
+Owner: JPL
+Wavelength Range: TIR
+Origin: N/A
+Collection Date: N/A
+Description: Particle size was 0-45um.Collected by JPL Original ASTER Spectral Library name was jpl.nicolet.mineral.carbonate.none.fine.c09a.spectrum.txt
+Mineral:  Siderite Fe^2+CO_3
+
+File Name:  c09a.txt
+
+XRD Analysis:  Siderite(A), Quartz(M)
+

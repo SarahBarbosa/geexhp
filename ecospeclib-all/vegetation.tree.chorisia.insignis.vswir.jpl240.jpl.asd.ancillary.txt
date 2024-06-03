@@ -1,0 +1,10 @@
+Name: Chorisia insignis
+Type: vegetation
+Class: Tree
+Genus: Chorisia
+Species: insignis
+Sample No.: JPL240
+Owner: JPL
+Chemistry: Water Content: 27.89%
+Biophysical Properties: 
+

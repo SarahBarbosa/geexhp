@@ -1,0 +1,16 @@
+Name: Analcime NaAlSi_2O_6.H_2O
+Type: Mineral
+Class: Silicate
+Subclass: Tectosilicate
+Particle Size: Fine
+Sample No.: TS-18A
+Owner: JPL
+Wavelength Range: TIR
+Origin: 
+Collection Date: N/A
+Description: Particle size was 0-45um.Collected by JPL Original ASTER Spectral Library name was jpl.nicolet.mineral.silicate.tectosilicate.fine.ts18a.spectrum.txt
+Mineral:  Analcime NaAlSi_2O_6.H_2O
+
+File Name:  ts18a.txt
+
+XRD Analysis:  Analcime(A)

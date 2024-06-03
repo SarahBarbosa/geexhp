@@ -1,0 +1,32 @@
+Name: Leucite KAlSi2O6
+Type: Mineral
+Class: Silicate
+Subclass: Tectosilicate
+Particle Size: Solid
+Sample No.: leucite_1
+Owner: JHU
+Wavelength Range: TIR
+Origin: Lake Latium, Italy via the Smithsonian (sample no. NMNHB18734)
+Collection Date: N/A
+Description:  The sample was a single small crystal, 1 cm in diameter and weighing 1.25 g.  It had good crystal faces and no impurities or alterations were apparent in hand sample or under the microscope.  It did contain what appeared to be fluid inclusions. Sample was unknown crystal face.(Framework Silicates); (Feldspathoid Group) Original ASTER Spectral Library name was jhu.nicolet.mineral.silicate.tectosilicate.solid.leucit1.spectrum.txt
+Mineral:  Leucite KAlSi2O6
+
+Sample No.: leucite.1
+
+XRD Analysis:  Pure leucite according to XRD. (However, infrared 
+hydroxyl bands indicate minor alteration to sericite.)
+
+Chemistry:  Microprobe analysis indicated homogeneity within and 
+between grains.  An average of 10 analyses indicates pure leucite:
+
+SiO2	55.98
+Al2O3	24.07
+FeO	0.38
+MgO	0.06
+CaO	0.02
+K2O	20.39
+Na2O 	0.19
+TiO2	0.06
+Cr2O3	0.03
+	_____
+Total 	101.08

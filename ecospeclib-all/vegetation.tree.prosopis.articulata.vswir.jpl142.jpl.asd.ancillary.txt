@@ -1,0 +1,10 @@
+Name: Prosopis articulata
+Type: vegetation
+Class: Tree
+Genus: Prosopis
+Species: articulata
+Sample No.: JPL142
+Owner: JPL
+Chemistry: Water Content: 35.11%
+Biophysical Properties: 
+

@@ -1,0 +1,11 @@
+Name: Heteromeles arbutifolia 1
+Type: vegetation
+Class: Shrub
+Genus: Heteromeles
+Species: arbutifolia
+Sample No.: VH133
+Owner: UCSB
+Chemistry: Nitrogen: 1.07%; Carbon: 49.35%; Cellulose: 12.63%; Lignin: 10.29%; Water Content:56.23%
+Biophysical Properties: Leaf Mass per Area: 192 g/m^2; Leaf Thickness: 0.35 mm
+Reference: Meerdink; Roberts; King; Roth; Dennison; Amaral; & Hook (2016). Linking seasonal foliar traits to VSWIR-TIR spectroscopy across California ecosystems. Remote Sensing of Environment; 186; 322-338.
+

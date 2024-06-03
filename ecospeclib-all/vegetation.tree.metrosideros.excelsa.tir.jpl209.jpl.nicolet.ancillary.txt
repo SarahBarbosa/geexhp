@@ -1,0 +1,10 @@
+Name: Metrosideros excelsa
+Type: vegetation
+Class: Tree
+Genus: Metrosideros
+Species: excelsa
+Sample No.: JPL209
+Owner: JPL
+Chemistry: Water Content: 41.77%
+Biophysical Properties: 
+

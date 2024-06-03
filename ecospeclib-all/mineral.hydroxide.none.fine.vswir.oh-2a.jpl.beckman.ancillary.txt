@@ -1,0 +1,17 @@
+Name: Goethite alpha Fe^3+O(OH)
+Type: Mineral
+Class: Hydroxide
+Subclass: None
+Particle Size: Fine
+Sample No.: OH-2A
+Owner: JPL
+Wavelength Range: VSWIR
+Origin: USA, California, San Diego County, Julian
+Collection Date: N/A
+Description: Particle size was 0-45um.Collected by Burminco Original ASTER Spectral Library name was jpl.beckman.mineral.hydroxide.none.fine.oh02a.spectrum.txt
+Mineral:  Goethite alpha Fe^3+O(OH) 
+
+File Name:  OH02a.txt
+
+XRD Analysis:  Goethite(A)
+
