@@ -1,0 +1,10 @@
+Name: Casimiroa edulis
+Type: vegetation
+Class: Tree
+Genus: Casimiroa
+Species: edulis
+Sample No.: JPL217
+Owner: JPL
+Chemistry: Water Content: 37.86%
+Biophysical Properties: 
+

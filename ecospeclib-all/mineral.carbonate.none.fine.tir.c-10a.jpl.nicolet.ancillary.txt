@@ -1,0 +1,17 @@
+Name: Cerussite PbCO_3
+Type: Mineral
+Class: Carbonate
+Subclass: None
+Particle Size: Fine
+Sample No.: C-10A
+Owner: JPL
+Wavelength Range: TIR
+Origin: USA, Arizona, Flux Mine
+Collection Date: N/A
+Description: Particle size was 0-45um.Collected by JPL Original ASTER Spectral Library name was jpl.nicolet.mineral.carbonate.none.fine.c10a.spectrum.txt
+Mineral:  Cerussite PbCO_3
+
+File Name:  c10a.txt
+
+XRD Analysis:  Cerussite(A)
+

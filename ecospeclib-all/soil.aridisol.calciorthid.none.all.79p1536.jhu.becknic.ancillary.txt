@@ -1,0 +1,20 @@
+Name: Light yellowish brown interior dry gravelly loam
+Type: soil
+Class: Aridisol
+Subclass: Calciorthid
+Particle Size: none
+Sample No.: 79P1536
+Owner: JHU
+Wavelength Range: All
+Origin: 8 km north of Deir El zor, Syria via USDA Soil Conservationservice.
+Collection Date: N/A
+Description:  The parent material is alluvium from mixed material; alluvial fine material overlayed on gypsum sandy loam, uncultivated from terracettes in lake plains.  Light yellowish brown interior dry gravelly loam. Original ASTER Spectral Library name was jhu.becknic.soil.aridisol.calciorthid.coarse.79P1536.spectrum.txt
+Weak medium subangular blocky structure, soft, friable, slightly sticky and 
+plastic and strongly effervescent with a clear smooth boundary.  0.5% 
+organic carbon, 0.6% extractable Fe.  10.7% clay, 40.4% silt, 48.9% sand.  
+
+Chemical analyses give 21% CaCO3.
+
+Clay mineralogy: none.  
+
+Coarse mineralogy: none.

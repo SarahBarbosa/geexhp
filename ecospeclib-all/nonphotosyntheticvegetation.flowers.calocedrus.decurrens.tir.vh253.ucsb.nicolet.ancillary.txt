@@ -1,0 +1,11 @@
+Name: Calocedrus decrruens
+Type: non photosynthetic vegetation
+Class: flowers
+Genus: Arctostaphylos
+Species: glandulosa
+Sample No.: VH253
+Owner: UCSB
+Chemistry: Nitrogen: 1.03%; Carbon: 50.02%; Water Content:54.12%
+Biophysical Properties: Leaf Mass per Area: 352 g/m^2; Leaf Thickness: 0.45 mm
+Reference: Meerdink; Roberts; King; Roth; Dennison; Amaral; & Hook (2016). Linking seasonal foliar traits to VSWIR-TIR spectroscopy across California ecosystems. Remote Sensing of Environment; 186; 322-338.
+

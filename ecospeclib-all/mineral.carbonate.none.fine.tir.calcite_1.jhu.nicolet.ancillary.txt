@@ -1,0 +1,19 @@
+Name: Calcite CaCO3
+Type: Mineral
+Class: Carbonate
+Subclass: None
+Particle Size: Fine
+Sample No.: calcite_1
+Owner: JHU
+Wavelength Range: TIR
+Origin: Hunt and Salisbury Collection #194B (purchased from Ward'sNatural Science Establishment); Sample from Mexico.
+Collection Date: N/A
+Description: The sample consisted of transparent euhedral crystals.  The largest was about 2 cm x 2 cm.  This was obviously pure optical quality calcite. Particle size was less than 2 Micrometers. Original ASTER Spectral Library name was jhu.nicolet.mineral.carbonate.none.powder.calcit1.spectrum.txt
+Mineral:  Calcite CaCO3
+
+Sample No.: calcite.1
+
+XRD Analysis:  Pure calcite.
+
+Chemistry:  No analysis requested in view of optical quality 
+appearance of sample.

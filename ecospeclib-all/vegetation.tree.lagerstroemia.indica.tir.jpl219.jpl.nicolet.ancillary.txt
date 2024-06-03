@@ -1,0 +1,10 @@
+Name: Lagerstroemia indica
+Type: vegetation
+Class: Tree
+Genus: Lagerstroemia
+Species: indica
+Sample No.: JPL219
+Owner: JPL
+Chemistry: Water Content: 33.06%
+Biophysical Properties: 
+

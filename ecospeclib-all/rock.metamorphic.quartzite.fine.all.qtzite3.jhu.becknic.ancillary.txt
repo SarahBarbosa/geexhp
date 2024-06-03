@@ -1,0 +1,15 @@
+Name: Pink Quartzite
+Type: rock
+Class: Metamorphic
+Subclass: Quartzite
+Particle Size: Fine
+Sample No.: qtzite3
+Owner: JHU
+Wavelength Range: All
+Origin: Sample No. 379, The Hunt and Salisbury Collection at the U.S.Geological Survey, Denver, Co.
+Collection Date: N/A
+Description:  A medium-grained quartzite composed of subrounded equant quartz with some secondary silica (chalcedony) and quartz deposition; sometimes the chalcedony is pseudomorphic to quartz grains.  These quartz grains contain numerous fluid inclusions, are often strained and occasionally show pressure solution effects.  Ferric material (plus clay?) is scattered throughout the sample giving this rock its reddish hue. Particle size was 0-75 Micrometer.   Original ASTER Spectral Library name was jhu.becknic.rock.metamorphic.quartzite.fine.qrtzit3.spectrum.txt
+There are trace amounts of zircon and lesser brown tourmaline (detrital), with a 
+few scattered opaque/carbonaceous grains noted in this section.  The modal 
+analyses for this rock gave 90.4% quartz, 6.96% muscovite, 1.74% opaques, and 
+0.94% other. 

@@ -1,0 +1,17 @@
+Name: Anatase TiO_2
+Type: Mineral
+Class: Oxide
+Subclass: None
+Particle Size: Fine
+Sample No.: O-12A
+Owner: JPL
+Wavelength Range: TIR
+Origin: N/A
+Collection Date: N/A
+Description: Synthetic anatase.Particle size was 0-45um.Collected by JPL Original ASTER Spectral Library name was jpl.nicolet.mineral.oxide.none.fine.o12a.spectrum.txt
+Mineral:  Anatase TiO_2  
+
+File Name:  012a.txt
+
+XRD Analysis:  Anatase(A)
+

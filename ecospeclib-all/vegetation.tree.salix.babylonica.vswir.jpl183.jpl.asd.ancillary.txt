@@ -1,0 +1,10 @@
+Name: Salix babylonica
+Type: vegetation
+Class: Tree
+Genus: Salix
+Species: babylonica
+Sample No.: JPL183
+Owner: JPL
+Chemistry: Water Content: 31.6%
+Biophysical Properties: 
+

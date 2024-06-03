@@ -1,0 +1,16 @@
+Name: Quartz SiO_2
+Type: Mineral
+Class: Silicate
+Subclass: Tectosilicate
+Particle Size: Fine
+Sample No.: TS-1D
+Owner: JPL
+Wavelength Range: TIR
+Origin: USA, Coloradi, Buffalo
+Collection Date: N/A
+Description: Milky quartz. Particle size was 0-45um.Collected by Ward's Original ASTER Spectral Library name was jpl.nicolet.mineral.silicate.tectosilicate.fine.ts01d.spectrum.txt
+Mineral:  Quartz SiO_2
+
+File Name:  ts01d.txt
+
+XRD Analysis:  Quartz(A)

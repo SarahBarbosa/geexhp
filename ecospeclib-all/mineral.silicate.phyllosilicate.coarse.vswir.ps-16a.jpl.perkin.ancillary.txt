@@ -1,0 +1,16 @@
+Name: Muscovite KAl_2(Si_3Al)O_10(OH,F)_2
+Type: Mineral
+Class: Silicate
+Subclass: Phyllosilicate
+Particle Size: Coarse
+Sample No.: PS-16A
+Owner: JPL
+Wavelength Range: VSWIR
+Origin: USA, Connecticut.
+Collection Date: N/A
+Description: Particle size was 125-500um.Collected by:  Ward's Original ASTER Spectral Library name was jpl.perkin.mineral.silicate.phyllosilicate.coarse.ps16a.spectrum.txt
+Mineral:  Muscovite KAl_2(Si_3Al)O_10(OH,F)_2
+
+File Name:  ps16a.txt
+
+XRD Analysis:  Muscovite(A), Feldspar(M)

@@ -1,0 +1,32 @@
+Name: Andalusite Al2SiO5
+Type: Mineral
+Class: Silicate
+Subclass: Nesosilicate
+Particle Size: Coarse
+Sample No.: andalusite_1
+Owner: JHU
+Wavelength Range: TIR
+Origin: Sample from St. Theresa, Espirito Santo, Brazil via Smithsonian(sample no. NMNH R17898). 
+Collection Date: N/A
+Description:  Sample was composed of two crystals, one clear and one pale pink. Both appeared pure, both 1 cm x 1 cm x 5 cm. Examination under a petrographic microscope indicated pure and clean samples. Sample grains chosen for microprobe analysis were clear, but with poor polish in part. Particle size was 74-250 Micrometers.(Isolated tetrahedra) (Al2SiO5 Group) Original ASTER Spectral Library name was jhu.nicolet.mineral.silicate.nesosilicate.coarse.andalu1.spectrum.txt
+Mineral:  Andalusite Al2SiO5
+
+Sample No.: andalus.1
+
+XRD Analysis:  Pure andalusite.
+
+Chemistry:  Microprobe analysis showed the sample to be 
+homogeneous within and between grains.  An average of 10 analyses, 
+indicating close to end member composition, is:
+
+SiO2 	37.19
+Al2O3	63.62
+FeO 	0.26
+MgO	0.06
+CaO 	0.02
+K2O	0.01
+Na2O	0.02
+TiO2	0.03
+MnO 	0.01
+	_____
+Total 	101.22

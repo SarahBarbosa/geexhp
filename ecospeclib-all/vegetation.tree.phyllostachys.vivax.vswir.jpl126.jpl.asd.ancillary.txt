@@ -1,0 +1,10 @@
+Name: Phyllostachys vivax
+Type: vegetation
+Class: Tree
+Genus: Phyllostachys
+Species: vivax
+Sample No.: JPL126
+Owner: JPL
+Chemistry: Water Content: 42.46%
+Biophysical Properties: 
+

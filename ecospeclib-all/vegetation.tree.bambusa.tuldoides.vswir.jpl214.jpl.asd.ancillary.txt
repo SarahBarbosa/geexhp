@@ -1,0 +1,10 @@
+Name: Bambusa tuldoides
+Type: vegetation
+Class: Tree
+Genus: Bambusa
+Species: tuldoides
+Sample No.: JPL214
+Owner: JPL
+Chemistry: Water Content: 43.48%
+Biophysical Properties: 
+

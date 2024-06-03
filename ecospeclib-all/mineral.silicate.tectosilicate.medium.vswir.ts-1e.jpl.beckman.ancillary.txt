@@ -1,0 +1,16 @@
+Name: Quartz SiO_2
+Type: Mineral
+Class: Silicate
+Subclass: Tectosilicate
+Particle Size: Medium
+Sample No.: TS-1E
+Owner: JPL
+Wavelength Range: VSWIR
+Origin: 
+Collection Date: N/A
+Description: Crysoprase. Particle size was 45-125um.Collected by JPL Original ASTER Spectral Library name was jpl.beckman.mineral.silicate.tectosilicate.medium.ts01e.spectrum.txt
+Mineral:  Quartz SiO_2
+
+File Name:  ts01e.txt
+
+XRD Analysis:  Quartz(A)

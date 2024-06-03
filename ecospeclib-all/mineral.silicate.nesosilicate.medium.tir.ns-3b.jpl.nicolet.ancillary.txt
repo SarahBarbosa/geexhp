@@ -1,0 +1,19 @@
+Name: Grossular Garnet Ca_3Al_2(SiO_4)_3
+Type: Mineral
+Class: Silicate
+Subclass: Nesosilicate
+Particle Size: Medium
+Sample No.: NS-3B
+Owner: JPL
+Wavelength Range: TIR
+Origin: Mexico, Lake Jaco
+Collection Date: N/A
+Description: Particle size was 45-125um.Collected by New, David Original ASTER Spectral Library name was jpl.nicolet.mineral.silicate.nesosilicate.medium.ns03b.spectrum.txt
+Mineral:  Grossular Garnet Ca_3Al_2(SiO_4)_3
+
+File Name:  ns03b.txt
+
+XRD Analysis:  Grossular Garnet(A)
+
+Chemical Analysis:
+from electron microprobe (Ca_2.97Mn_0.01Mg_0.08)(Al_1.71Fe_0.21^3+Ti_0.02)Si_3.01O_12

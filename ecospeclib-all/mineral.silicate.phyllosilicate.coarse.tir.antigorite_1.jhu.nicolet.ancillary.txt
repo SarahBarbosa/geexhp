@@ -1,0 +1,27 @@
+Name: Antigorite (Mg, Fe+2)3 Si2O5(OH)4
+Type: Mineral
+Class: Silicate
+Subclass: Phyllosilicate
+Particle Size: Coarse
+Sample No.: antigorite_1
+Owner: JHU.
+Wavelength Range: TIR
+Origin: Sample from Kalsertal, Tyrol, Austria, via the Smithsonian(sample no. NMNH B17958, borrowed from Jim Crowley, USGS).  
+Collection Date: N/A
+Description: The sample was a large green single crystal.  It appeared to be mostly pure antigorite under the microscope, but some (<3%) alteration or impurity was present, possibly chrysotile. Particle size was 74-250 Micrometers.(Sheet silicates)  (Serpentine/Kaolin Group)  Original ASTER Spectral Library name was jhu.nicolet.mineral.silicate.phyllosilicate.coarse.antigo1.spectrum.txt
+Mineral name:  Antigorite (Mg, Fe+2)3 Si2O5(OH)4
+
+Sample No.: antigor.1
+
+Locality:  Kalsertal, Tyrol, Austria.
+
+Source:  NMNH B17958 (sample borrowed from Jim Crowley, USGS).
+
+Petrographic Description:  The sample was a large green single 
+crystal.  It appeared to be mostly pure antigorite under the 
+microscope, but some (<3%) alteration or impurity was present, 
+possibly chrysotile.
+
+XRD Analysis:  Pure magnesian antigorite (analysis by Jim Crowley).
+
+Chemistry:  Not available.

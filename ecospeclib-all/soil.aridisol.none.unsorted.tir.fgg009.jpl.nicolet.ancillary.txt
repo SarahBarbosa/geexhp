@@ -1,0 +1,29 @@
+Name: Red-orange sandy soil.
+Type: soil
+Class: Aridisol
+Subclass: None
+Particle Size: Unsorted
+Sample No.: fgg009
+Owner: University of NSW
+Wavelength Range: TIR
+Origin: Fowlers Gap, western New South Wales, AustraliaHewson(1998) PhD thesis
+Collection Date: N/A
+Description: Parent material consists of aeolian silts/clays and sandstone debris.Physiography: Alluvium along creek on footslopes of sandstone (Nundooka Sandstone) outcropping hills Original ASTER Spectral Library name was jpl.nicolet.soil.aridisol.none.unsorted.fgg009.spectrum.txt
+Red-orange sandy soil containing a texture consisting of 22% finer than 20 um 
+(8% finer than 5 um).
+
+Clay mineralogy : XRD analysis indicates the presence of predominantly 
+illite/muscovite with some kaolinite. 
+
+Coarse mineralogy : XRF-normative analysis estimated this soil consisted of 79% 
+quartz, 9% illite/muscovite and 5% kaolinite.
+
+Spectral Description: The FTIR spectrum for fgg009 indicates the quartz 
+reststrahlen features at 8.2 and 8.625 um. However the subdued longer wavelength 
+reststrahlen (9.29 um), the minor presence of the doublet feature at 12.83 um, 
+and the presence of the 6.4 um feature is suggestive of a fine grained quartz 
+texture. The presence of clay is also suggested by the broadened and pronounced 
+longer wavelength quartz reststrahlen feature at 9.29 um. 
+
+
+

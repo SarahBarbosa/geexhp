@@ -1,0 +1,16 @@
+Name: Celestite SrSO_4
+Type: Mineral
+Class: Sulfate
+Subclass: None
+Particle Size: Fine
+Sample No.: SO-5A
+Owner: JPL
+Wavelength Range: TIR
+Origin: USA, Utah, Emery County
+Collection Date: N/A
+Description: Particle size was 0-45um.Collected by Grieger's Inc. Original ASTER Spectral Library name was jpl.nicolet.mineral.sulfate.none.fine.so05a.spectrum.txt
+Mineral:  Celestite SrSO_4
+
+File Name:  so05a.txt
+
+XRD Analysis:  Celestite(A)

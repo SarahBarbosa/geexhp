@@ -1,0 +1,17 @@
+Name: Magnesite MgCO_3
+Type: Mineral
+Class: Carbonate
+Subclass: None
+Particle Size: Medium
+Sample No.: C-6A
+Owner: JPL
+Wavelength Range: VSWIR
+Origin: USA, California, Riverside County.
+Collection Date: N/A
+Description: Particle size was 45-125um.Collected by:  Ward's Original ASTER Spectral Library name was jpl.perkin.mineral.carbonate.none.medium.c06a.spectrum.txt
+Mineral:  Magnesite MgCO_3
+
+File Name:  c06a.txt
+
+XRD Analysis:  Magnesite(A)
+

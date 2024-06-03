@@ -1,0 +1,10 @@
+Name: Taxodium mucronatum
+Type: vegetation
+Class: Tree
+Genus: Taxodium
+Species: mucronatum
+Sample No.: JPL228
+Owner: JPL
+Chemistry: Water Content: 24.55%
+Biophysical Properties: 
+

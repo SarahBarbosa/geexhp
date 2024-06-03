@@ -1,0 +1,11 @@
+Name: Quercus agrifolia 2
+Type: vegetation
+Class: Tree
+Genus: Quercus
+Species: agrifolia
+Sample No.: VH079
+Owner: UCSB
+Chemistry: Nitrogen: 1.29%; Carbon: 47.14%; Cellulose: 17.77%; Lignin: 11.75%; Water Content:45.45%
+Biophysical Properties: Leaf Mass per Area: 189 g/m^2; Leaf Thickness: 0.3 mm
+Reference: Meerdink; Roberts; King; Roth; Dennison; Amaral; & Hook (2016). Linking seasonal foliar traits to VSWIR-TIR spectroscopy across California ecosystems. Remote Sensing of Environment; 186; 322-338.
+

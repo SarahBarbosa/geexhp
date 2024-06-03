@@ -1,0 +1,10 @@
+Name: Ombu tree
+Type: vegetation
+Class: Tree
+Genus: Ombu
+Species: tree
+Sample No.: JPL166
+Owner: JPL
+Chemistry: Water Content: 26.36%
+Biophysical Properties: 
+

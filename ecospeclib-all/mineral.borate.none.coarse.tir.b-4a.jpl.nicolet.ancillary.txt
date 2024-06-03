@@ -1,0 +1,17 @@
+Name: Tincalconite Na_2B_4O_5(OH)_4.3H_2O
+Type: Mineral
+Class: Borate
+Subclass: None
+Particle Size: Coarse
+Sample No.: B-4A
+Owner: JPL
+Wavelength Range: TIR
+Origin: USA, California, Kern County, Boron
+Collection Date: N/A
+Description: Particle size was 125-500um.Collected by Burminco Original ASTER Spectral Library name was jpl.nicolet.mineral.borate.none.coarse.b04a.spectrum.txt
+Mineral:  Tincalconite Na_2B_4O_5(OH)_4.3H_2O  
+
+File Name:  b04a.txt  
+
+XRD Analysis:  Tincalconite(A), Borax(A)  
+

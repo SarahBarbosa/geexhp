@@ -1,0 +1,16 @@
+Name: Biotite K(Mg,Fe^2+)_3(Al,Fe^3+)Si_3O_10(OH,F)_2
+Type: Mineral
+Class: Silicate
+Subclass: Phyllosilicate
+Particle Size: Fine
+Sample No.: PS-23A
+Owner: JPL
+Wavelength Range: VSWIR
+Origin: 
+Collection Date: N/A
+Description: Particle size was 0-45um.Collected by JPL Original ASTER Spectral Library name was jpl.beckman.mineral.silicate.phyllosilicate.fine.ps23a.spectrum.txt
+Mineral:  Biotite K(Mg,Fe^2+)_3(Al,Fe^3+)Si_3O_10(OH,F)_2
+
+File Name:  ps23a.txt
+
+XRD Analysis:  Biotite(A)

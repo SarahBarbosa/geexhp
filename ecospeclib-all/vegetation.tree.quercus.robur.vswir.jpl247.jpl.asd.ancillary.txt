@@ -1,0 +1,10 @@
+Name: Quercus robur
+Type: vegetation
+Class: Tree
+Genus: Quercus
+Species: robur
+Sample No.: JPL247
+Owner: JPL
+Chemistry: Water Content: 43.12%
+Biophysical Properties: 
+

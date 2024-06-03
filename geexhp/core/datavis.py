@@ -39,11 +39,8 @@ class DataVis:
         """
         DataVis._configurar_matplotlib()
 
-        wavelength_str = df.iloc[indice]["WAVELENGHT"]
-        wavelength = [float(value.strip()) for value in wavelength_str.split(',')]
-
-        albedo_str = df.iloc[indice]["ALBEDO"]
-        albedo = [float(value.strip()) for value in albedo_str.split(',')]
+        wavelength = df.iloc[indice]["WAVELENGHT"]
+        albedo = df.iloc[indice]["ALBEDO"]
 
         _, ax = plt.subplots()
         ax.plot(wavelength, albedo, label=f"planeta = {indice}")

@@ -1,0 +1,13 @@
+Name: Green Quartzite
+Type: rock
+Class: Metamorphic
+Subclass: Quartzite
+Particle Size: Fine
+Sample No.: qrtzit6
+Owner: JHU
+Wavelength Range: All
+Origin: Sample No. 475, The Hunt and Salisbury Collection at the U.S.Geological Survey, Denver, Co.
+Collection Date: N/A
+Description: This medium to coarse-grained rock is composed of well compacted rounded to subrounded strained quartz grains showing pressure solution effects, with some silica recrystallization and fluid inclusions present.  In the remaining small interstices and rimming the quartz is what appears to be fine to microcrystalline chlorite.  Additionally there are scattered opaques present in this section. Particle size was 0-75 Micrometer. Original ASTER Spectral Library name was jhu.becknic.rock.metamorphic.quartzite.fine.qrtzit6.spectrum.txt
+This rock contains 81.7% quartz, 18.2% chlorite and < 1% opaques.  
+opaques, 0.11% clay/alteration.  

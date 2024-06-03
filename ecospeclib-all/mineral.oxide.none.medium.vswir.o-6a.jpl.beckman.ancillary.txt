@@ -1,0 +1,16 @@
+Name: Pyrolusite MnO_2
+Type: Mineral
+Class: Oxide
+Subclass: None
+Particle Size: Medium
+Sample No.: O-6A
+Owner: JPL
+Wavelength Range: VSWIR
+Origin: Mexico, Chihuahua
+Collection Date: N/A
+Description: Particle size was 45-125um.Collected by Grieger's Inc. Original ASTER Spectral Library name was jpl.beckman.mineral.oxide.none.medium.o06a.spectrum.txt
+Mineral:  Pyrolusite MnO_2  
+
+File Name:  O06a.txt  
+
+XRD Analysis:  Pyrolusite(A), Ramsdellite(M)  

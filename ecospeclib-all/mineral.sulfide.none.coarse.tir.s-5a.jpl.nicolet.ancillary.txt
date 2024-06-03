@@ -1,0 +1,16 @@
+Name: Arsenopyrite FeAsS
+Type: Mineral
+Class: Sulfide
+Subclass: None
+Particle Size: Coarse
+Sample No.: S-5A
+Owner: JPL
+Wavelength Range: TIR
+Origin: USA, Nevada, Lander County, Austin
+Collection Date: N/A
+Description: Particle size was 125-500um.Collected by Burminco Original ASTER Spectral Library name was jpl.nicolet.mineral.sulfide.none.coarse.s05a.spectrum.txt
+Mineral:  Arsenopyrite FeAsS
+
+File Name:  s05a.txt
+
+XRD Analysis:  Arsenopyrite(A), Quartz(M)

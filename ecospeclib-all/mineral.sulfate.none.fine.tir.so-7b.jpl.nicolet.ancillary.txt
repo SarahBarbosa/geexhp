@@ -1,0 +1,16 @@
+Name: Plumbojarosite PbFe_3^3+(SO_4)_4(OH)_12
+Type: Mineral
+Class: Sulfate
+Subclass: None
+Particle Size: Fine
+Sample No.: SO-7B
+Owner: JPL
+Wavelength Range: TIR
+Origin: Mexico, Hidalgo, Zimapan, Lomo De Toro Mine
+Collection Date: N/A
+Description: Particle size was 0-45um.Collected by Burminco Original ASTER Spectral Library name was jpl.nicolet.mineral.sulfate.none.fine.so07b.spectrum.txt
+Mineral:  Plumbojarosite PbFe_3^3+(SO_4)_4(OH)_12
+
+File Name:  so07b.txt
+
+XRD Analysis:  Plumbojarosite(A), Goethite(M)

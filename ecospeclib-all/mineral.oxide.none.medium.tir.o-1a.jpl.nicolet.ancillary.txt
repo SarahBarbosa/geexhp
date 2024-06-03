@@ -1,0 +1,17 @@
+Name: Hematite alpha Fe_2O_3
+Type: Mineral
+Class: Oxide
+Subclass: None
+Particle Size: Medium
+Sample No.: O-1A
+Owner: JPL
+Wavelength Range: TIR
+Origin: USA, Alabama, Birmingham
+Collection Date: N/A
+Description: Particle size was 45-125um.Collected by Burminco Original ASTER Spectral Library name was jpl.nicolet.mineral.oxide.none.medium.o01a.spectrum.txt
+Mineral: Hematite alpha Fe_2O_3 
+
+File Name:  O01a.txt    
+
+XRD Analysis:  Hematite(A), Quartz(M), Calcite(M) 
+

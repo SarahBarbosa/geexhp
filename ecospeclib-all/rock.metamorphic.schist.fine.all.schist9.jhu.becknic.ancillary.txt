@@ -1,0 +1,14 @@
+Name: Hornblende Schist
+Type: rock
+Class: Metamorphic
+Subclass: Schist
+Particle Size: Fine
+Sample No.: schist9
+Owner: JHU
+Wavelength Range: All
+Origin: Sample No. 393, The Hunt and Salisbury Collection at the U.S.Geological Survey, Denver, Co.
+Collection Date: N/A
+Description: This low grade schist is a very coarse-grained rock composed of bands of acicular hornblende and feldspar.  Microscopically there are large hornblende subhedra associated with serpophite and chlorite.  In addition to the alkali feldspar anhedra there are small muscovite subhedra, and scattered magnetite.  Calcite crystals and grains occur throughout the sample, often associated with the hornblende or serpophite/chlorite. Particle size was 0-75 Micrometer.  Original ASTER Spectral Library name was jhu.becknic.rock.metamorphic.schist.fine.schist9.spectrum.txt
+Modes gave 46.9% hornblende, 21.9% feldspar, 15.7% chlorite/serpophite, 7.6% 
+muscovite, 5.5%calcite, and 2.4% opaques.
+

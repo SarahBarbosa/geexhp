@@ -1,0 +1,35 @@
+Name: Labradorite (Na,Ca)Al(Al,Si)Si2O8
+Type: Mineral
+Class: Silicate
+Subclass: Tectosilicate
+Particle Size: Solid
+Sample No.: labrador_1
+Owner: JHU
+Wavelength Range: TIR
+Origin: Lake County, Oregon, acquired from the Smithsonian (sampleno. NMNH 115500) via Dave Stewart, USGS
+Collection Date: N/A
+Description: The sample consisted of a 2 cm x 1 cm x 0.2 cm, 0.536 g portion, of a single transparent crystal.  The fragment seemed to have been sawn on one side.  A very, very small amount of iron oxide stain could be seen on the surface of the fragment and still less on the inside.  No impurities were detected under the microscope. Sample had Fractured Surface.(Framework Silicates); (Feldspar Group) Original ASTER Spectral Library name was jhu.nicolet.mineral.silicate.tectosilicate.solid.labrad1.spectrum.txt
+Mineral:  Labradorite (Na,Ca)Al(Al,Si)Si2O8
+
+Sample No.: labrador.1
+
+XRD Analysis:  Pure labradorite.
+
+Chemistry:  Sample analyzed and described in Stewart, D.B., Walker, 
+G.W., Wright, T.L., and Fahey, J.J., 1966, Physical properties of calcic 
+labradorite from Lake County, Oregon:  American Mineralogist, v. 51, 
+p. 177-197.
+
+SiO2	51.42
+TiO2	0.04
+Al2O3	30.76
+Fe2O3	0.24
+FeO	0.17
+MnO	not reported
+MgO	0.05
+CaO	13.42
+Na2O	3.52
+K2O	0.23
+H2O	0.04
+	_____
+Total	99.89

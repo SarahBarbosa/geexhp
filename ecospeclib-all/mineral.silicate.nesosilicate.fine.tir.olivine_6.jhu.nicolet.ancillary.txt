@@ -1,0 +1,31 @@
+Name: Olivine (Fo60) (Fe+2,Mg)2SiO4
+Type: Mineral
+Class: Silicate
+Subclass: Nesosilicate
+Particle Size: Fine
+Sample No.: olivine_6
+Owner: JHU
+Wavelength Range: TIR
+Origin: Kiglapait Intrusion, Labrador via Trude King #KI3189(obtained from S.A. Morse, Univ. of Mass.)
+Collection Date: N/A
+Description: Initially, the specimen was contaminated with pyroxene, spinel, and ilmenite.  Heavy liquid separation, followed by magnetic separation and hand picking, allowed olivines of different iron content to be obtained.  Sample ground to <60 micrometers and wet sieved.  Sample preparation by Trude King, USGS, Denver. Particle size was less than 2 Micrometers.(Isolated tetrahedra); (Olivine Group) Original ASTER Spectral Library name was jhu.nicolet.mineral.silicate.nesosilicate.powder.olivin6.spectrum.txt
+Mineral:  Olivine (Fo60) (Fe+2,Mg)2SiO4
+
+Sample No.:  olivine.6
+
+XRD Analysis:  None.
+
+Chemistry:  Microprobe analysis by W.I. Ridley, USGS, showed 
+good Fo60 composition:
+
+SiO2	35.47
+TiO2	0.03
+Al2O3	0.00
+Cr2O3	0.04
+MnO	0.55
+NiO	0.05
+FeO 	34.63
+MgO 	29.49
+CaO	0.09
+	_____
+Total	100.35

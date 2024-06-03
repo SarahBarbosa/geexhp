@@ -1,0 +1,10 @@
+Name: Macadamia integrifolia
+Type: vegetation
+Class: Tree
+Genus: Macadamia
+Species: integrifolia
+Sample No.: JPL205
+Owner: JPL
+Chemistry: Water Content: 47.98%
+Biophysical Properties: 
+

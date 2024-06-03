@@ -1,0 +1,16 @@
+Name: Stilbite NaCa_2Al_5Si_3O_36.14H_2O
+Type: Mineral
+Class: Silicate
+Subclass: Tectosilicate
+Particle Size: Medium
+Sample No.: TS-9A
+Owner: JPL
+Wavelength Range: TIR
+Origin: India
+Collection Date: N/A
+Description: Particle size was 45-125um.Collected by Grieger's Inc. Original ASTER Spectral Library name was jpl.nicolet.mineral.silicate.tectosilicate.medium.ts09a.spectrum.txt
+Mineral:  Stilbite NaCa_2Al_5Si_3O_36.14H_2O
+
+File Name:  ts09a.txt
+
+XRD Analysis:  Stilbite(A)

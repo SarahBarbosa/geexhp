@@ -1,0 +1,10 @@
+Name: Olea africana
+Type: vegetation
+Class: Tree
+Genus: Olea
+Species: africana
+Sample No.: JPL226
+Owner: JPL
+Chemistry: Water Content: 41.1%
+Biophysical Properties: 
+

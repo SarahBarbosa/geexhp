@@ -1,0 +1,11 @@
+Name: Baccharis pilularis 3
+Type: vegetation
+Class: Shrub
+Genus: Baccharis
+Species: pilularis
+Sample No.: VH006
+Owner: UCSB
+Chemistry: Nitrogen: 3.29%; Carbon: 51.63%; Cellulose: 8%; Lignin: 10.3%; Water Content:75.35%
+Biophysical Properties: Leaf Mass per Area: 40 g/m^2; Leaf Thickness: 0.2 mm
+Reference: Meerdink; Roberts; King; Roth; Dennison; Amaral; & Hook (2016). Linking seasonal foliar traits to VSWIR-TIR spectroscopy across California ecosystems. Remote Sensing of Environment; 186; 322-338.
+

@@ -1,0 +1,16 @@
+Name: Nontronite Na_0.33Fe_2^3+(Si,Al)_4O_10(OH)_2.H_2O
+Type: Mineral
+Class: Silicate
+Subclass: Phyllosilicate
+Particle Size: Fine
+Sample No.: PS-6A
+Owner: JPL
+Wavelength Range: VSWIR
+Origin: USA, Pennsylvania
+Collection Date: N/A
+Description: Particle size was 0-45um.Collected by Ward's Original ASTER Spectral Library name was jpl.beckman.mineral.silicate.phyllosilicate.fine.ps06a.spectrum.txt
+Mineral:  Nontronite Na_0.33Fe_2^3+(Si,Al)_4O_10(OH)_2.H_2O
+
+File Name:  ps06a.txt
+
+XRD Analysis:  Nontronite(A)

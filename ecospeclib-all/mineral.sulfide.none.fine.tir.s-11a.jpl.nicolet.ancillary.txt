@@ -1,0 +1,16 @@
+Name: Molybdenite MoS_2
+Type: Mineral
+Class: Sulfide
+Subclass: None
+Particle Size: Fine
+Sample No.: S-11A
+Owner: JPL
+Wavelength Range: TIR
+Origin: Norway, Arendal, Froland
+Collection Date: N/A
+Description: Particle size was 0-45um.Collected by JPL Original ASTER Spectral Library name was jpl.nicolet.mineral.sulfide.none.fine.s11a.spectrum.txt
+Mineral:  Molybdenite MoS_2
+
+File Name:  s11a.txt
+
+XRD Analysis:  Molybdenite(A)

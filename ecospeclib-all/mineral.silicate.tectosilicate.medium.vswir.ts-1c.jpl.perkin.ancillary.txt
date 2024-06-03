@@ -1,0 +1,16 @@
+Name: Quartz SiO_2
+Type: Mineral
+Class: Silicate
+Subclass: Tectosilicate
+Particle Size: Medium
+Sample No.: TS-1C
+Owner: JPL
+Wavelength Range: VSWIR
+Origin: USA, South Dakota, Custer County, Custer.
+Collection Date: N/A
+Description: Rose quartzParticle size was 45-125um.Collected by:  Ward's Original ASTER Spectral Library name was jpl.perkin.mineral.silicate.tectosilicate.medium.ts01c.spectrum.txt
+Mineral:  Quartz SiO_2
+
+File Name:  ts01c.txt
+
+XRD Analysis:  Quartz(A)

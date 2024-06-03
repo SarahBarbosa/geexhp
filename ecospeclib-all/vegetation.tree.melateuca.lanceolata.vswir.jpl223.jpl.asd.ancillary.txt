@@ -1,0 +1,10 @@
+Name: Melateuca lanceolata
+Type: vegetation
+Class: Tree
+Genus: Melateuca
+Species: lanceolata
+Sample No.: JPL223
+Owner: JPL
+Chemistry: Water Content: 43.24%
+Biophysical Properties: 
+

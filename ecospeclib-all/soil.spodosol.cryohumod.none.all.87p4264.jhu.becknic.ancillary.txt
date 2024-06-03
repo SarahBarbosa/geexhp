@@ -1,0 +1,29 @@
+Name: Dark reddish brown, organic-rich, silty loam
+Type: soil
+Class: Spodosol
+Subclass: Cryohumod
+Particle Size: none
+Sample No.: 87P4264
+Owner: JHU
+Wavelength Range: All
+Origin: Kenai-Cook Inlet Division, Ak.
+Collection Date: N/A
+Description: Parent material: volcanic ash from acidic-ash material over glacial till from mixed-igneous and metamorphic matter.  Physiography: hillside with 18¡ east-facing slope.  Dark reddish brown, organic-rich, silty loam (A0 horizon); (medial over loamy, mixed typic). Original ASTER Spectral Library name was jhu.becknic.soil.spodosol.cryohumod.coarse.87P4264.spectrum.txt
+Extremely acidic (pH 4.0).  28.5% organic carbon, 0.04 % clay, 99.96% silt, 
+0.0% sand.
+
+Clay mineralogy: no mineral peaks present, indicating amorphous material 
+(glass?).
+
+Coarse mineralogy: 87% glass, 13% quartz.
+
+Spectral description: This uppermost soil horizon is very rich in organic 
+matter, which dominates the spectrum.  Strong H-C stretching vibration 
+bands near 3.42 and 3.50 microns are accompanied by a broad, strong 
+hydrocarbon absorption near 2.51 microns, weaker features near 2.27, 2.31 
+and 2.35 microns, and a complex, ramped peak near 6.70 microns.  Organic 
+matter also contributes to the broad reflectance peak near 11.7 microns, 
+which may also be in part due to secondary volume scattering.  Quartz 
+features can only be seen as weak combination tone bands near 5.08 and 
+5.31 microns.  Because of the fine particle size and strong absorption by 
+hydrocarbon, no reststrahlen bands are visible.

@@ -1,0 +1,11 @@
+Name: Adenostoma fasciculatum 1
+Type: vegetation
+Class: Shrub
+Genus: Adenostoma
+Species: fasciculatum
+Sample No.: VH217
+Owner: UCSB
+Chemistry: Nitrogen: 0.48%; Carbon: 31.99%; Water Content:42.14%
+Biophysical Properties: Leaf Mass per Area: 396 g/m^2; Leaf Thickness: 0.59 mm
+Reference: Meerdink; Roberts; King; Roth; Dennison; Amaral; & Hook (2016). Linking seasonal foliar traits to VSWIR-TIR spectroscopy across California ecosystems. Remote Sensing of Environment; 186; 322-338.
+

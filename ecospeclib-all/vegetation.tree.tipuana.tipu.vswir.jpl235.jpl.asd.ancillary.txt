@@ -1,0 +1,10 @@
+Name: Tipuana tipu
+Type: vegetation
+Class: Tree
+Genus: Tipuana
+Species: tipu
+Sample No.: JPL235
+Owner: JPL
+Chemistry: Water Content: 31.16%
+Biophysical Properties: 
+

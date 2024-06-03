@@ -1,0 +1,17 @@
+Name: Magnetite Fe^2+Fe_2^3+O_4
+Type: Mineral
+Class: Oxide
+Subclass: None
+Particle Size: Medium
+Sample No.: O-4A
+Owner: JPL
+Wavelength Range: VSWIR
+Origin: Canada, Ontario, Haliburton County, Wilberforce.collected by:  Ward's
+Collection Date: N/A
+Description: Particle size was 45-125um. Original ASTER Spectral Library name was jpl.perkin.mineral.oxide.none.medium.o04a.spectrum.txt
+Mineral:  Magnetite Fe^2+Fe_2^3+O_4  
+
+File Name:  O04a.txt 
+
+XRD Analysis:  Magnetite(A) 
+

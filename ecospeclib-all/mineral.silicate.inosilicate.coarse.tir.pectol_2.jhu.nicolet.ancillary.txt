@@ -1,0 +1,31 @@
+Name: Pectolite NaCa2Si308(OH)
+Type: Mineral
+Class: Silicate
+Subclass: Inosilicate
+Particle Size: Coarse
+Sample No.: pectol_2
+Owner: JHU
+Wavelength Range: TIR
+Origin: Thedford, Ontario, Canada via the Smithsonian (sample no.NMNH 94865)
+Collection Date: N/A
+Description: Sample consisted of a small (1 mm x 1 mm x 1 cm ) and one larger (5 mm x 6 mm x 1 cm) fragment. Sample appears to be composed of pure pectolite needles. However, microsopic examination revealed that it contained 2% of an isotropic mineral. Fibrous pectolite precludes effective sieving; the fine fraction was separated from the coarse fraction by elutriation in acetone. Particle size was 75 - 250  Micrometers.(Chain Silicates); (Pyrexenoid Group) Original ASTER Spectral Library name was jhu.nicolet.mineral.silicate.inosilicate.coarse.pectol2.spectrum.txt
+Mineral:  Pectolite NaCa2Si308(OH)
+
+Sample No.:  pectol.2
+
+XRD Analysis:  Pure pectolite.
+
+Chemistry:  Microprobe analysis found the sample homogeneous 
+within and between grains of pectolite.  An average of 8 analyses:
+
+SiO2	53.37
+Al2O3	0.03
+FeO	0.11
+MgO	0.03
+CaO	33.84
+K2O	0.01
+Na2O	9.61
+TiO2	0.01
+MnO	0.03
+	_____
+Total	97.04

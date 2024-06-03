@@ -1,0 +1,36 @@
+Name: Beryl Be3Al2Si6O18
+Type: Mineral
+Class: Silicate
+Subclass: Cyclosilicate
+Particle Size: Coarse
+Sample No.: beryl_1
+Owner: JHU
+Wavelength Range: TIR
+Origin: Sample from Maine via Hunt and Salisbury Collection sample#180B (purchased from Ward's Natural Science Establishment).
+Collection Date: N/A
+Description: The hand sample was cut and polished along an unknown axis.  It was pale green and appeared pure.  Microscopic examination showed a small amount (2% or less) of very fine, low birefringent material in the sample.  The contaminating grains occasionally have rhombic or cubic shape.  These grains were unidentifiable. Particle size was 74-250 Micrometers. (Ring Silicates) Original ASTER Spectral Library name was jhu.nicolet.mineral.silicate.cyclosilicate.coarse.beryl1.spectrum.txt
+Mineral:  Beryl Be3Al2Si6O18
+
+Sample No.: beryl.1
+
+XRD Analysis:  Pure beryl.
+
+Chemistry:  Microprobe analysis showed that grains selected were 
+homogeneous within and between grains.  An average of 10 analyses 
+lacking beryllium indicates silica and alumina content appropriate 
+for beryl:
+
+SiO2 	66.12
+Al2O3	17.36
+FeO	0.48
+MgO	0.17
+CaO	0.01
+K2O	0.03
+Na2O	0.35
+TiO2	 0.01
+MnO	0.00	
+Total	*84.53
+*Without beryllium.
+
+*Note the very strong CO2 band near 4.3 micrometers due to CO2 
+trapped in axial channels.

@@ -1,0 +1,16 @@
+Name: Natrolite Na_2Al_2Si_3O_10.2H_2O
+Type: Mineral
+Class: Silicate
+Subclass: Tectosilicate
+Particle Size: Fine
+Sample No.: TS-8A
+Owner: JPL
+Wavelength Range: VSWIR
+Origin: India, Maharashtra, Poona
+Collection Date: N/A
+Description: Particle size was 0-45um.Collected by Ward's Original ASTER Spectral Library name was jpl.beckman.mineral.silicate.tectosilicate.fine.ts08a.spectrum.txt
+Mineral:  Natrolite Na_2Al_2Si_3O_10.2H_2O
+
+File Name:  ts08a.txt
+
+XRD Analysis:  Natrolite(A)

@@ -1,0 +1,30 @@
+Name: Dacite
+Type: Rock
+Class: Intermediate
+Subclass: Felsic
+Particle Size: Solid
+Sample No.: AP-960-157b
+Owner: United States Geological Survey, L. C. Rowan
+Wavelength Range: All
+Origin: Iberian Pyrite Belt, Spain
+Collection Date: N/A
+Description: Dacite, chloriticSample was Whole Rock Chips. Original ASTER Spectral Library name was usgs.perknic.rock.igneous.felsic.solid.dac157b.spectrum.txt
+Lithology      Dacite
+Sample#        AP-960-157b
+Chemistry
+SiO2           64.07
+Al2O3          16.46
+Fe             4.59
+CaO            1.97
+TiO2           0.82
+MnO            0.03
+K2O            0.25
+MgO            0.97
+Na2O           7.08
+P2O5           0.11
+PPC            3.65
+X-Ray Diffraction
+               Plagioclase
+               Quartz
+               Chlorite
+               Mica

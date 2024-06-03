@@ -1,0 +1,33 @@
+Name: Sanidine (K,Na)Al3O8
+Type: Mineral
+Class: Silicate
+Subclass: Tectosilicate
+Particle Size: Solid
+Sample No.: sanidine_3
+Owner: JHU
+Wavelength Range: TIR
+Origin: Higasinuiro-gun, Taiji, Wakayama, Japan via the Smithsonian(sample no. NMNH 103200)
+Collection Date: N/A
+Description: The sample consisted of many small (0.5 cm) euhedral crystals totaling 6.49 g.  Almost all had some adhering clay/limonite, to be removed by brushing and ultrasonic cleaning.  Under the microscope, a few acicular inclusions (rutile) could be seen.  Otherwise the sample appeared very pure. Sample had cleavage face.(Feldspar Group) Original ASTER Spectral Library name was jhu.nicolet.mineral.silicate.tectosilicate.solid.sanidi3.spectrum.txt
+Mineral:  Sanidine (K,Na)Al3O8
+
+Sample No.:  sanidine.3
+
+XRD Analysis:  Sanidine plus a moderate amount of albite.
+
+Chemistry:  Microprobe analysis showed homogeneity within and 
+between grains.  This is typical sanidine with about as much soda as 
+potash, but the albite present is cryptoperthitic.  Average of 10 
+analyses:
+
+SiO2	67.43
+Al2O3	18.65
+FeO	0.59
+MgO	0.03
+CaO	0.02
+K2O	7.38
+Na2O	5.38
+TiO2	0.03
+MnO	0.02
+	_____
+Total	99.97

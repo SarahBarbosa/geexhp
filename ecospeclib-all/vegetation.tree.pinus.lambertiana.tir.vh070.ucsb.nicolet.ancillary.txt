@@ -1,0 +1,11 @@
+Name: Pinus lambertiana 3
+Type: vegetation
+Class: Tree
+Genus: Pinus
+Species: lambertiana
+Sample No.: VH070
+Owner: UCSB
+Chemistry: Nitrogen: 0.9%; Carbon: 46.13%; Cellulose: 19.57%; Lignin: 10.77%; Water Content:53.94%
+Biophysical Properties: Leaf Mass per Area: 373 g/m^2; Leaf Thickness: 0.59 mm
+Reference: Meerdink; Roberts; King; Roth; Dennison; Amaral; & Hook (2016). Linking seasonal foliar traits to VSWIR-TIR spectroscopy across California ecosystems. Remote Sensing of Environment; 186; 322-338.
+

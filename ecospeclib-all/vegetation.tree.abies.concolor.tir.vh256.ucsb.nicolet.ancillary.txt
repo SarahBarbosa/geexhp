@@ -1,0 +1,11 @@
+Name: Abies concolor 2
+Type: vegetation
+Class: Tree
+Genus: Abies
+Species: concolor
+Sample No.: VH256
+Owner: UCSB
+Chemistry: Nitrogen: 0.93%; Carbon: 49.59%; Cellulose: 14.5%; Lignin: 11.62%; Water Content:57.36%
+Biophysical Properties: Leaf Mass per Area: 308 g/m^2; Leaf Thickness: 0.39 mm
+Reference: Meerdink; Roberts; King; Roth; Dennison; Amaral; & Hook (2016). Linking seasonal foliar traits to VSWIR-TIR spectroscopy across California ecosystems. Remote Sensing of Environment; 186; 322-338.
+

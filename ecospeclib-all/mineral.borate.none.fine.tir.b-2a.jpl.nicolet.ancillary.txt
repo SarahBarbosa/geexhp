@@ -1,0 +1,17 @@
+Name: Kernite Na_2B_4O_6(OH)_2.3H_2O
+Type: Mineral
+Class: Borate
+Subclass: None
+Particle Size: Fine
+Sample No.: B-2A
+Owner: JPL
+Wavelength Range: TIR
+Origin: USA, California, Kern County, Boron
+Collection Date: N/A
+Description: Particle size was 0-45um.Collected by JPL Original ASTER Spectral Library name was jpl.nicolet.mineral.borate.none.fine.b02a.spectrum.txt
+Mineral:  Kernite Na_2B_4O_6(OH)_2.3H_2O
+
+File Name:  b02a.txt  
+
+XRD Analysis:  Kernite(A)  
+

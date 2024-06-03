@@ -1,0 +1,10 @@
+Name: Cassia leptophylla
+Type: vegetation
+Class: Tree
+Genus: Cassia
+Species: leptophylla
+Sample No.: JPL254
+Owner: JPL
+Chemistry: Water Content: 39.66%
+Biophysical Properties: 
+

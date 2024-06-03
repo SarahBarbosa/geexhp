@@ -1,0 +1,12 @@
+Name: Misc Leaf Litter
+Type: non photosynthetic vegetation
+Class: leaves
+Genus: none
+Species: none
+Sample No.: LL-2-89z
+Owner: UCSB
+Wavelength Range: Site 2 leaves; Sampled from under tower
+Origin: "Chris Still (PI) & Dar Roberts (Co-PI) processed by Susan Meerdink as part of NSF Macrosystem Biology proposal titled: ""Collaborative Research: Thermal controls on ecosystem metabolism and function: scaling from leaves to canopies to regions"""
+Collection Date: 
+Description: 
+

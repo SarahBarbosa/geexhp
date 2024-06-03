@@ -1,0 +1,29 @@
+Name: Rhyolite
+Type: Rock
+Class: Igneous
+Subclass: Felsic
+Particle Size: Solid
+Sample No.: AP-938-91
+Owner: United States Geological Survey, L. C. Rowan
+Wavelength Range: All
+Origin: Iberian Pyrite Belt, Spain
+Collection Date: N/A
+Description: Rhyolite, fresh, blue-graySample was Whole Rock Chips. Original ASTER Spectral Library name was usgs.perknic.rock.igneous.felsic.solid.rhy91.spectrum.txt
+Lithology      Rhyolite
+Sample#        AP-938-91
+Chemistry
+SiO2           76.90
+Al2O3          12.10
+Fe             2.00
+CaO            0.10
+TiO2           0.14
+MnO            0.02
+K2O            3.49
+MgO            0.40
+Na2O           3.67
+P2O5           0.02
+PPC            1.20
+X-Ray Diffraction
+               Quartz, Plagioclase
+               Mica
+               Chlorite

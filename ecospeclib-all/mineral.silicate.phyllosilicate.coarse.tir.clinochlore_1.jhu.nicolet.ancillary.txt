@@ -1,0 +1,34 @@
+Name: Clinochlore (Mg,Fe+2)5Al(Si3Al)O10(OH)8
+Type: Mineral
+Class: Silicate
+Subclass: Phyllosilicate
+Particle Size: Coarse
+Sample No.: clinochlore_1
+Owner: JHU
+Wavelength Range: TIR
+Origin: The Smithsonian (NMNH 83369), donated by Jim Crowley(USGS). Sample originally from Tilly Foster Mine, Brewster, New York.
+Collection Date: N/A
+Description: The sample was a green micaceous mass about 3 cm square. Particle size was 74-250 Micrometers.(sheet silicates) (Chlorite Group) Original ASTER Spectral Library name was jhu.nicolet.mineral.silicate.phyllosilicate.coarse.clinoc1.spectrum.txt
+Mineral:  Clinochlore (Mg,Fe+2)5Al(Si3Al)O10(OH)8
+
+Sample No.: clinochl.1
+
+XRD Analysis:  Pure magnesian clinochlore (Jim Crowley).
+
+Chemistry:  XRF analysis by J. Taggart, A. Bartel, and D. Siems, USGS 
+Branch of Geochemistry, Denver:
+
+SiO2	32.00
+Al2O3	16.00
+FeTO3	3.76
+MgO	33.90
+CaO 	0.09
+K2O 	0.07
+Na2O	<0.15
+K2O	0.07
+TiO2	<0.02
+MnO 	<0.02
+P2O5	<0.05
+LOI 900 C	13.60
+	_____
+Total	99.73

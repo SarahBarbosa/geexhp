@@ -1,0 +1,10 @@
+Name: Cedrus deodara
+Type: vegetation
+Class: Tree
+Genus: Cedrus
+Species: deodara
+Sample No.: JPL212
+Owner: JPL
+Chemistry: Water Content: 38.94%
+Biophysical Properties: 
+

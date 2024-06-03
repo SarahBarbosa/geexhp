@@ -1,0 +1,10 @@
+Name: Acer paxii
+Type: vegetation
+Class: Tree
+Genus: Acer
+Species: paxii
+Sample No.: JPL120
+Owner: JPL
+Chemistry: Water Content: 44.4%
+Biophysical Properties: 
+

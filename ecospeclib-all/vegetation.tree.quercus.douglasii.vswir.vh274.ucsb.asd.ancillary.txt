@@ -1,0 +1,11 @@
+Name: Quercus douglasii 2
+Type: vegetation
+Class: Tree
+Genus: Quercus
+Species: douglasii
+Sample No.: VH274
+Owner: UCSB
+Chemistry: Nitrogen: 1.43%; Carbon: 44.55%; Cellulose: 12.09%; Lignin: 5.51%; Water Content:29.75%
+Biophysical Properties: Leaf Mass per Area: 151 g/m^2; Leaf Thickness: 0.83 mm
+Reference: Meerdink; Roberts; King; Roth; Dennison; Amaral; & Hook (2016). Linking seasonal foliar traits to VSWIR-TIR spectroscopy across California ecosystems. Remote Sensing of Environment; 186; 322-338.
+

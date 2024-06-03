@@ -1,0 +1,16 @@
+Name: Light yellowish brown loam
+Type: soil
+Class: Aridisol
+Subclass: Calciorthid
+Particle Size: none
+Sample No.: 84P3721
+Owner: JHU
+Wavelength Range: All
+Origin: 1.5 km NE of Minkher Gharbi, Syria via USDA Soil Conservationservice.
+Collection Date: N/A
+Description:  The parent material is igneous-basaltic rock.  Physiography: level to undulating upland plains.  Light yellowish brown loam, (typic xerollic). Original ASTER Spectral Library name was jhu.becknic.soil.aridisol.calciorthid.coarse.84P3721.spectrum.txt
+Fine and medium subangular blocky structure parting to moderate medium 
+platy; hard, friable, sticky and plastic.  1.02% organic carbon, 18.1% clay, 
+70.7% silt, 11.2 % sand.
+
+Clay mineralogy: none, but chemical analysis gives 20% CaCO3.

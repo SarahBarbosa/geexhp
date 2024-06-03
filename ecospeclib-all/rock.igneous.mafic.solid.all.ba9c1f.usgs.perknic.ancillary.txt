@@ -1,0 +1,34 @@
+Name: Basalt
+Type: Rock
+Class: Igneous
+Subclass: Mafic
+Particle Size: Solid
+Sample No.: ba9c1f
+Owner: Larry Rowan, USGS
+Wavelength Range: All
+Origin: Wadi Salima, Jordan
+Collection Date: N/A
+Description:  dark gray vesicular basalt Sample was Whole rock chips. Original ASTER Spectral Library name was usgs.perknic.rock.igneous.mafic.solid.ba9c1f.spectrum.txt
+Rock Type:  Basalt
+
+Mineral:  
+
+Sample No.:  ba9c1f
+
+XRF Analysis in %
+
+Chemistry:
+
+Al        6.3
+Ca        6.7
+Fe        9.1
+K         1.3
+Mg        >5.0
+Na        3.3
+P         0.29
+Ti        1.7
+
+              
+            
+ 
+

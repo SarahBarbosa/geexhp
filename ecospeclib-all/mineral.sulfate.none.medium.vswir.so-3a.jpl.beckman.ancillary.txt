@@ -1,0 +1,16 @@
+Name: Barite BaSO_4
+Type: Mineral
+Class: Sulfate
+Subclass: None
+Particle Size: Medium
+Sample No.: SO-3A
+Owner: JPL
+Wavelength Range: VSWIR
+Origin: USA, South Carolina, Cherokee County, Kings Creek
+Collection Date: N/A
+Description: Particle size was 45-125um.Collected by Ward's Original ASTER Spectral Library name was jpl.beckman.mineral.sulfate.none.medium.so03a.spectrum.txt
+Mineral:  Barite BaSO_4
+
+File Name:  so03a.txt
+
+XRD Analysis:  Barite(A)

@@ -1,0 +1,10 @@
+Name: Calodendrum capense
+Type: vegetation
+Class: Tree
+Genus: Calodendrum
+Species: capense
+Sample No.: JPL193
+Owner: JPL
+Chemistry: Water Content: 30.64%
+Biophysical Properties: 
+

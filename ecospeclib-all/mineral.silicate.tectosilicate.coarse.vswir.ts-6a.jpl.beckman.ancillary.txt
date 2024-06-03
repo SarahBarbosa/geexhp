@@ -1,0 +1,16 @@
+Name: Albite (Feldspar) (K,Na)AlSi_3O_8
+Type: Mineral
+Class: Silicate
+Subclass: Tectosilicate
+Particle Size: Coarse
+Sample No.: TS-6A
+Owner: JPL
+Wavelength Range: VSWIR
+Origin: 
+Collection Date: N/A
+Description: Particle size was 125-500um.Collected by JPL Original ASTER Spectral Library name was jpl.beckman.mineral.silicate.tectosilicate.coarse.ts06a.spectrum.txt
+Mineral:  Albite (Feldspar) (K,Na)AlSi_3O_8
+
+File Name:  ts06a.txt
+
+XRD Analysis:  Albite(A)

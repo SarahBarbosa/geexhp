@@ -1,0 +1,10 @@
+Name: Cedrus atlantica 'glauca'
+Type: vegetation
+Class: Tree
+Genus: Cedrus
+Species: atlantica_glauca
+Sample No.: JPL177
+Owner: JPL
+Chemistry: Water Content: 37.26%
+Biophysical Properties: 
+

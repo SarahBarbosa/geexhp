@@ -1,0 +1,17 @@
+Name: Calcite CaCO_3
+Type: Mineral
+Class: Carbonate
+Subclass: None
+Particle Size: Coarse
+Sample No.: C-3E
+Owner: JPL
+Wavelength Range: VSWIR
+Origin: 
+Collection Date: N/A
+Description: Particle size was 125-500um.Collected by JPL Original ASTER Spectral Library name was jpl.beckman.mineral.carbonate.none.coarse.c03e.spectrum.txt
+Mineral:  Calcite CaCO_3
+
+File Name:  c03e.txt
+
+XRD Analysis:  Calcite(A)
+

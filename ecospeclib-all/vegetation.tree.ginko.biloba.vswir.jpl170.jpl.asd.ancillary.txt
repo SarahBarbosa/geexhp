@@ -1,0 +1,10 @@
+Name: Ginko biloba
+Type: vegetation
+Class: Tree
+Genus: Ginko
+Species: biloba
+Sample No.: JPL170
+Owner: JPL
+Chemistry: Water Content: 27.79%
+Biophysical Properties: 
+

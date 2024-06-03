@@ -1,0 +1,16 @@
+Name: Lepidolite K(Li,Al)3(Si,Al)_4O_10(F,OH)_2
+Type: Mineral
+Class: Silicate
+Subclass: Phyllosilicate
+Particle Size: Fine
+Sample No.: PS-13B
+Owner: JPL
+Wavelength Range: TIR
+Origin: South Africa
+Collection Date: N/A
+Description: Lavender lepidolite.Particle size was 0-45um.Collected by Ward's Original ASTER Spectral Library name was jpl.nicolet.mineral.silicate.phyllosilicate.fine.ps13b.spectrum.txt
+Mineral:  Lepidolite K(Li,Al)3(Si,Al)_4O_10(F,OH)_2
+
+File Name:  ps13b.txt
+
+XRD Analysis:  Lepidolite(A), Feldspar(M)

@@ -1,0 +1,36 @@
+Name: Almandine Fe3+2Al2(SiO4)3
+Type: Mineral
+Class: Silicate
+Subclass: Nesosilicate
+Particle Size: Solid
+Sample No.: almandine_1
+Owner: JHU
+Wavelength Range: TIR
+Origin: Sample from Stikine River, Fort Wrangell, Alaska, USA via theSmithsonian (sample no. NMNH 104490-7).
+Collection Date: N/A
+Description: The sample was a single deep maroon crystal about 2 cm in diameter with good crystal faces, except for one fractured edge.  Weight was 17 g.  A thin, soft, almost transparent film was buffed off crystal faces.  Microscopic examination showed contamination by about 1% opaques and 1% quartz. (Isolated Tetrahedra) (Garnet Group) Original ASTER Spectral Library name was jhu.nicolet.mineral.silicate.nesosilicate.solid.almand1.spectrum.txt
+Mineral:  Almandine Fe3+2Al2(SiO4)3
+
+File Name:  almand1a.txt
+
+XRD Analysis:  Almandine with quartz and a small amount of chlorite 
+according to XRD. Magnetic separation yielded a substantially quartz-
+free magnetic fraction, which was used for microprobe analysis and 
+spectra.
+
+Chemistry:  Microprobe analysis showed the sample to be 
+homogeneous within and between grains, with typical almandine 
+composition, accompanied by a minor amount of pyrope molecule.  
+Average of 10 analyses:
+
+SiO2 	38.50
+Al2O3	22.10
+FeO	32.20
+MgO	4.70
+CaO	1.77
+K2O	0.02
+Na2O	0.01
+TiO2	0.13
+Cr2O3	0.10
+	_____
+Total	99.53

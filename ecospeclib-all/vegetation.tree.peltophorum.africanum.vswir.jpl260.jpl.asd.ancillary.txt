@@ -1,0 +1,10 @@
+Name: Peltophorum africanum
+Type: vegetation
+Class: Tree
+Genus: Peltophorum
+Species: africanum
+Sample No.: JPL260
+Owner: JPL
+Chemistry: Water Content: 41.6%
+Biophysical Properties: 
+

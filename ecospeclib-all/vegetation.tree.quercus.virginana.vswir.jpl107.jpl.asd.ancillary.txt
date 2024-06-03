@@ -1,0 +1,10 @@
+Name: Quercus virginana
+Type: vegetation
+Class: Tree
+Genus: Quercus
+Species: virginana
+Sample No.: JPL107
+Owner: JPL
+Chemistry: Water Content: 48.57%
+Biophysical Properties: 
+

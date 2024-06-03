@@ -1,0 +1,22 @@
+Name: Brown gravelly sandy loam
+Type: soil
+Class: Aridisol
+Subclass: Haplargid
+Particle Size: none
+Sample No.: 89P1793
+Owner: JHU
+Wavelength Range: All
+Origin: Inyo Co., Ca., (Wild Horse Mesa) via USDA Soil Conservationservice.
+Collection Date: N/A
+Description:  The parent material is alluvium from fan terrace.  Brown gravelly sandy loam, (fine-loamy, mixed, mesic Xerollic). Original ASTER Spectral Library name was jhu.becknic.soil.aridisol.haplargid.coarse.89P1793.spectrum.txt
+Moderate medium and coarse platy structure, slightly hard, friable, slightly 
+sticky but non plastic; slightly effervescent and mildly alkaline (pH 7.2).  
+0.10% organic carbon, 3.2% clay, 15.5% silt, 81.3% sand.
+
+Clay mineralogy: (BTQ1 horizon, at 50 cm), medium mica peak, and small 
+peaks of kaolinite and montmorillonite.
+
+Coarse mineralogy: (same horizon as for clay analysis), 52% quartz, 17% 
+potassic feldspar, 16% other, 7% opaque, 3% biotite, 3% hornblende, 1% 
+goethite, 1% zircon, 1% plagioclase feldspar, and traces of plant opal, glass, 
+garnet.

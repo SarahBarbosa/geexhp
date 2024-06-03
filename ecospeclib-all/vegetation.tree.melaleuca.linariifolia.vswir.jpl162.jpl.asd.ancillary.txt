@@ -1,0 +1,10 @@
+Name: Melaleuca linariifolia
+Type: vegetation
+Class: Tree
+Genus: Melaleuca
+Species: linariifolia
+Sample No.: JPL162
+Owner: JPL
+Chemistry: Water Content: 33.27%
+Biophysical Properties: 
+

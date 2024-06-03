@@ -1,0 +1,17 @@
+Name: Halite NaCl
+Type: Mineral
+Class: Halide
+Subclass: None
+Particle Size: Coarse
+Sample No.: H-3A
+Owner: JPL
+Wavelength Range: VSWIR
+Origin: USA, Michigan, Wayne County, Detroit.
+Collection Date: N/A
+Description: Particle size was 125-500um.Collected by:  Ward's Original ASTER Spectral Library name was jpl.perkin.mineral.halide.none.coarse.h03a.spectrum.txt
+Mineral:  Halite NaCl
+
+File Name:  h03a.txt
+
+XRD Analysis:  Halite(A)
+

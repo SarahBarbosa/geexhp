@@ -1,0 +1,10 @@
+Name: Prunus serotina
+Type: Vegetation
+Class: Tree
+Genus: Prunus
+Species: serotina
+Sample No.: PRSE-2-65
+Owner: UCSB
+Sampling Notes: shade leaves
+Citation: "Chris Still (PI) & Dar Roberts (Co-PI) processed by Susan Meerdink as part of NSF Macrosystem Biology proposal titled: ""Collaborative Research: Thermal controls on ecosystem metabolism and function: scaling from leaves to canopies to regions"""
+

@@ -1,0 +1,17 @@
+Name: Rutile TiO_2
+Type: Mineral
+Class: Oxide
+Subclass: None
+Particle Size: Fine
+Sample No.: O-2A
+Owner: JPL
+Wavelength Range: TIR
+Origin: N/A
+Collection Date: N/A
+Description: Particle size was 0-45um.Collected by JPL Original ASTER Spectral Library name was jpl.nicolet.mineral.oxide.none.fine.o02a.spectrum.txt
+Mineral Name: Rutile TiO_2  
+
+File Name:  O02a.txt  
+
+XRD Analysis:  Rutile(A), Calcite(T), Feldspar(T)  
+

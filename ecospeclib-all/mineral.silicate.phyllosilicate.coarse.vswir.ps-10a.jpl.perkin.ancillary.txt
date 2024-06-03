@@ -1,0 +1,16 @@
+Name: Corrensite (Mg,Fe)_9(Si,Al)_8O_20(OH)_10._xH_2O
+Type: Mineral
+Class: Silicate
+Subclass: Phyllosilicate
+Particle Size: Coarse
+Sample No.: PS-10A
+Owner: JPL
+Wavelength Range: VSWIR
+Origin: USA, Washington, Packwood.
+Collection Date: N/A
+Description: Particle size was 125-500um.Collected by:  Clay Mineral Society Original ASTER Spectral Library name was jpl.perkin.mineral.silicate.phyllosilicate.coarse.ps10a.spectrum.txt
+Mineral:  Corrensite (Mg,Fe)_9(Si,Al)_8O_20(OH)_10._xH_2O
+
+File Name:  ps10a.txt
+
+XRD Analysis:  Quartz(A), Feldspar(A), Corrensite(M)

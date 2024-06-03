@@ -1,0 +1,16 @@
+Name: Realgar AsS
+Type: Mineral
+Class: Sulfide
+Subclass: None
+Particle Size: Medium
+Sample No.: S-3A
+Owner: JPL
+Wavelength Range: VSWIR
+Origin: 
+Collection Date: N/A
+Description: Particle size was 45-125um.Collected by JPL Original ASTER Spectral Library name was jpl.beckman.mineral.sulfide.none.medium.s03a.spectrum.txt
+Mineral:  Realgar AsS
+
+File Name:  s03a.txt
+
+XRD Analysis:  Realgar(A)

@@ -1,0 +1,11 @@
+Name: Ceanothus megacarpus 2
+Type: vegetation
+Class: Shrub
+Genus: Ceanothus
+Species: megacarpus
+Sample No.: VH213
+Owner: UCSB
+Chemistry: Nitrogen: 1.34%; Carbon: 41.04%; Cellulose: 6.56%; Lignin: 6.37%; Water Content:36.44%
+Biophysical Properties: Leaf Mass per Area: 23 g/m^2; Leaf Thickness: 0.63 mm
+Reference: Meerdink; Roberts; King; Roth; Dennison; Amaral; & Hook (2016). Linking seasonal foliar traits to VSWIR-TIR spectroscopy across California ecosystems. Remote Sensing of Environment; 186; 322-338.
+

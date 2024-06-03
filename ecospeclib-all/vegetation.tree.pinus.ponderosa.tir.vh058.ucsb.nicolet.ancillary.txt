@@ -1,0 +1,11 @@
+Name: Pinus ponderosa 1
+Type: vegetation
+Class: Tree
+Genus: Pinus
+Species: ponderosa
+Sample No.: VH058
+Owner: UCSB
+Chemistry: Nitrogen: 1.08%; Carbon: 50.1%; Cellulose: 20.56%; Lignin: 12.58%; Water Content:51.23%
+Biophysical Properties: Leaf Mass per Area: 589 g/m^2; Leaf Thickness: 0.71 mm
+Reference: Meerdink; Roberts; King; Roth; Dennison; Amaral; & Hook (2016). Linking seasonal foliar traits to VSWIR-TIR spectroscopy across California ecosystems. Remote Sensing of Environment; 186; 322-338.
+

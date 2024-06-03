@@ -1,0 +1,16 @@
+Name: Augite (Ca,Na)(Mg,Fe,Al,Ti)(Si,Al)_2O_6
+Type: Mineral
+Class: Silicate
+Subclass: Inosilicate
+Particle Size: Fine
+Sample No.: IN-15A
+Owner: JPL
+Wavelength Range: VSWIR
+Origin: USA
+Collection Date: N/A
+Description: Particle size was 0-45um.Collected by JPL Original ASTER Spectral Library name was jpl.beckman.mineral.silicate.inosilicate.fine.in15a.spectrum.txt
+Mineral:  Augite (Ca,Na)(Mg,Fe,Al,Ti)(Si,Al)_2O_6
+
+File Name:  in15a.txt
+
+XRD Analysis:  Augite(A)

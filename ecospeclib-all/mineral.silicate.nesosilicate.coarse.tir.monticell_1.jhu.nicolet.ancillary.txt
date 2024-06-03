@@ -1,0 +1,36 @@
+Name: Monticellite CaMgSiO4
+Type: Mineral
+Class: Silicate
+Subclass: Nesosilicate
+Particle Size: Coarse
+Sample No.: monticell_1
+Owner: JHU
+Wavelength Range: TIR
+Origin: Magnet Cove, Arkansas via the Smithsonian (NMNH 79051-1)
+Collection Date: N/A
+Description: The sample was composed of one large fragment and two smaller ones, all from the same crystal.  The large fragment was 1 cm in diameter and 2.5 cm long, with the other pieces half as large.  Total weight was 7.5 g.  The sample was tan in color, with abundant (10-20%) calcite. Petrographic examination showed minor (<1%) alteration to green antigorite and a few opaque grains. Particle size was 75-250 micrometers. (Isolated tetrahedra); (OlivineGroup) Original ASTER Spectral Library name was jhu.nicolet.mineral.silicate.nesosilicate.coarse.montic1.spectrum.txt
+Mineral:  Monticellite CaMgSiO4
+
+Sample No.: minticell.1
+
+XRD Analysis:  After treatment with sodium acetate solution to 
+remove calcite, XRD showed the sample to be pure monticellite.  An 
+extremely weak calcite band in the infrared spectra shows that a 
+very minor amount of calcite remains.
+
+Chemistry:  Microprobe analysis indicated homogeneity within and 
+between grains.  There is a small amount of substitution of Mg by Fe, 
+resulting in departure from the ideal formula.  Average of ten 
+analyses:
+
+SiO2	37.26
+Al2O3	0.01
+FeO	5.14
+MgO	21.69
+CaO	34.94
+K2O	0.02
+Na2O	0.02
+TiO2	0.03
+Cr2O3	0.04
+	_____
+Total	99.15

@@ -1,0 +1,16 @@
+Name: Chabazite CaAl_2Si_4O_12.6H_2O
+Type: Mineral
+Class: Silicate
+Subclass: Tectosilicate
+Particle Size: Fine
+Sample No.: TS-15A
+Owner: JPL
+Wavelength Range: VSWIR
+Origin: USA, Oregon, Grant County, Ritter Hot Springs
+Collection Date: N/A
+Description: Particle size was 0-45um.Collected by Burminco Original ASTER Spectral Library name was jpl.beckman.mineral.silicate.tectosilicate.fine.ts15a.spectrum.txt
+Mineral:  Chabazite CaAl_2Si_4O_12.6H_2O
+
+File Name:  ts15a.txt
+
+XRD Analysis:  Chabazite(A)

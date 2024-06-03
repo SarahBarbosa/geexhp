@@ -1,0 +1,10 @@
+Name: Eucalyptus saligna
+Type: vegetation
+Class: Tree
+Genus: Eucalyptus
+Species: saligna
+Sample No.: JPL224
+Owner: JPL
+Chemistry: Water Content: 40.53%
+Biophysical Properties: 
+

@@ -1,0 +1,10 @@
+Name: Podocarpus gracilior
+Type: vegetation
+Class: Tree
+Genus: Podocarpus
+Species: gracilior
+Sample No.: JPL155
+Owner: JPL
+Chemistry: Water Content: 32.77%
+Biophysical Properties: 
+

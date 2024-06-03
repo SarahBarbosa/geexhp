@@ -1,0 +1,19 @@
+Name: Chlorite
+Type: Mineral
+Class: Silicate
+Subclass: Phyllosilicate
+Particle Size: Medium
+Sample No.: PS-12F
+Owner: JPL
+Wavelength Range: TIR
+Origin: USA, New Mexico
+Collection Date: N/A
+Description: Particle size was 45-125um.Collected by Ward's Original ASTER Spectral Library name was jpl.nicolet.mineral.silicate.phyllosilicate.medium.ps12f.spectrum.txt
+Mineral:  Chlorite (Mg,Al)_6(Si,Al)_4O_10(OH)_8
+
+File Name:  ps12f.txt
+
+XRD Analysis:  Chlorite(A)
+
+Chemical Analysis:
+from electron microprobe (Mg_1.11Fe_3.22Mn_0.08Ti_0.01Al_1.49)(Si_2.68Al_1.32)O_10(OH)_8

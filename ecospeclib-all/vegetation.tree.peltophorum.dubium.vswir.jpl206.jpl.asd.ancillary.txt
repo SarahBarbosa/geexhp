@@ -1,0 +1,10 @@
+Name: Peltophorum dubium
+Type: vegetation
+Class: Tree
+Genus: Peltophorum
+Species: dubium
+Sample No.: JPL206
+Owner: JPL
+Chemistry: Water Content: 41.9%
+Biophysical Properties: 
+

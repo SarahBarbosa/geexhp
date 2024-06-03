@@ -1,0 +1,16 @@
+Name: Amblygonite (Li,Na)Al(PO_4)(F,OH)
+Type: Mineral
+Class: Phosphate
+Subclass: None
+Particle Size: Fine
+Sample No.: P-3A
+Owner: JPL
+Wavelength Range: VSWIR
+Origin: USA, California, San Diego County, Pala.
+Collection Date: N/A
+Description: Particle size was 0-45um. Collected by:  Burminco Original ASTER Spectral Library name was jpl.perkin.mineral.phosphate.none.fine.p03a.spectrum.txt
+Mineral:  Amblygonite (Li,Na)Al(PO_4)(F,OH)
+
+File Name:  p03a.txt
+
+XRD Analysis:  Amblygonite(A)

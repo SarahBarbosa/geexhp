@@ -1,0 +1,16 @@
+Name: Kaolinite Al_2Si_2O_5(OH)_4
+Type: Mineral
+Class: Silicate
+Subclass: Phyllosilicate
+Particle Size: Fine
+Sample No.: PS-1A
+Owner: JPL
+Wavelength Range: VSWIR
+Origin: USA, Georgia, Washington County
+Collection Date: N/A
+Description: Well-ordered Kaolinite. Particle size was 0-45um.Collected by Clay Mineral Society Original ASTER Spectral Library name was jpl.beckman.mineral.silicate.phyllosilicate.fine.ps01a.spectrum.txt
+Mineral:  Kaolinite Al_2Si_2O_5(OH)_4
+
+File Name:  ps01a.txt
+
+XRD Analysis:  Kaolinite(A)

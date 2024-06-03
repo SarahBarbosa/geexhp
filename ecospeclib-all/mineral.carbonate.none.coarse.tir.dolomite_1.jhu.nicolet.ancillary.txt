@@ -1,0 +1,23 @@
+Name: Dolomite CaMg(CO3)2
+Type: Mineral
+Class: Carbonate
+Subclass: None
+Particle Size: Coarse
+Sample No.: dolomite_1
+Owner: JHU
+Wavelength Range: TIR
+Origin: Sample from Oberdorf, Styria, Austria via the Smithsonian(sample no. NMNH R12596).  
+Collection Date: N/A
+Description:  The sample was a single white crystal, 3 cm x 2 cm x 2 cm and 29 g, showing good cleavage.  No impurities or alteration were visible in hand sample.  Under the microscope it appears very pure and unaltered.Particle size was 74-250 Micrometers. Original ASTER Spectral Library name was jhu.nicolet.mineral.carbonate.none.coarse.dolomi1.spectrum.txt
+Mineral:  Dolomite CaMg(CO3)2
+
+Sample No.: dolomite.1
+
+XRD Analysis:  XRD shows small peaks at 9.4 and 3.11 angstroms,  
+indicating the presence of a very small amount of talc (not seen in IR 
+spectrum).
+
+Chemistry:  Microprobe analysis of 6 grains showed homogeneous 
+grain composition, a Ca/Mg ratio of 53.47/46.50, and only a trace of 
+iron.  The analysis technique was not appropriate for CO3, but the 
+cation abundances indicate a good dolomite.
