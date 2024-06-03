@@ -8,5 +8,5 @@ setup(name="geexhp",
       author_email="sarahg.aroucha@gmail.com",
       packages=["geexhp"], 
       install_requires=["numpy", "matplotlib", "pandas", "msgpack", "astropy", "fastparquet", 
-                        "PyQt5", "tqdm"],
+                        "PyQt5", "tqdm", "tensorflow", "scikit-learn"],
       zip_safe = False)
