@@ -1,0 +1,11 @@
+Name: Quercus lobata 1
+Type: vegetation
+Class: Tree
+Genus: Quercus
+Species: lobata
+Sample No.: VH181
+Owner: UCSB
+Chemistry: Nitrogen: 2.19%; Carbon: 45.76%; Cellulose: 12.22%; Lignin: 8.52%; Water Content:53.52%
+Biophysical Properties: Leaf Mass per Area: 125 g/m^2; Leaf Thickness: 0.24 mm
+Reference: Meerdink; Roberts; King; Roth; Dennison; Amaral; & Hook (2016). Linking seasonal foliar traits to VSWIR-TIR spectroscopy across California ecosystems. Remote Sensing of Environment; 186; 322-338.
+

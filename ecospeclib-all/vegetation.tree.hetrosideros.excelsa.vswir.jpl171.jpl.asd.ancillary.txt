@@ -1,0 +1,10 @@
+Name: Hetrosideros excelsa
+Type: vegetation
+Class: Tree
+Genus: Hetrosideros
+Species: excelsa
+Sample No.: JPL171
+Owner: JPL
+Chemistry: Water Content: 41.62%
+Biophysical Properties: 
+

@@ -1,0 +1,16 @@
+Name: Cummingtonite (Mg,Fe^2+)_7Si_8O_22(OH)_2
+Type: Mineral
+Class: Silicate
+Subclass: Inosilicate
+Particle Size: Fine
+Sample No.: IN-6A
+Owner: JPL
+Wavelength Range: TIR
+Origin: USA, South Dakota
+Collection Date: N/A
+Description: Particle size was 0-45um.Collected by Ward's Original ASTER Spectral Library name was jpl.nicolet.mineral.silicate.inosilicate.fine.in06a.spectrum.txt
+Mineral:  Cummingtonite (Mg,Fe^2+)_7Si_8O_22(OH)_2
+
+File Name:  in06a.txt
+
+XRD Analysis:  Cummingtonite(A), Mica(M), Feldspar(M), Chlorite(M)

@@ -1,0 +1,16 @@
+Name: Buddingtonite (Feldspar) (NH_4)AlSi_3O_8.0.5H_2O
+Type: Mineral
+Class: Silicate
+Subclass: Tectosilicate
+Particle Size: Medium
+Sample No.: TS-11A
+Owner: JPL
+Wavelength Range: VSWIR
+Origin: USA, California, Lake County, Sulfur Bank
+Collection Date: N/A
+Description: Particle size was 45-125um.Collected by Krohn, Dennis Original ASTER Spectral Library name was jpl.beckman.mineral.silicate.tectosilicate.medium.ts11a.spectrum.txt
+Mineral:  Buddingtonite (Feldspar) (NH_4)AlSi_3O_8.0.5H_2O
+
+File Name:  ts11a.txt
+
+XRD Analysis:  Buddingtonite(A), Illite/Smectite clay(A)

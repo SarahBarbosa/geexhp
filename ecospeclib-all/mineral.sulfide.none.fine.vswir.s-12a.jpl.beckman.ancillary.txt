@@ -1,0 +1,16 @@
+Name: Pyrrhotite Fe_1-xS
+Type: Mineral
+Class: Sulfide
+Subclass: None
+Particle Size: Fine
+Sample No.: S-12A
+Owner: JPL
+Wavelength Range: VSWIR
+Origin: Mexico, Chihuahua, Santa Eulalia
+Collection Date: N/A
+Description: Particle size was 0-45um.Collected by JPL Original ASTER Spectral Library name was jpl.beckman.mineral.sulfide.none.fine.s12a.spectrum.txt
+Mineral:  Pyrrhotite Fe_1-xS
+
+File Name:  s12a.txt
+
+XRD Analysis:  Pyrrhotite(A), Pyrite(T)

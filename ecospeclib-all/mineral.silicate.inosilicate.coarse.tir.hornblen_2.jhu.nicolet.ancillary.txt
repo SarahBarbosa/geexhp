@@ -1,0 +1,35 @@
+Name: Hornblende Ca2(Fe2+,Mg)4Al(Si7,Al)O22(OH,F)2
+Type: Mineral
+Class: Silicate
+Subclass: Inosilicate
+Particle Size: Coarse
+Sample No.: hornblen_2
+Owner: JHU
+Wavelength Range: TIR
+Origin: Kragero, Norway via the Smithsonian (sample no. NMNH117329). 
+Collection Date: N/A
+Description: Sample was a fragment of a black crystal, contaminated on one end with a clay coating and surficial quartz crystals; this surficial contamination was scraped off. There appeared to be a small amount of internal contamination by a fibrous mineral. Very few grains showed mild alteration; there was about 1% contamination by a low refractive index mineral with low birefringence.  Particle size was 74-250 micrometers.(Amphibole Group) Original ASTER Spectral Library name was jhu.nicolet.mineral.silicate.inosilicate.coarse.hornbl2.spectrum.txt
+Mineral:  Hornblende Ca2(Fe2+,Mg)4Al(Si7,Al)O22(OH,F)2
+
+Sample No.: hornblen.2
+
+XRD Analysis:  Pure magnesiohornblende.
+
+Chemistry:  Microprobe analysis showed that the grains selected 
+were homogeneous within and between grains.  The relatively high 
+soda shows some solid solution towards edenite.  
+
+Average of 12 analyses:
+
+SiO2 	50.66
+Al203	5.45
+FeO	7.73
+MgO	19.33
+CaO	10.84
+K2O	0.30
+Na2O	2.40
+TiO2	1.28
+MnO	0.07
+	_____
+Total	*98.06
+	*OH and F not measured.

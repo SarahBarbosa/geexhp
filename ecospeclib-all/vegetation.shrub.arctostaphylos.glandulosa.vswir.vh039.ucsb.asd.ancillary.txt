@@ -1,0 +1,11 @@
+Name: Arctostaphylos glandulosa 3
+Type: vegetation
+Class: Shrub
+Genus: Arctostaphylos
+Species: glandulosa
+Sample No.: VH039
+Owner: UCSB
+Chemistry: Nitrogen: 0.59%; Carbon: 49.35%; Cellulose: 7.24%; Lignin: 10.48%; Water Content:46.67%
+Biophysical Properties: Leaf Mass per Area: 384 g/m^2; Leaf Thickness: 0.56 mm
+Reference: Meerdink; Roberts; King; Roth; Dennison; Amaral; & Hook (2016). Linking seasonal foliar traits to VSWIR-TIR spectroscopy across California ecosystems. Remote Sensing of Environment; 186; 322-338.
+

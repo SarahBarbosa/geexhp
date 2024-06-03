@@ -1,0 +1,17 @@
+Name: Fluorite CaF_2
+Type: Mineral
+Class: Halide
+Subclass: None
+Particle Size: Coarse
+Sample No.: H-2B
+Owner: JPL
+Wavelength Range: VSWIR
+Origin: United Kingdom, England, Durham County, Weardal
+Collection Date: N/A
+Description: Particle size was 125-500um.Collected by Ward's Original ASTER Spectral Library name was jpl.beckman.mineral.halide.none.coarse.h02b.spectrum.txt
+Mineral:  Fluorite CaF_2
+
+File Name:  h02b.txt
+
+XRD Analysis:  Fluorite(A)
+

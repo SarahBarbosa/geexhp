@@ -1,0 +1,30 @@
+Name: Quartzite
+Type: Rock
+Class: Metamorphic
+Subclass: Quartzite
+Particle Size: Solid
+Sample No.: AP-958-111
+Owner: United States Geological Survey, L. C. Rowan
+Wavelength Range: All
+Origin: Iberian Pyrite Belt, Spain
+Collection Date: N/A
+Description: Quartzite, light gray, silicifiedSample was Whole Rock Chips. Original ASTER Spectral Library name was usgs.perknic.rock.metamorphic.quartzite.solid.qua111.spectrum.txt
+Lithology      Quartzite
+Sample#        AP-958-111
+Chemistry
+SiO2           95.66
+Al2O3          2.12
+Fe             0.86
+CaO            0.01
+TiO2           0.25
+MnO            0.00
+K2O            0.28
+MgO            0.06
+Na2O           0.14
+P2O5           0.02
+PPC            0.60
+X-Ray Diffraction
+               Quartz
+               Potassium Feldspar
+               Mica, Kaolinite
+               Chlorite

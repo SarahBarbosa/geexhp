@@ -1,0 +1,34 @@
+Name: Diopside CaMgSi2O6
+Type: Mineral
+Class: Silicate
+Subclass: Inosilicate
+Particle Size: Fine
+Sample No.: diopside_2
+Owner: JHU
+Wavelength Range: TIR
+Origin: Sample from DeKalb, New York via the Smithsonian (sampleno. NMNH R18685). 
+Collection Date: N/A
+Description:  Most of the 13 mm x 10 mm x 6 mm sample was clean, fresh and green.  One area was eroded and weathered and probably impure.  The crushed sample was hand-picked to avoid impurities.  A moderate amount of weathering and alteration can be seen under the microscope.  The alteration is brown in color (limonite). Particle size was less than 2 Micrometers.(Chain Silicates) (Pyroxene Group) Original ASTER Spectral Library name was jhu.nicolet.mineral.silicate.inosilicate.powder.diopsi2.spectrum.txt
+Mineral:  Diopside CaMgSi2O6
+
+Sample No.: diopside.2
+
+XRD Analysis:  Diopside plus a trace of quartz.  (Spectra show no 
+quartz bands, but do show weak water and hydroxyl bands).
+
+Chemistry:  Microprobe analysis showed the sample to be 
+homogeneous within and between the grains examined.  An average 
+of 12 analyses indicates that this sample is close to end member 
+composition:
+
+SiO2 	54.77
+Al2O3	0.49
+FeO 	 0.87
+MgO	18.26
+CaO	25.60
+K2O	0.01
+Na2O	0.39
+TiO2 	0.05
+MnO 	0.06
+	_____
+Total 	100.49

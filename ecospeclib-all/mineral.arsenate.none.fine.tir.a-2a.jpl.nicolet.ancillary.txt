@@ -1,0 +1,16 @@
+Name: Scorodite Fe^3+AsO_4.2H_2O
+Type: Mineral
+Class: Arsenate
+Subclass: None
+Particle Size: Fine
+Sample No.: A-2A
+Owner: JPL
+Wavelength Range: TIR
+Origin: USA, Utah, Tooele County, Gold Hill
+Collection Date: N/A
+Description: Particle size was 0-45um.Collected by Ward's Original ASTER Spectral Library name was jpl.nicolet.mineral.arsenate.none.fine.a02a.spectrum.txt
+Mineral:  Scorodite Fe^3+AsO_4.2H_2O
+
+File Name:  a02a.txt
+
+XRD Analysis:  Scorodite(A)

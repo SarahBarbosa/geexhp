@@ -1,0 +1,41 @@
+Name: Hedenbergite CaFe+2Si2O6
+Type: Mineral
+Class: Silicate
+Subclass: Inosilicate
+Particle Size: Fine
+Sample No.: hedenber_1
+Owner: JHU
+Wavelength Range: TIR
+Origin: Eureka Mine, 2nd Level, Sub-level 1, 135 N, 645E, Ducktown,Tennesse, via the Smithsonian (sample no. NMNH 119197)
+Collection Date: N/A
+Description: The sample was made up of three large pieces and three small fragments, weighing altogether about 28 g.  All pieces are deep green and parts of single crystals.  They display a very small amount of veining.  Surfaces of the pieces have a veneer of contamination Ñprobably the same as the veining.  There is also an extremely small amount of sulphide contamination. Particle size was less than 2 Micrometers. (Single chain Pyroxene Group) Original ASTER Spectral Library name was jhu.nicolet.mineral.silicate.inosilicate.powder.hedenb1.spectrum.txt
+Mineral:  Hedenbergite CaFe+2Si2O6
+
+Sample No.: hedenber.1
+
+Under the microscope this appears to be largely pure hedenbergite 
+with a rather small (<1%) degree of alteration.  A few large, high-
+birefringent carbonate (?) grains are present.
+
+XRD Analysis:  XRD indicates pure hedenbergite, with no sign of 
+exsolved orthopyroxene or carbonate.  (The carbonate does show up, 
+however, in the infrared spectrum, especially of the finest particle-
+size range, showing the infrared more sensitive than XRD for 
+detection of carbonate).
+
+Chemistry:  Microprobe analysis showed slight heterogeneity within 
+and between grains Ñi.e., alumina varies between 0.5 and 1.5% with 
+no concomitant variation of the other oxides measured. Average of 9 
+analyses:
+
+SiO2	53.36
+Al2O3	0.87
+FeO	6.45
+MgO	14.35
+CaO	24.53
+K2O	0.03
+Na2O	0.48
+TiO2	0.04
+MnO	0.73
+	_____
+Total 	100.84

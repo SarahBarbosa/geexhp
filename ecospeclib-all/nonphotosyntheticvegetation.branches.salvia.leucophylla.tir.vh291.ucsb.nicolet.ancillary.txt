@@ -1,0 +1,11 @@
+Name: Salvia leucophylla 2
+Type: non photosynthetic vegetation
+Class: branches
+Genus: Salvia
+Species: leucophylla
+Sample No.: VH291
+Owner: UCSB
+Chemistry: Cellulose: 39.36%; Lignin: 12.9%; Water Content:11.33%
+Biophysical Properties: 
+Reference: Meerdink; Roberts; King; Roth; Dennison; Amaral; & Hook (2016). Linking seasonal foliar traits to VSWIR-TIR spectroscopy across California ecosystems. Remote Sensing of Environment; 186; 322-338.
+

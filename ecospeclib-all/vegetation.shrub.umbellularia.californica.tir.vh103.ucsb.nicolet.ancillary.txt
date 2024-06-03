@@ -1,0 +1,11 @@
+Name: Umbellularia californica 1
+Type: vegetation
+Class: Shrub
+Genus: Umbellularia
+Species: californica
+Sample No.: VH103
+Owner: UCSB
+Chemistry: Nitrogen: 1.06%; Carbon: 49.54%; Cellulose: 11.47%; Lignin: 11.08%; Water Content:52.01%
+Biophysical Properties: Leaf Mass per Area: 15 g/m^2; Leaf Thickness: 0.23 mm
+Reference: Meerdink; Roberts; King; Roth; Dennison; Amaral; & Hook (2016). Linking seasonal foliar traits to VSWIR-TIR spectroscopy across California ecosystems. Remote Sensing of Environment; 186; 322-338.
+

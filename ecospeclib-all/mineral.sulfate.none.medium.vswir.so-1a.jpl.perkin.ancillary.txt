@@ -1,0 +1,16 @@
+Name: Anhydrite CaSO_4
+Type: Mineral
+Class: Sulfate
+Subclass: None
+Particle Size: Medium
+Sample No.: SO-1A
+Owner: JPL
+Wavelength Range: VSWIR
+Origin: Canada, Nova Scotia.
+Collection Date: N/A
+Description: Particle size was 45-125um. Collected by:  Ward's Original ASTER Spectral Library name was jpl.perkin.mineral.sulfate.none.medium.so01a.spectrum.txt
+Mineral:  Anhydrite CaSO_4
+
+File Name:  so01a.txt
+
+XRD Analysis:  Anhydrite(A), Gypsum(M)

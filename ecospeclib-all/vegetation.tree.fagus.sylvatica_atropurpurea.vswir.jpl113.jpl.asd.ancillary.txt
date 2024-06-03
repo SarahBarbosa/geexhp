@@ -1,0 +1,10 @@
+Name: Fagus sylvatica 'atropurpurea'
+Type: vegetation
+Class: Tree
+Genus: Fagus
+Species: sylvatica_atropurpurea
+Sample No.: JPL113
+Owner: JPL
+Chemistry: Water Content: 42.66%
+Biophysical Properties: 
+

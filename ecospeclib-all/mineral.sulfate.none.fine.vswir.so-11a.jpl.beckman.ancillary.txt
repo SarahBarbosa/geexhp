@@ -1,0 +1,16 @@
+Name: Antlerite Cu_3(SO_4)(OH)_4
+Type: Mineral
+Class: Sulfate
+Subclass: None
+Particle Size: Fine
+Sample No.: SO-11A
+Owner: JPL
+Wavelength Range: VSWIR
+Origin: USA, Arizona, Greenlee County, Morenci
+Collection Date: N/A
+Description: Particle size was 0-45um.Collected by Burminco Original ASTER Spectral Library name was jpl.beckman.mineral.sulfate.none.fine.so11a.spectrum.txt
+Mineral:  Antlerite Cu_3(SO_4)(OH)_4
+
+File Name:  so11a.txt
+
+XRD Analysis:  Antlerite(A), Quartz(M), possible Chrysocolla(T)

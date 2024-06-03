@@ -1,0 +1,17 @@
+Name: Calcite CaCO_3
+Type: Mineral
+Class: Carbonate
+Subclass: None
+Particle Size: Fine
+Sample No.: C-3A
+Owner: JPL
+Wavelength Range: VSWIR
+Origin: Italy
+Collection Date: N/A
+Description: Travertine. Particle size was 0-45um.Collected by Ward's Original ASTER Spectral Library name was jpl.beckman.mineral.carbonate.none.fine.c03a.spectrum.txt
+Mineral:  Calcite CaCO_3  
+
+File Name:  c03a.txt  
+
+XRD Analysis:  Calcite(A)  
+

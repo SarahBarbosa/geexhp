@@ -1,0 +1,11 @@
+Name: Ceanothus spinosus 2
+Type: vegetation
+Class: Shrub
+Genus: Ceanothus
+Species: spinosus
+Sample No.: VH129
+Owner: UCSB
+Chemistry: Nitrogen: 1.5%; Carbon: 47.92%; Cellulose: 4.43%; Lignin: 3.19%; Water Content:51.16%
+Biophysical Properties: Leaf Mass per Area: 132 g/m^2; Leaf Thickness: 0.28 mm
+Reference: Meerdink; Roberts; King; Roth; Dennison; Amaral; & Hook (2016). Linking seasonal foliar traits to VSWIR-TIR spectroscopy across California ecosystems. Remote Sensing of Environment; 186; 322-338.
+

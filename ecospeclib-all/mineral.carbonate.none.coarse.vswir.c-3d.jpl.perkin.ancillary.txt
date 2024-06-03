@@ -1,0 +1,17 @@
+Name: Calcite CaCO_3
+Type: Mineral
+Class: Carbonate
+Subclass: None
+Particle Size: Coarse
+Sample No.: C-3D
+Owner: JPL
+Wavelength Range: VSWIR
+Origin: United Kingdom, England.
+Collection Date: N/A
+Description: Particle size was 125-500um.Collected by:  Ward's Original ASTER Spectral Library name was jpl.perkin.mineral.carbonate.none.coarse.c03d.spectrum.txt
+Mineral:  Calcite CaCO_3
+
+File Name:  c03d.txt
+
+XRD Analysis:  Calcite(A)
+

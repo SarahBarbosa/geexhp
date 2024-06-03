@@ -1,0 +1,11 @@
+Name: Calocedrus decrruens 2
+Type: vegetation
+Class: Tree
+Genus: Calocedrus
+Species: decurrens
+Sample No.: VH152
+Owner: UCSB
+Chemistry: Nitrogen: 1.14%; Carbon: 49.67%; Cellulose: 14.82%; Lignin: 13.31%; Water Content:56.07%
+Biophysical Properties: Leaf Mass per Area: 206 g/m^2; Leaf Thickness: 0.43 mm
+Reference: Meerdink; Roberts; King; Roth; Dennison; Amaral; & Hook (2016). Linking seasonal foliar traits to VSWIR-TIR spectroscopy across California ecosystems. Remote Sensing of Environment; 186; 322-338.
+

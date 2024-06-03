@@ -1,0 +1,16 @@
+Name: Serpentine (Mg,Fe^2+,Ni)Si_2O_5(OH)_4
+Type: Mineral
+Class: Silicate
+Subclass: Phyllosilicate
+Particle Size: Coarse
+Sample No.: PS-20A
+Owner: JPL
+Wavelength Range: VSWIR
+Origin: USA, New York.
+Collection Date: N/A
+Description: Particle size was 125-500um.Collected by:  Ward's Original ASTER Spectral Library name was jpl.perkin.mineral.silicate.phyllosilicate.coarse.ps20a.spectrum.txt
+Mineral:  Serpentine (Mg,Fe^2+,Ni)Si_2O_5(OH)_4
+
+File Name:  ps20a.txt
+
+XRD Analysis:  Serpentine(A), Talc(T)

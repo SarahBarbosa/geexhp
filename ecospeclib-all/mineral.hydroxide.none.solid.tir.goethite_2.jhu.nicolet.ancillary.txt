@@ -1,0 +1,40 @@
+Name: Goethite a-Fe+3O(OH)
+Type: Mineral
+Class: Hydroxide
+Subclass: None
+Particle Size: Solid
+Sample No.: goethite_2
+Owner: JHU
+Wavelength Range: TIR
+Origin: Sample from Calavi, Bolivia via the Smithsonian (sample no.NMNH C5055) 
+Collection Date: N/A
+Description: The sample was a 2 cm x 2 cm x 2 cm layered botryoidal fragment weighing 14.5 g.  Its surface was glossy black, with interior layers various shades of yellow-brown.  No impurities were noted in hand sample or microscopically. Sample was surface normal to layering.(Goethite Group) Original ASTER Spectral Library name was jhu.nicolet.mineral.hydroxide.none.solid.goethi2.spectrum.txt
+Mineral:  Goethite a-Fe+3O(OH)
+
+Sample No.: goethite.2
+
+XRD Analysis:  Goethite and other (unidentified) contaminant.  
+Sample was purified by magnetic separation.
+
+Chemistry:  Ten microprobe analyses were homogeneous.  The 
+amount of iron oxide is low for  goethite (typically 82-89%).  The 
+sample probably contains elements which were not analyzed, 
+accounting for the low total.  The most likely material present in a 
+massive, layered sample such as this is manganite, which might well 
+account for the additional overtone bands seen near 7.5 micrometers. 
+However, the difference in grain shape may also produce a 
+significant spectral effect in oxides.  In addition, the analysis clearly 
+shows that the sample contains at least a small silicate 
+contamination. Such a slightly impure composition is typical for 
+goethites, so the sample was retained.
+
+SiO2 	3.39
+Al2O3	0.01
+Fe2O3	75.7
+MgO	0.07
+CaO	0.07
+K2O	0.02
+TiO2	0.09
+H2O	12.9
+	_____
+Total 	92.25

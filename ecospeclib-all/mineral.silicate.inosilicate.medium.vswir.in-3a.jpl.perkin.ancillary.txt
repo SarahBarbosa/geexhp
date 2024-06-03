@@ -1,0 +1,16 @@
+Name: Glaucophane Na_2(Mg,Fe^2+)_3Al_2Si_8O_22(OH)_2
+Type: Mineral
+Class: Silicate
+Subclass: Inosilicate
+Particle Size: Medium
+Sample No.: IN-3A
+Owner: JPL
+Wavelength Range: VSWIR
+Origin: USA, California.
+Collection Date: N/A
+Description: Particle size was 45-125um.Collected by:  Ward's Original ASTER Spectral Library name was jpl.perkin.mineral.silicate.inosilicate.medium.in03a.spectrum.txt
+Mineral: Glaucophane Na_2(Mg,Fe^2+)_3Al_2Si_8O_22(OH)_2
+
+File Name:  in03a.txt
+
+XRD Analysis:  Glaucophane(A), Chlorite(M)

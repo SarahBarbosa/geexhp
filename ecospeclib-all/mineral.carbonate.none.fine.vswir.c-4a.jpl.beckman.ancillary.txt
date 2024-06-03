@@ -1,0 +1,17 @@
+Name: Trona Na_3(CO_3)(HCO_3).2H_2O
+Type: Mineral
+Class: Carbonate
+Subclass: None
+Particle Size: Fine
+Sample No.: C-4A
+Owner: JPL
+Wavelength Range: VSWIR
+Origin: USA, Wyoming, Sweetwater County
+Collection Date: N/A
+Description: Particle size was 0-45um.Collected by Ward's Original ASTER Spectral Library name was jpl.beckman.mineral.carbonate.none.fine.c04a.spectrum.txt
+Mineral:  Trona Na_3(CO_3)(HCO_3).2H_2O  
+
+File Name:  c04a.txt
+
+XRD Analysis:  Trona(A)
+

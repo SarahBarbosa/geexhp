@@ -1,0 +1,16 @@
+Name: Sphalerite (Zn,Fe)S
+Type: Mineral
+Class: Sulfide
+Subclass: None
+Particle Size: Fine
+Sample No.: S-1A
+Owner: JPL
+Wavelength Range: VSWIR
+Origin: USA, Oklahoma, Ottawa County, Picher
+Collection Date: N/A
+Description: Particle size was 0-45um.Collected by JPL Original ASTER Spectral Library name was jpl.beckman.mineral.sulfide.none.fine.s01a.spectrum.txt
+Mineral:  Sphalerite (Zn,Fe)S  
+
+File Name: s01a.txt
+
+XRD Analysis:  Sphalerite(A), Wurtzite(M)

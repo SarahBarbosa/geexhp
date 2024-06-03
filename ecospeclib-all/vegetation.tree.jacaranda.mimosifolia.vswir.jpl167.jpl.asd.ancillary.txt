@@ -1,0 +1,10 @@
+Name: Jacaranda mimosifolia
+Type: vegetation
+Class: Tree
+Genus: Jacaranda
+Species: mimosifolia
+Sample No.: JPL167
+Owner: JPL
+Chemistry: Water Content: 38.44%
+Biophysical Properties: 
+

@@ -1,0 +1,16 @@
+Name: Nepheline (Na,K)AlSiO_4
+Type: Mineral
+Class: Silicate
+Subclass: Tectosilicate
+Particle Size: Fine
+Sample No.: TS-16A
+Owner: JPL
+Wavelength Range: VSWIR
+Origin: Canada, Ontario, Hastings County, Bancroft
+Collection Date: N/A
+Description: Particle size was 0-45um.Collected by Ward's Original ASTER Spectral Library name was jpl.beckman.mineral.silicate.tectosilicate.fine.ts16a.spectrum.txt
+Mineral:  Nepheline (Na,K)AlSiO_4
+
+File Name:  ts16a.txt
+
+XRD Analysis:  Nepheline(A), Cancrinite(M), Biotite(M), Alkali Feldspar(M)

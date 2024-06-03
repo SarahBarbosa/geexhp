@@ -1,0 +1,10 @@
+Name: Quercus ilex
+Type: vegetation
+Class: Tree
+Genus: Quercus
+Species: ilex
+Sample No.: JPL114
+Owner: JPL
+Chemistry: Water Content: 55.76%
+Biophysical Properties: 
+

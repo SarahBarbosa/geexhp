@@ -1,0 +1,10 @@
+Name: Quercus rubra
+Type: vegetation
+Class: Tree
+Genus: Quercus
+Species: rubra
+Sample No.: JPL189
+Owner: JPL
+Chemistry: Water Content: 53.53%
+Biophysical Properties: 
+

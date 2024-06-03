@@ -1,0 +1,38 @@
+Name: Limestone CaCO3
+Type: Rock
+Class: Sedimentary
+Subclass: Limestone
+Particle Size: Solid
+Sample No.: ro354
+Owner: Larry Rowan, USGS
+Wavelength Range: All
+Origin: Ronda, Spain
+Collection Date: N/A
+Description:  white limestone Sample was Whole rock chips. Original ASTER Spectral Library name was usgs.perknic.rock.sedimentary.limestone.solid.ls354.spectrum.txt
+Rock Type:  
+
+Mineral: Calcite
+
+Sample No.: ro354
+
+XRD Analysis:  Calcite 98%, Dolomite 2%, Quartz <1%
+
+Chemistry:
+
+SiO2      0.41
+Al2O3     0.13
+Fe2O3    <0.10
+CaO      54.22
+TiO2     <0.01
+MnO      <0.01
+K2O      <0.10
+MgO       1.34
+Na2O      0.28
+P2O5      0.02
+         43.56
+Total    99.96
+
+              
+            
+ 
+

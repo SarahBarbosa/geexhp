@@ -1,0 +1,19 @@
+Name: Brown to dark brown silt loam
+Type: soil
+Class: Entisol
+Subclass: Ustifluvent
+Particle Size: none
+Sample No.: 82P2230
+Owner: JHU
+Wavelength Range: All
+Origin: Near Bait Radam, Yemen via USDA Soil Conservation service.
+Collection Date: N/A
+Description:  Parent material: alluvium.  Brown to dark brown silt loam (fine-loamy, mixed-calcareous, isothermic typic ustifluvent). Original ASTER Spectral Library name was jhu.becknic.soil.entisol.ustifluvent.coarse.82P2230.spectrum.txt
+Moderate fine crumb structure, very friable, slightly sticky and plastic.  
+0.43% organic carbon, 32.2% clay, 46.3% silt, 21.5% sand.
+
+Chemical analyses give a trace of CaCO3.
+
+Clay mineralogy: none.
+
+Coarse mineralogy: none. 

@@ -1,0 +1,19 @@
+Name: Almandine Garnet Fe_3Al_2(SiO_4)_3
+Type: Mineral
+Class: Silicate
+Subclass: Nesosilicate
+Particle Size: Medium
+Sample No.: NS-4A
+Owner: JPL
+Wavelength Range: TIR
+Origin: USA, Arizona, Graham County, Stanley Butte
+Collection Date: N/A
+Description: Particle size was 45-125um.Collected by Burminco Original ASTER Spectral Library name was jpl.nicolet.mineral.silicate.nesosilicate.medium.ns04a.spectrum.txt
+Mineral:  Almandine Garnet Fe_3Al_2(SiO_4)_3
+
+File Name:  ns04a.txt
+
+XRD Analysis:  Almandine Garnet(A)
+
+Chemical Analysis:
+from electron microprobe (Fe_1.41Mg_1.25Mn_0.03Ca_0.32)(Al_2.00)(Si_2.99Al_0.01)O_12

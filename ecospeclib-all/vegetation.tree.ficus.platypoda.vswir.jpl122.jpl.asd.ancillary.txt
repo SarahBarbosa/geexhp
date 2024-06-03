@@ -1,0 +1,10 @@
+Name: Ficus platypoda
+Type: vegetation
+Class: Tree
+Genus: Ficus
+Species: platypoda
+Sample No.: JPL122
+Owner: JPL
+Chemistry: Water Content: 29.69%
+Biophysical Properties: 
+

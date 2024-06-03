@@ -1,0 +1,10 @@
+Name: Eucalyptus ficifolia
+Type: vegetation
+Class: Tree
+Genus: Eucalyptus
+Species: ficifolia
+Sample No.: JPL202
+Owner: JPL
+Chemistry: Water Content: 47.44%
+Biophysical Properties: 
+
