@@ -63,9 +63,9 @@ def random_atmospheric_layers(config: dict, layers: int) -> None:
         strings concatenated to the initial unmodified parts.
     """
 
-    # Generate a random factor for each of the 60 columns, with a 25% chance of 
-    # being zero
-    random_factors = [0 if np.random.random() < 0.25 else np.random.random() for _ in range(layers)]
+    # Generate random factors for each type of gas with 25% chance of being zero
+    num_gases = len(config[f"ATMOSPHERE-LAYER-1"].split(",")) - 2
+    random_factors = [0 if np.random.random() < 0.25 else np.random.uniform(0, 2) for _ in range(num_gases)]
 
     # Iterate over each key in the dictionary and modify the values accordingly
     for i in range(layers):
@@ -128,21 +128,35 @@ def set_spectral_type(config: dict) -> None:
 def set_stellar_parameters(config: dict) -> None:
     """
     Sets the radius and temperature of the star based on its spectral type.
+    Source: https://www.pas.rochester.edu/~emamajek/EEM_dwarf_UBVIJHK_colors_Teff.dat
     """
     class_star = config['OBJECT-STAR-TYPE']
     params = {
-        'U': {'temp_range': (6000, 7220), 'radius_range': (1.18, 1.79)},
-        'G': {'temp_range': (5340, 5920), 'radius_range': (0.876, 1.12)},
-        'K': {'temp_range': (3940, 5280), 'radius_range': (0.552, 0.817)},
-        'M': {'temp_range': (2320, 3870), 'radius_range': (0.104, 0.559)}
+        'U': {'temp_range': (6000, 7220), 'radius_range': (1.18, 1.79), 'mag_range': (2.50, 4.22)},
+        'G': {'temp_range': (5340, 5920), 'radius_range': (0.876, 1.12), 'mag_range': (4.40, 5.34)},
+        'K': {'temp_range': (3940, 5280), 'radius_range': (0.552, 0.817), 'mag_range': (5.54, 7.59)},
+        'M': {'temp_range': (2320, 3870), 'radius_range': (0.104, 0.559), 'mag_range': (7.75,  13.62)}
     }
 
     star_temperature = round(np.random.uniform(*params[class_star]['temp_range']), 3)
     star_radius = round(np.random.uniform(*params[class_star]['radius_range']), 3)
+    star_mag = round(np.random.uniform(*params[class_star]['mag_range']), 3)
 
     config['OBJECT-STAR-RADIUS'] = star_radius
     config['OBJECT-STAR-TEMPERATURE'] = star_temperature
     config['GEOMETRY-STELLAR-TEMPERATURE'] = star_temperature
+    config["GEOMETRY-STELLAR-MAGNITUDE"] = star_mag
+
+    # Motivation and source: High metallicity and non-equilibrium chemistry... 
+    # (Madhusudhan1 and Seager 2011)
+    # https://iopscience.iop.org/article/10.1088/0004-637X/729/1/41/meta
+    # 10x greater and lesser the metallicity of the sun (in dex)
+    config["OBJECT-STAR-METALLICITY"] = round(np.random.uniform(-1, 1), 3)
+
+    # THIS IS FOR THE PLANET! (SORRY FOR TO BE HERE!)
+    config["SURFACE-TEMPERATURE"] = float(config["ATMOSPHERE-LAYER-1"].split(",")[1])
+    config["SURFACE-ALBEDO"] = np.random.uniform(0.1, 0.9)
+    config["SURFACE-EMISSIVITY"] = 1 - config["SURFACE-ALBEDO"]
 
 def set_solar_coordinates(config: dict) -> None:
     """
@@ -344,8 +358,11 @@ def random_planet(config: dict, molweight: list, layers: int = 60) -> None:
     Parameters
     ----------
     config : dict
-        A dictionary where all the planetary and stellar configuration 
-        settings are stored.
+        A dictionary where all the planetary and stellar configuration settings are stored.
+    molweight : list
+        A list of molecular weights used to normalize atmospheric layers.
+    layers : int, optional
+        The number of atmospheric layers to generate and configure, default is 60.
 
     Steps:
     1. Set a constant mixing ratio for the atmosphere.
