@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 from matplotlib import pyplot as plt
 
 class DataVis:
@@ -39,7 +40,7 @@ class DataVis:
         """
         DataVis._configurar_matplotlib()
 
-        wavelength = df.iloc[indice]["WAVELENGHT"]
+        wavelength = df.iloc[indice]["WAVELENGTH"]
         albedo = df.iloc[indice]["ALBEDO"]
 
         _, ax = plt.subplots()

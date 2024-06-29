@@ -5,7 +5,8 @@ import msgpack
 import pandas as pd
 import tqdm
 from pypsg import PSG
-from geexhp.utils import mod, estagios
+from geexhp.core import geostages
+from geexhp.utils import mod
 from tqdm import tqdm
 
 class DataGen:
@@ -48,7 +49,7 @@ class DataGen:
             config = OrderedDict(msgpack.unpack(f, raw=False))
 
             if estagio == "moderna":
-                estagios.terra_moderna(config)
+                geostages.terra_moderna(config)
 
             if instrumento not in ["HWC", "SS-NIR", "SS-UV", "SS-Vis"]:
                 raise ValueError("O instrumento deve ser 'HWC', 'SS-NIR', 'SS-UV' ou 'SS-Vis'.")

@@ -43,7 +43,7 @@ def instrumento(dicionario: dict, instrumento: str) -> None:
             0.251@0.401,0.273@0.421,0.302@0.454,0.312@0.508,0.302@0.620,0.283@0.714,0.258@0.793,0.248@0.836,0.261@0.905,0.280@0.955, \
                 0.287@1.004,0.295@1.131,0.302@1.291,0.314@1.426,0.321@1.561,0.330@1.693,0.335@1.800'
         dicionario['GENERATOR-NOISEFRAMES'] = 10
-        dicionario['GENERATOR-NOISETIME'] = 3600   # Aqui usando o tempo de exposição = 0 (modifica o original para evitar erros)
+        dicionario['GENERATOR-NOISETIME'] = 3600  
         dicionario['GENERATOR-NOISEPIXELS'] = 8
         dicionario['GENERATOR-CONT-STELLAR'] = 'Y'
     
@@ -82,6 +82,7 @@ def instrumento(dicionario: dict, instrumento: str) -> None:
                     6.911e-01@-4.441e-02,7.000e-01@-4.791e-02,7.000e-01@-5.853e-02,7.000e-01@-7.314e-02,7.000e-01@-8.340e-02,7.000e-01@-8.810e-02'
         dicionario['GENERATOR-NOISEFRAMES'] = 1
         dicionario['GENERATOR-NOISETIME'] = 1000
+
 
 
 def _gas(dicionario: dict, gas: str, multiplicador: float) -> None:
@@ -139,17 +140,25 @@ def rnd(dicionario: dict) -> None:
     # Fonte: A Modern Mean Dwarf Stellar Color and Effective Temperature Sequence (2019)
     # https://www.pas.rochester.edu/~emamajek/EEM_dwarf_UBVIJHK_colors_Teff.dat
     if classe_estrela == 'U':                                   # Isso é tipo F -- usa modelo de corpo negro
-        temp_estrela = round(np.random.uniform(6000, 7220), 3)  # Em K
-        raio_estrela = round(np.random.uniform(1.18, 1.79), 3)  # Em raio solar 
+        temp_estrela = round(
+            np.random.uniform(6000, 7220), 3)  # Em K
+        raio_estrela = round(
+            np.random.uniform(1.18, 1.79), 3)  # Em raio solar 
     elif classe_estrela == 'G':
-        temp_estrela = round(np.random.uniform(5340, 5920), 3)
-        raio_estrela = round(np.random.uniform(0.876, 1.12), 3)
+        temp_estrela = round(
+            np.random.uniform(5340, 5920), 3)
+        raio_estrela = round(
+            np.random.uniform(0.876, 1.12), 3)
     elif classe_estrela == 'K':
-        temp_estrela = round(np.random.uniform(3940, 5280), 3)
-        raio_estrela = round(np.random.uniform(0.552, 0.817), 3)
+        temp_estrela = round(
+            np.random.uniform(3940, 5280), 3)
+        raio_estrela = round(
+            np.random.uniform(0.552, 0.817), 3)
     elif classe_estrela == 'M':
-        temp_estrela = round(np.random.uniform(2320, 3870), 3)
-        raio_estrela = round(np.random.uniform(0.104, 0.559), 3)
+        temp_estrela = round(
+            np.random.uniform(2320, 3870), 3)
+        raio_estrela = round(
+            np.random.uniform(0.104, 0.559), 3)
 
     dicionario['OBJECT-STAR-RADIUS'] = raio_estrela             
     dicionario['OBJECT-STAR-TEMPERATURE'] = temp_estrela        
@@ -258,7 +267,7 @@ def rnd(dicionario: dict) -> None:
         # Intervalo do raio para planetas terrestes ~ 1.7 raios terrestres
         # Fonte: The Super-Earth Opportunity – Search for Habitable Exoplanets in the 2020s
         # https://arxiv.org/pdf/1903.05258
-        raio_planeta = np.random.uniform(0.5, 1.6)
+        raio_planeta = np.random.uniform(0.5, 1.71)
 
         # Considerando as equações (11) e (12) de Sotin, Grasset e Mocquet (2007):
         # Fonte: Mass–radius curve for extrasolar Earth-like planets and ocean planets
@@ -276,17 +285,26 @@ def rnd(dicionario: dict) -> None:
         velocidade_escape_km = velocidade_escape / 1000
 
         # Vamos calcular a insolação do planeta em termos da Terra
-        # Equação (4) de Zahnle e Catling (2017)
+        # Equação (27) de Zahnle e Catling (2017)
         # https://arxiv.org/pdf/1702.03386
-        insolacao = (luminosidade_estrela / const.L_sun.value)  * (1 / semi_eixo_maior ** 2)
+        insolacao_xuv = (1 ** 2 / semi_eixo_maior ** 2) * (luminosidade_estrela / const.L_sun.value) ** 0.4
 
-        # Vamos seguir a aproximação "arriscada" do INARA aqui, onde usaremos a Figura 2 de Zahnle e Catling (2017)
-        # para "estimar" de forma grotesca a linha no plot loglog (inclusive o paper fala The line is drawn by eye.)
+        # Usando a Figura 2 de Zahnle e Catling (2017), podemos
+        # "estimar" de forma grotesca a linha no plot loglog 
+        # (inclusive o paper fala The line is drawn by eye.)
+        # "Confirmado" pelo WebPLotDigitizer
         slope_shoreline = np.log10(1e4 / 1e-6) / np.log10(70 / 0.2)
-        insolacao_planeta = 1e4 * (velocidade_escape_km / 70) ** slope_shoreline
+        
+        # A fórmula utilizada aqui é derivada da equação da reta em escala log-log:
+        # log10(I) = m * log10(V/70) + b
+        # Onde I é a insolação, V é a velocidade de escape, m é a inclinação (slope) e b é a interseção.
+        # Aqui, a fórmula está normalizada pela velocidade de escape de 70 km/s.
+        # Reescrevendo em termos exponenciais:
+        # I = 10^(m * log10(V/70) + b)
+        insolacao_planeta = np.exp(slope_shoreline * np.log(velocidade_escape_km / 70) + np.log(1e4))
 
         # A insolação atual precisa ser menor que a insolação do planeta
-        if insolacao < insolacao_planeta:
+        if insolacao_xuv < insolacao_planeta:
             mantem_atmosfera = True
     
     # Qaudno tudo der certo, podemos modificar o dicionário
