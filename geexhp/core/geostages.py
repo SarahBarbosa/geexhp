@@ -1,4 +1,107 @@
 import numpy as np
+from scipy.stats import beta
+
+def molweight_modern() -> np.ndarray:
+    """
+    Returns the molecular weights of elements in the modern Earth's atmosphere.
+
+    The molecules included are:
+    - CO2 : Carbon Dioxide
+    - N2  : Nitrogen
+    - O2  : Oxygen
+    - H2O : Water
+    - CO  : Carbon Monoxide
+    - H2  : Hydrogen
+    - C2H6: Ethane
+    - HCN : Hydrogen Cyanide
+    - H2S : Hydrogen Sulfide
+    - SO2 : Sulfur Dioxide
+    - O3  : Ozone
+    - CH4 : Methane
+    - N2O : Nitrous Oxide
+    - NH3 : Ammonia
+    - CH3Cl: Methyl Chloride
+
+    Returns
+    -------
+    numpy.ndarray
+        Array of molecular weights corresponding to the specified molecules.
+    """
+    # Information about molecules (Reference: https://pt.webqc.org/mmcalc.php)
+    molecular_weights = np.array([
+        44.0095, 28.01340, 31.99880, 18.01528, 28.0101, 2.01588, 30.0690, 
+        27.0253, 34.0809, 64.0638, 47.99820, 16.0425, 44.01280, 17.03052, 50.4875
+        ])
+    return molecular_weights
+
+def isothermal_PT(layers: int) -> tuple[np.ndarray, np.ndarray]:
+    """
+    Generates an isothermal pressure-temperature profile for a planetary atmosphere,
+    using a Beta distribution to model atmospheric pressures and temperatures 
+    between values typical for Mars and a theoretical upper limit less favorable than Venus.
+
+    Parameters:
+    -----------
+    layers : int
+        The number of atmospheric layers for which the pressure values are generated.
+        This defines the vertical resolution of the model.
+
+    Returns:
+    --------
+    tuple (np.ndarray, np.ndarray)
+        A tuple containing two arrays:
+        - The first array contains logarithmically spaced pressure values from a near vacuum
+            to a scaled pressure value.
+        - The second array contains a constant temperature value replicated across all layers.
+
+    Physics Context:
+    ----------------
+    - The pressure values are generated to simulate a range for a terrestrial atmosphere, 
+        bounded by extreme low (Mars-like) and moderate high pressures, avoiding extremes 
+        like those on Venus.
+    - The temperature is set using a Beta distribution to represent variability in planetary 
+        atmospheric temperatures, constrained within a range that approximates Mars-like to 
+        lower than Venus-like conditions.
+
+    Beta Distribution Parameters (a, b):
+    ------------------------------------
+    - The parameters 'a' and 'b' are set to 2 and 5 respectively to create a distribution 
+        that is skewed towards lower values (more common) with a longer tail towards higher 
+        values (less common). This helps simulate conditions where typical temperatures and 
+        pressures are low with a possibility of reaching higher values occasionally.
+
+    Scaling Formula:
+    ----------------
+    - The formula used for scaling the Beta distribution output to a specific range is:
+      scaled_value = min_value + (max_value - min_value) * beta_output
+    - This is a standard approach for feature scaling that adjusts the data into a specified 
+        range [min_value, max_value].
+    - More on this can be read about feature scaling on Wikipedia: 
+        https://en.wikipedia.org/wiki/Feature_scaling
+
+    Source:
+    ------
+    Fuller-Rowell, T. (2014). Physical Characteristics and Modeling of Earth’s Thermosphere. 
+    > https://agupubs.onlinelibrary.wiley.com/doi/abs/10.1002/9781118704417.ch2
+    > https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html
+    > https://nssdc.gsfc.nasa.gov/planetary/factsheet/venusfact.html
+    """
+    min_press_earth = 1e-11      # Earth’s upper atmosphere (Fuller-Rowell, 2014)
+    a, b = 2, 5                  # Shape parameters for Beta distribution
+    min_temp = 210               # Approximate Mars-like minimum atmosphere temperature in Kelvin
+    max_temp = 737               # Lower than Venus-like maximum atmosphere temperature in Kelvin
+    min_pres = 0.006             # Approximate Mars surface pressure in bars
+    max_pres = 20.0              # A practical upper limit for pressures, less than Venus (92 bars TO MUCH!)
+
+    # Generate beta-distributed random values for temperature and pressure
+    scaled_temp = min_temp + (max_temp - min_temp) * beta.rvs(a, b)
+    scaled_pres = min_pres + (max_pres - min_pres) * beta.rvs(a, b)
+
+    # Generate logarithmically spaced pressures from a minimum value to a scaled value
+    pressure = np.logspace(np.log10(min_press_earth), np.log10(scaled_pres), num=layers)
+    
+    # Return pressure array and a constant temperature array
+    return pressure, np.ones(len(pressure)) * scaled_temp
 
 def modern_earth(config: dict) -> None:
     """
@@ -152,14 +255,11 @@ def modern_earth(config: dict) -> None:
     # Information about molecules (Reference: https://pt.webqc.org/mmcalc.php)
     molecules = ["CO2" , "N2" , "O2" , "H2O", "CO", "H2" , "C2H6" , "HCN", 
                     "H2S", "SO2" , "O3" , "CH4" , "N2O", "NH3" , "CH3Cl"]
-    molecular_weight = np.array([44.0095, 28.01340, 31.99880, 18.01528, 28.0101, 2.01588, 
-                                    30.0690, 27.0253, 34.0809, 64.0638, 47.99820, 16.0425, 44.01280, 
-                                    17.03052, 50.4875])
-    
+
     # Calculating average abundance from the first layer (as an approximation)
     abundances = np.array([CO2[0], N2[0], O2[0], H2O[0], CO[0], H2[0], C2H6[0], 
                             HCN[0], H2S[0], SO2[0], O3[0], CH4[0], N2O[0], NH3[0], CH3Cl[0]])
-    average_molecular_weight = np.sum(molecular_weight * abundances)
+    average_molecular_weight = np.sum(molweight_modern() * abundances)
     
     # Mapping molecules to HITRAN database indices
     # https://hitran.org/lbl/
@@ -175,3 +275,9 @@ def modern_earth(config: dict) -> None:
     config['ATMOSPHERE-ABUN'] = "1,"*(len(molecules)-1) + '1'
     config['ATMOSPHERE-UNIT'] = "scl,"*(len(molecules)-1) + 'scl' 
     config['ATMOSPHERE-LAYERS-MOLECULES'] = ','.join(molecules)
+
+def random_exoplanet(config: dict) -> None:
+    layers = 60
+    pressure, temperature = isothermal_PT()
+    pass
+
