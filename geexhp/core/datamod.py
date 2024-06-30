@@ -155,7 +155,7 @@ def set_stellar_parameters(config: dict) -> None:
 
     # THIS IS FOR THE PLANET! (SORRY FOR TO BE HERE!)
     config["SURFACE-TEMPERATURE"] = float(config["ATMOSPHERE-LAYER-1"].split(",")[1])
-    config["SURFACE-ALBEDO"] = np.random.uniform(0.1, 0.9)
+    config["SURFACE-ALBEDO"] = np.random.uniform(0.1, 0.8)
     config["SURFACE-EMISSIVITY"] = 1 - config["SURFACE-ALBEDO"]
 
 def set_solar_coordinates(config: dict) -> None:

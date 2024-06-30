@@ -95,22 +95,43 @@ class DataGen:
             return self.config.get(key)
         return self.config 
     
-    def generator(self, nplanets: int, verbose: bool, molweight: list, file: str = "data") -> None:
+    def generator(self, nplanets: int, random_atm: bool, verbose: bool, molweight: list = None, file: str = "data") -> None:
         """
         Generates a dataset using the PSG for a specified number of planets 
-        and saves it to a Parquet file.
+        and saves it to a Parquet file. The dataset generation can include random atmosphere
+        configurations if specified.
 
         Parameters
         ----------
         nplanets : int
             The number of planets to generate data for.
+        random_atm : bool
+            Flag to indicate whether to generate random atmospheric compositions. If True, 
+            `molweight` is not required and will be ignored.
         verbose : bool
             Flag to indicate whether to print output messages.
-        molweight: list
-            A list of molecular weights for the molecules in the order specified by 
+        molweight: list, optional
+            A list of molecular weights for the molecules. This parameter is required if 
+            `random_atm` is False. It should be in the order specified by 
             `config["ATMOSPHERE-LAYERS-MOLECULES"]`.
         file : str, optional
             The filename to save the data. Default is "data".
+        
+        Notes
+        -----
+        If `random_atm` is True, the atmospheric composition is generated randomly, and the
+        `molweight` parameter is not used. This allows flexibility in the function usage depending
+        on the scenario of the atmospheric simulation. The molecules included in the random atmosphere 
+        generation are:
+        - H2O (Water vapor)
+        - CO2 (Carbon dioxide)
+        - CH4 (Methane)
+        - O2 (Oxygen)
+        - NH3 (Ammonia)
+        - HCN (Hydrogen cyanide)
+        - PH3 (Phosphine)
+        - SO2 (Sulfur dioxide)
+        - H2S (Hydrogen sulfide)
         """
         data_dir = "../data/"
         os.makedirs(data_dir, exist_ok=True)
@@ -124,24 +145,33 @@ class DataGen:
             for i in range(nplanets):
                 try:
                     configuration = self.config.copy()
-                    datamod.random_planet(configuration, molweight)
+                    if random_atm:
+                        geostages.random_atmosphere(configuration)
+                    else:
+                        if molweight is None:
+                            raise ValueError("Molecular weights must be provided if random_atm is False.")
+                        datamod.random_planet(configuration, molweight)
+                    
                     spectrum = self.psg.run(configuration)
                     df = pd.DataFrame({
                         "WAVELENGTH": [spectrum["spectrum"][:, 0].tolist()],
                         "ALBEDO": [spectrum["spectrum"][:, 1].tolist()],
                         **{key: [value] for key, value in configuration.items()}
                         })
+                    
                     if parquet_writer is None:
                         schema = pa.Table.from_pandas(df).schema
                         parquet_writer = pq.ParquetWriter(output_path, schema)
                     table = pa.Table.from_pandas(df, schema=schema)
                     parquet_writer.write_table(table)
                     bar.update(1)
+                
                 except Exception as e:
                     if verbose:
                         print(f"Error processing this planet: {e}. Skipping...")
                         bar.update(1)
                     continue
+        
         if parquet_writer:
             parquet_writer.close()
         if verbose:
