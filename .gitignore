@@ -13,5 +13,7 @@ __pycache__/
 # Informações do pacote egg
 geexhp.egg-info/
 
-# Ignorando o arquivo
+# Ignorando
 data/moderna10k.parquet
+docs/WebPlotDigitizer/
+ecospeclib-all/
