@@ -125,23 +125,18 @@ class DataGen:
                 try:
                     configuration = self.config.copy()
                     datamod.random_planet(configuration, molweight)
-
                     spectrum = self.psg.run(configuration)
-
                     df = pd.DataFrame({
                         "WAVELENGTH": [spectrum["spectrum"][:, 0].tolist()],
                         "ALBEDO": [spectrum["spectrum"][:, 1].tolist()],
                         **{key: [value] for key, value in configuration.items()}
                         })
-
                     if parquet_writer is None:
                         schema = pa.Table.from_pandas(df).schema
                         parquet_writer = pq.ParquetWriter(output_path, schema)
-
                     table = pa.Table.from_pandas(df, schema=schema)
                     parquet_writer.write_table(table)
                     bar.update(1)
-
                 except Exception as e:
                     if verbose:
                         print(f"Error processing this planet: {e}. Skipping...")
