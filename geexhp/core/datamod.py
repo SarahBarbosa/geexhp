@@ -4,8 +4,8 @@ from astropy.constants import R_sun, L_sun, sigma_sb, G, M_earth, R_earth
 
 def mixing_ratio_constant(config: dict, layers: int) -> None:
     """
-    Modifies the input configuration dictionary to normalize abundance 
-    values across atmospheric layers.
+    Modifies the input configuration dictionary to set a constant 
+    abundance value across atmospheric layers.
 
     Parameters
     ----------
@@ -20,7 +20,8 @@ def mixing_ratio_constant(config: dict, layers: int) -> None:
     Notes
     -----
     This function directly modifies the 'config' dictionary to update the abundance values
-    for each layer based on the normalized sum of abundances across all layers.
+    for each layer based on the first layer's abundance values. This approach assumes all layers
+    will have the same abundance values as the first layer.
     This function DOES NOT MODIFY the average molecular weight.
     """
     # Preallocate a numpy array for performance and memory efficiency
@@ -45,7 +46,7 @@ def random_atmospheric_layers(config: dict, layers: int) -> None:
     """
     Modify the atmospheric layers configuration by multiplying each column (starting 
     from the third element in each entry) with a random factor. Each column has a 
-    20% chance to get a random factor of zero, otherwise a random factor between 0 
+    25% chance to get a random factor of zero, otherwise a random factor between 0 
     and 1.
 
     Parameters
