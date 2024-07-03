@@ -28,7 +28,7 @@ class DataGen:
             Path to the PSG configuration file. 
             Defaults to "../geexhp/config/default_habex.config".
         stage : str, optional
-            Geological stage of Earth to consider. Options: TODO 
+            Geological stage of Earth to consider. Options: "modern", "goe", "noe" 
             Defaults to "modern".
         instrument : str, optional
             The telescope instrument setting to modify. 
@@ -59,8 +59,11 @@ class DataGen:
         except FileNotFoundError:
             raise FileNotFoundError(f"The configuration file {config_path} was not found.")
         
-        if stage == "modern":
-            geostages.modern_earth(config)
+        valid_stages = {'modern': geostages.modern_earth, 'goe': geostages.after_goe, 'noe': geostages.after_noe}
+        if stage in valid_stages:
+            valid_stages[stage](config)
+        else:
+            raise ValueError(f"Stage must be one of {list(valid_stages.keys())}.")
 
         valid_instruments = ["HWC", "SS-NIR", "SS-UV", "SS-Vis"]
         if instrument not in valid_instruments:

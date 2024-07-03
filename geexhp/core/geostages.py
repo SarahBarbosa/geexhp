@@ -45,9 +45,10 @@ def molweight_after_goe() -> np.ndarray:
     - CO2 : Carbon Dioxide
     - O2  : Oxygen
     - CH4 : Methane
+    - N2  : Nitrogen
     """
     molecular_weights = np.array([
-        18.01528, 44.01280, 47.99820, 28.0101, 44.0095, 31.99880, 16.0425 
+        18.01528, 44.01280, 47.99820, 28.0101, 44.0095, 31.99880, 16.0425, 28.01340 
         ])
     return molecular_weights   
 
@@ -68,9 +69,10 @@ def molweight_after_noe() -> np.ndarray:
     - CH4 : Methane
     - O2  : Oxygen
     - CO2 : Carbon Dioxide    
+    - N2  : Nitrogen
     """
     molecular_weights = np.array([
-        44.01280, 28.0101, 47.99820, 18.01528, 16.0425 , 31.99880, 44.0095
+        44.01280, 28.0101, 47.99820, 18.01528, 16.0425 , 31.99880, 44.0095, 28.01340
         ])
     return molecular_weights 
 
@@ -167,7 +169,6 @@ def modern_earth(config: dict) -> None:
     """
     layers = 60
     modern = pd.read_csv("../data/atmos_layers/modern_atm.csv")
-
     molecules = ["CO2" , "N2" , "O2" , "H2O", "CO", "C2H6" , 
                 "HCN", "SO2" , "O3" , "CH4" , "N2O", "NH3" , 
                 "CH3Cl"]
@@ -191,6 +192,107 @@ def modern_earth(config: dict) -> None:
     config['ATMOSPHERE-ABUN'] = "1," * (len(molecules) - 1) + '1'
     config['ATMOSPHERE-UNIT'] = "scl," * (len(molecules) - 1) + 'scl' 
     config['ATMOSPHERE-LAYERS-MOLECULES'] = ",".join(molecules)
+
+def after_goe(config: dict) -> None:
+    """
+    Processes atmospheric data from a CSV file for a period 2.0 Ga after the Great Oxidation Event (GOE),
+    normalizes gas abundances, calculates the mean molecular weight, and updates a configuration dictionary
+    with atmospheric parameters. This function is based on scenarios described in the study by Kawashima and
+    Rugheimer (2019).
+
+    Parameters
+    ----------
+    config : dict
+        A dictionary where atmospheric parameters will be stored. The dictionary is updated
+        with various keys representing atmospheric properties like layer data, gas composition,
+        molecular weight, and other relevant settings.
+
+    Notes
+    -----
+    - The CSV file is expected to be in "../data/atmos_layers/" directory.
+    - The normalization assumes that the sum of gas abundances in each layer should equal 1.
+    - The mean molecular weight is computed based on predefined molecular weights associated
+        with each gas.
+    - The atmospheric data and scenarios are based on the study:
+        Kawashima, Y., & Rugheimer, S. (2019). "Spectra of Earth-like Planets Through Geological Evolution
+        Around FGKM Stars." The Astronomical Journal, 157(6), 225. DOI: 10.3847/1538-3881/ab14e3
+        Available at: https://iopscience.iop.org/article/10.3847/1538-3881/ab14e3
+    """
+    layers = 60
+    goe = pd.read_csv("../data/atmos_layers/after_goe.csv")
+    molecules = ["H2O", "N2O", "O3", "CO", "CO2", "O2", "CH4", "N2"]
+    HITRAN_DICT = {"H2O": "HIT[1]", "N2O": "HIT[4]", "O3":"HIT[3]", "CO": "HIT[5]",
+                    "CO2": "HIT[2]", "O2" : "HIT[7]", "CH4" :"HIT[6]", "N2" : "HIT[22]"}
+    
+    # Unit sum normalization at each layer
+    goe["N2"] = np.full(60, 0.781) # add N2 or not ??
+    abun = goe.columns[2:]
+    goe[abun] = goe[abun].div(goe[abun].sum(axis=1), axis=0)
+
+    # That's right, right? Mean Molecular Weight Calculation
+    mmw = goe[abun].apply(lambda row: sum(row[col] * molweight_after_goe()[i] for i, col in enumerate(abun)), axis=1).mean()
+        
+    for i in range(layers):
+        layer_data = [f'{goe["Pressure"][i]}', f'{goe["Temperature"][i]}']
+        layer_data += [f'{goe[molecule][i]}' for molecule in molecules]
+        config[f'ATMOSPHERE-LAYER-{i + 1}'] = ','.join(layer_data)
+
+    config['ATMOSPHERE-WEIGHT'] = mmw
+    config['ATMOSPHERE-NGAS'] = len(molecules)
+    config['ATMOSPHERE-GAS'] = ",".join(molecules)
+    config['ATMOSPHERE-TYPE'] = ",".join([HITRAN_DICT[mol] for mol in molecules]) 
+    config['ATMOSPHERE-ABUN'] = "1," * (len(molecules) - 1) + '1'
+    config['ATMOSPHERE-UNIT'] = "scl," * (len(molecules) - 1) + 'scl' 
+    config['ATMOSPHERE-LAYERS-MOLECULES'] = ",".join(molecules)
+    config["ATMOSPHERE-PRESSURE"] = goe["Pressure"][0] * 1000 # in mbar
+    config["SURFACE-TEMPERATURE"] = goe["Temperature"][0] # in K
+
+def after_noe(config: dict) -> None:
+    """
+    Processes atmospheric data from a CSV file representing conditions 0.8 Ga after the Neoproterozoic 
+    Oxidation Event (NOE), normalizes gas abundances, calculates the mean molecular weight, and updates a 
+    configuration dictionary with atmospheric parameters. This function is tailored to model the atmospheric 
+    conditions based on speculated gas compositions of that era.
+
+    Parameters
+    ----------
+    config : dict
+        A dictionary where atmospheric parameters will be stored. The dictionary is updated with various keys 
+        representing atmospheric properties like layer data, gas composition, molecular weight, and other relevant settings.
+
+    Notes
+    -----
+    - The atmospheric data and scenarios are based on the study:
+        Kawashima, Y., & Rugheimer, S. (2019). "Spectra of Earth-like Planets Through Geological Evolution
+        Around FGKM Stars." The Astronomical Journal, 157(6), 225. DOI: 10.3847/1538-3881/ab14e3
+        Available at: https://iopscience.iop.org/article/10.3847/1538-3881/ab14e3
+
+    """
+    layers = 60
+    noe = pd.read_csv("../data/atmos_layers/after_noe.csv")
+    molecules = ["N2O", "CO", "O3", "H2O", "CH4", "O2", "CO2", "N2"]
+    HITRAN_DICT = {"N2O": "HIT[4]", "CO": "HIT[5]", "O3":"HIT[3]",  "H2O": "HIT[1]", "CH4" :"HIT[6]",
+                    "O2" : "HIT[7]", "CO2": "HIT[2]", "N2": "HIT[22]"}
+
+    noe["N2"] = np.full(60, 0.781)
+    abun = noe.columns[2:]
+    noe[abun] = noe[abun].div(noe[abun].sum(axis=1), axis=0)
+    mmw = noe[abun].apply(lambda row: sum(row[col] * molweight_after_noe()[i] for i, col in enumerate(abun)), axis=1).mean()
+        
+    for i in range(layers):
+        layer_data = [f'{noe["Pressure"][i]}', f'{noe["Temperature"][i]}']
+        layer_data += [f'{noe[molecule][i]}' for molecule in molecules]
+        config[f'ATMOSPHERE-LAYER-{i + 1}'] = ','.join(layer_data)
+
+    config['ATMOSPHERE-WEIGHT'] = mmw
+    config['ATMOSPHERE-NGAS'] = len(molecules)
+    config['ATMOSPHERE-GAS'] = ",".join(molecules)
+    config['ATMOSPHERE-TYPE'] = ",".join([HITRAN_DICT[mol] for mol in molecules]) 
+    config['ATMOSPHERE-ABUN'] = "1," * (len(molecules) - 1) + '1'
+    config['ATMOSPHERE-UNIT'] = "scl," * (len(molecules) - 1) + 'scl' 
+    config['ATMOSPHERE-LAYERS-MOLECULES'] = ",".join(molecules)
+    config["ATMOSPHERE-PRESSURE"] = noe["Pressure"][0] * 1000 # in mbar
+    config["SURFACE-TEMPERATURE"] = noe["Temperature"][0] # in K
 
 def random_atmosphere(config: dict) -> None:
     """
