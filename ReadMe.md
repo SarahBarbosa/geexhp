@@ -1,4 +1,4 @@
-# Install with Git (recommended)¶
+# Install with Git (recommended)
 
 ```bash
 git clone https://github.com/SarahBarbosa/geexhp.git
