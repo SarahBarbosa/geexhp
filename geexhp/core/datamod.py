@@ -298,7 +298,7 @@ def set_instrument(config: dict, instrument: str) -> None:
         by 50%.
         """
         config['GENERATOR-RANGE1'] = 0.2    # From UV! (Just a modification...)
-        config['GENERATOR-RANGE2'] = 1.80
+        config['GENERATOR-RANGE2'] = 2.00   # Another modification!
         config['GENERATOR-RESOLUTION'] = 1000
         config['GENERATOR-TELESCOPE'] = "SINGLE"
         config['GENERATOR-TELESCOPE1'] = 1
