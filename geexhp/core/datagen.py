@@ -97,7 +97,7 @@ class DataGen:
             return self.config.get(key)
         return self.config 
     
-    def generator(self, start: int, end: int, random_atm: bool, verbose: bool, file: str, molweight: list = None) -> None:
+    def generator(self, start: int, end: int, random_atm: bool, verbose: bool, file: str, molweight: list = None, sample_type: str = "default") -> None:
         """
         Generates a dataset using the PSG for a specified number of planets 
         and saves it to a Parquet file. The dataset generation can include random atmosphere
@@ -128,6 +128,9 @@ class DataGen:
             To simplify the generation of this list, you can use the following functions:
             - `geostages.molweight_modern()`: Returns the molecular weights of elements in the modern Earth's atmosphere. 
             - `geostages.molweight_after_goe()`: Returns the molecular weights of elements in 2.0 Ga after the Great Oxidation Event. 
+        sample_type : str, optional
+            Type of sample being computed, which determines the output directory structure.
+            Default is "default".
         
         Notes
         -----
@@ -149,13 +152,15 @@ class DataGen:
         you could divide this into chunks like 0-200, 201-400, etc., and run them concurrently 
         in different threads or processes.
         """
+        kind = sample_type
+
         # Check if molweight is required and not provided
         if not random_atm and molweight is None:
             raise ValueError("molweight must be provided when `random_atm` is False.")
 
-        data_dir = "../data/"
+        data_dir = os.path.join("data", kind)
         os.makedirs(data_dir, exist_ok=True)
-        output_path = os.path.join(data_dir, f"genexo_{file}.parquet")
+        output_path = os.path.join(data_dir, f"{file}.parquet")
 
         parquet_writer = None
         schema = None
@@ -169,7 +174,7 @@ class DataGen:
                 if random_atm:
                     geo.random_atmosphere(configuration)
                 else:
-                    geo.random_planet(configuration, molweight)
+                    dm.random_planet(configuration, molweight)
                 
                 spectrum = self.psg.run(configuration)
                 df = pd.DataFrame({
