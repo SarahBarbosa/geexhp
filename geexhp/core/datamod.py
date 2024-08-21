@@ -121,7 +121,7 @@ def set_spectral_type(config: dict) -> None:
     Sets the spectral type of the star and updates the dictionary with star and 
     occultation class.
     """
-    spectral_type = ['U', 'G', 'K', 'M']
+    spectral_type = ['F', 'G', 'K', 'M']
     class_star = np.random.choice(spectral_type)
     config['OBJECT-STAR-TYPE'] = class_star
     config['GEOMETRY-STELLAR-TYPE'] = class_star
@@ -133,7 +133,7 @@ def set_stellar_parameters(config: dict) -> None:
     """
     class_star = config['OBJECT-STAR-TYPE']
     params = {
-        'U': {'temp_range': (6000, 7220), 'radius_range': (1.18, 1.79), 'mag_range': (2.50, 4.22)},
+        'F': {'temp_range': (6000, 7220), 'radius_range': (1.18, 1.79), 'mag_range': (2.50, 4.22)},
         'G': {'temp_range': (5340, 5920), 'radius_range': (0.876, 1.12), 'mag_range': (4.40, 5.34)},
         'K': {'temp_range': (3940, 5280), 'radius_range': (0.552, 0.817), 'mag_range': (5.54, 7.59)},
         'M': {'temp_range': (2320, 3870), 'radius_range': (0.104, 0.559), 'mag_range': (7.75,  13.62)}
@@ -152,7 +152,7 @@ def set_stellar_parameters(config: dict) -> None:
     # (Madhusudhan1 and Seager 2011)
     # https://iopscience.iop.org/article/10.1088/0004-637X/729/1/41/meta
     # 10x greater and lesser the metallicity of the sun (in dex)
-    config["OBJECT-STAR-METALLICITY"] = round(np.random.uniform(-1, 1), 3)
+    #config["OBJECT-STAR-METALLICITY"] = round(np.random.uniform(-1, 1), 3)
 
     # THIS IS FOR THE PLANET! (SORRY FOR TO BE HERE!)
     config["SURFACE-TEMPERATURE"] = float(config["ATMOSPHERE-LAYER-1"].split(",")[1])
@@ -188,9 +188,9 @@ def set_habitable_zone_distance(config: dict) -> None:
 
     Notes
     -----
-    Source: Habitable zones around main-sequence stars... (Kopparapu et al. 2013) 
-    > https://iopscience.iop.org/article/10.1088/0004-637X/765/2/131/pdf
-    See Equations (2) and (3) and the Table 3 from Kopparapu et al. 2013
+    Source: Habitable zones around main-sequence stars... 
+    ([Kopparapu et al. (2013)](https://iopscience.iop.org/article/10.1088/0004-637X/765/2/131/pdf)). 
+    See Equations (2) and (3) and the Table 3 from Kopparapu et al. (2013)
     """
     temp = config['OBJECT-STAR-TEMPERATURE'] - 5780
     luminosity_star = calculate_luminosity(config)
@@ -212,8 +212,8 @@ def set_habitable_zone_distance(config: dict) -> None:
 
 def maintain_planetary_atmosphere(config: dict) -> None:
     """
-    Simulates to find a planet size that can maintain an atmosphere.
-    > References are included for each scientific principle used.
+    Simulates to find a planet size that can maintain an atmosphere. 
+    References are included for each scientific principle used.
     """
     semi_major_axis = config['OBJECT-STAR-DISTANCE']
     star_luminosity = calculate_luminosity(config)

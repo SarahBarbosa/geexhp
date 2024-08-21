@@ -1,5 +1,4 @@
 import os
-from tqdm import tqdm
 import pandas as pd
 
 import pyarrow as pa
@@ -10,8 +9,8 @@ from pypsg import PSG
 from collections import OrderedDict
 from typing import Any, Optional
 
-from geexhp.core import geostages
-from geexhp.core import datamod
+from geexhp.core import geostages as geo
+from geexhp.core import datamod as dm
 
 
 class DataGen:
@@ -59,7 +58,7 @@ class DataGen:
         except FileNotFoundError:
             raise FileNotFoundError(f"The configuration file {config_path} was not found.")
         
-        valid_stages = {'modern': geostages.modern_earth, 'goe': geostages.after_goe}
+        valid_stages = {'modern': geo.modern_earth, 'goe': geo.after_goe}
         if stage in valid_stages:
             valid_stages[stage](config)
         else:
@@ -70,7 +69,7 @@ class DataGen:
             raise ValueError(f"Instrument must be one of {valid_instruments}.")
         
         if instrument != "SS-Vis":
-            datamod.set_instrument(config, instrument)
+            dm.set_instrument(config, instrument)
         
         return config
     
@@ -98,84 +97,100 @@ class DataGen:
             return self.config.get(key)
         return self.config 
     
-    def generator(self, nplanets: int, random_atm: bool, verbose: bool, molweight: list = None, file: str = "data") -> None:
+    def generator(self, start: int, end: int, random_atm: bool, verbose: bool, file: str, molweight: list = None) -> None:
         """
         Generates a dataset using the PSG for a specified number of planets 
         and saves it to a Parquet file. The dataset generation can include random atmosphere
         configurations if specified.
 
+        This function is designed to be used in a multithreaded environment. When running in 
+        parallel, ensure that the `start` and `end` parameters are appropriately divided across 
+        threads to avoid overlapping ranges.
+
         Parameters
         ----------
-        nplanets : int
-            The number of planets to generate data for.
+        start : int
+            The starting index for the range of planets to generate data for.
+        end : int
+            The ending index for the range of planets to generate data for.
         random_atm : bool
             Flag to indicate whether to generate random atmospheric compositions. If True, 
             `molweight` is not required and will be ignored.
         verbose : bool
             Flag to indicate whether to print output messages.
-        molweight: list, optional
+        file : str, optional
+            The filename to save the data.
+        molweight : list of float, optional
             A list of molecular weights for the molecules. This parameter is required if 
             `random_atm` is False. It should be in the order specified by 
             `config["ATMOSPHERE-LAYERS-MOLECULES"]`.
-        file : str, optional
-            The filename to save the data. Default is "data".
+
+            To simplify the generation of this list, you can use the following functions:
+            - `geostages.molweight_modern()`: Returns the molecular weights of elements in the modern Earth's atmosphere. 
+            - `geostages.molweight_after_goe()`: Returns the molecular weights of elements in 2.0 Ga after the Great Oxidation Event. 
         
         Notes
         -----
-        If `random_atm` is True, the atmospheric composition is generated randomly, and the
+        - If `random_atm` is True, the atmospheric composition is generated randomly, and the
         `molweight` parameter is not used. This allows flexibility in the function usage depending
         on the scenario of the atmospheric simulation. The molecules included in the random atmosphere 
         generation are:
-        - H2O (Water vapor)
-        - CO2 (Carbon dioxide)
-        - CH4 (Methane)
-        - O2 (Oxygen)
-        - NH3 (Ammonia)
-        - HCN (Hydrogen cyanide)
-        - PH3 (Phosphine)
-        - SO2 (Sulfur dioxide)
-        - H2S (Hydrogen sulfide)
+            - H2O (Water vapor)
+            - CO2 (Carbon dioxide)
+            - CH4 (Methane)
+            - O2 (Oxygen)
+            - NH3 (Ammonia)
+            - HCN (Hydrogen cyanide)
+            - PH3 (Phosphine)
+            - SO2 (Sulfur dioxide)
+            - H2S (Hydrogen sulfide)
+        - To run this function in parallel, consider dividing the `start` and `end` range across 
+        multiple threads or processes. For example, if generating data for planets 0 to 1000, 
+        you could divide this into chunks like 0-200, 201-400, etc., and run them concurrently 
+        in different threads or processes.
         """
+        # Check if molweight is required and not provided
+        if not random_atm and molweight is None:
+            raise ValueError("molweight must be provided when `random_atm` is False.")
+
         data_dir = "../data/"
         os.makedirs(data_dir, exist_ok=True)
-        output_path = os.path.join(data_dir, f"{file}.parquet")
+        output_path = os.path.join(data_dir, f"genexo_{file}.parquet")
 
         parquet_writer = None
         schema = None
 
-        with tqdm(total=nplanets, desc="Gererating planets:", disable=not verbose, colour="green",
-                    bar_format="{l_bar}{bar}| {n_fmt}/{total_fmt} [Remaining: {remaining}, Elapsed: {elapsed}]") as bar:          
-            for i in range(nplanets):
-                try:
-                    configuration = self.config.copy()
-                    if random_atm:
-                        geostages.random_atmosphere(configuration)
-                    else:
-                        if molweight is None:
-                            raise ValueError("Molecular weights must be provided if random_atm is False.")
-                        datamod.random_planet(configuration, molweight)
-                    
-                    spectrum = self.psg.run(configuration)
-                    df = pd.DataFrame({
-                        "WAVELENGTH": [spectrum["spectrum"][:, 0].tolist()],
-                        "ALBEDO": [spectrum["spectrum"][:, 1].tolist()],
-                        **{key: [value] for key, value in configuration.items()}
-                        })
-                    
-                    if parquet_writer is None:
-                        schema = pa.Table.from_pandas(df).schema
-                        parquet_writer = pq.ParquetWriter(output_path, schema)
-                    table = pa.Table.from_pandas(df, schema=schema)
-                    parquet_writer.write_table(table)
-                    bar.update(1)
+        for i in range(int(start), int(end)):
+            try:
+                if verbose:
+                    print(f"> Processing planet index: {i}...")
+
+                configuration = self.config.copy()
+                if random_atm:
+                    geo.random_atmosphere(configuration)
+                else:
+                    geo.random_planet(configuration, molweight)
                 
-                except Exception as e:
-                    if verbose:
-                        print(f"Error processing this planet: {e}. Skipping...")
-                        bar.update(1)
-                    continue
+                spectrum = self.psg.run(configuration)
+                df = pd.DataFrame({
+                    "WAVELENGTH": [spectrum["spectrum"][:, 0].tolist()],
+                    "ALBEDO": [spectrum["spectrum"][:, 1].tolist()],
+                    **{key: [value] for key, value in configuration.items()}
+                })
+                
+                if parquet_writer is None:
+                    schema = pa.Table.from_pandas(df).schema
+                    parquet_writer = pq.ParquetWriter(output_path, schema)
+                table = pa.Table.from_pandas(df, schema=schema)
+                parquet_writer.write_table(table)
+            
+            except Exception as e:
+                if verbose:
+                    print(f"Error processing planet index {i}: {e}. Skipping...")
+                continue
         
         if parquet_writer:
             parquet_writer.close()
         if verbose:
-            print("Generation completed.")
+            print(f"> Generation completed for range {start} to {end}.")
+            print(f"> Data successfully saved to {output_path}.")
