@@ -2,7 +2,8 @@ from setuptools import setup
 
 setup(name="geexhp", 
       version="1.0.0", 
-      description="Gerador de espectro de reflexão de exoplaneta tipo terra visto pelo HWO usando PSG",
+      description="Generator of synthetic reflection spectra of Earth-like exoplanets observed \
+                        by the Habitable Worlds Observatory using the Planetary Spectrum Generator",
       long_description="ReadMe.md",
       author="Sarah G. A. Barbosa",
       author_email="sarahg.aroucha@gmail.com",
