@@ -15,5 +15,5 @@ geexhp.egg-info/
 
 # Ignorando
 data/moderna10k.parquet
-docs/WebPlotDigitizer/
+examples/WebPlotDigitizer/
 ecospeclib-all/
