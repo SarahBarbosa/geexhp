@@ -2,6 +2,7 @@ import os
 from typing import List, Tuple
 
 NUM_THREADS = os.cpu_count()
+NPLANETS = 10_000
 
 def threadranges(nplanets: int, num_threads: int) -> List[Tuple[int, int]]:
     """
@@ -26,30 +27,18 @@ def parallel_bash_script(nplanets: int) -> None:
     script_dir = os.path.dirname(os.path.realpath(__file__))
     filename = os.path.join(script_dir, f"N_{nplanets}_multithread_pc.sh")
     python_script_path = os.path.join(script_dir, "genparallel_pc.py")
-    
-    bash_script_content = [
-        "#!/bin/bash\n\n",
-        "# Function to execute the Python script with provided arguments in parallel\n",
-        "run_code() {\n\t",
-        f"python {python_script_path} \"$1\" \"$2\"\n",
-        "}\n\n",
-        "# Export the function for use in parallel execution\n",
-        "export -f run_code\n\n"
-    ]
 
     ranges = threadranges(nplanets, NUM_THREADS)
     formatted_arguments = ' '.join([f"'{start} {end}'" for start, end in ranges])
 
-    bash_script_content += [
+    bash_script_lines = [
+        "#!/bin/bash\n\n",
         f"arguments=({formatted_arguments})\n",
-        "for args in \"${arguments[@]}\"; do\n",
-        "  read start end <<< \"$args\"\n",
-        "  run_code \"$start\" \"$end\" &\n",
-        "done\n",
+        f"python {python_script_path} \"${{arguments[@]}}\"\n",
     ]
     
-    with open(filename, "w") as script_file:
-        script_file.writelines(bash_script_content)
+    with open(filename, "w+") as script_file:
+        script_file.writelines(bash_script_lines)
 
 def permissions(nplanets: int) -> None:
     """
@@ -60,11 +49,10 @@ def permissions(nplanets: int) -> None:
     os.system(f"chmod 700 {filename}")
 
 if __name__ == "__main__":
-    nplanets = 100
-    parallel_bash_script(nplanets)
-    permissions(nplanets)
+    parallel_bash_script(NPLANETS)
+    permissions(NPLANETS)
     
     script_dir = os.path.dirname(os.path.realpath(__file__))
-    bash_script_path = os.path.join(script_dir, f"N_{nplanets}_multithread_pc.sh")
-    os.system(f"{bash_script_path}")
+    bash_script_path = os.path.join(script_dir, f"N_{NPLANETS}_multithread_pc.sh")
+    #os.system(f"{bash_script_path}")
 

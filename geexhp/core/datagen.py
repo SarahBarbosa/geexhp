@@ -1,4 +1,6 @@
 import os
+import time
+from datetime import timedelta
 import pandas as pd
 
 import pyarrow as pa
@@ -14,7 +16,7 @@ from geexhp.core import datamod as dm
 
 
 class DataGen:
-    def __init__(self, url: str, config: str = "../geexhp/config/default_habex.config", 
+    def __init__(self, url: str, config: str = "geexhp/config/default_habex.config", 
                     stage: str = "modern", instrument: str = "HWC") -> None:
         """
         Initializes the DataGen class to manage the generation of data from the PSG server.
@@ -42,7 +44,7 @@ class DataGen:
         Establishes a connection to the PSG server.
         """
         try:
-            psg = PSG(server_url=self.url, timeout_seconds=200)
+            psg = PSG(server_url=self.url, timeout_seconds=2000)
             return psg
         except Exception as e:
             raise ConnectionError(f"Connection error. Please try again. Details: {str(e)}")
@@ -97,7 +99,7 @@ class DataGen:
             return self.config.get(key)
         return self.config 
     
-    def generator(self, start: int, end: int, random_atm: bool, verbose: bool, file: str, molweight: list = None, sample_type: str = "default") -> None:
+    def generator(self, start: int, end: int, random_atm: bool, verbose: bool, file: str, molweight: list = None) -> None:
         """
         Generates a dataset using the PSG for a specified number of planets 
         and saves it to a Parquet file. The dataset generation can include random atmosphere
@@ -128,9 +130,6 @@ class DataGen:
             To simplify the generation of this list, you can use the following functions:
             - `geostages.molweight_modern()`: Returns the molecular weights of elements in the modern Earth's atmosphere. 
             - `geostages.molweight_after_goe()`: Returns the molecular weights of elements in 2.0 Ga after the Great Oxidation Event. 
-        sample_type : str, optional
-            Type of sample being computed, which determines the output directory structure.
-            Default is "default".
         
         Notes
         -----
@@ -152,23 +151,21 @@ class DataGen:
         you could divide this into chunks like 0-200, 201-400, etc., and run them concurrently 
         in different threads or processes.
         """
-        kind = sample_type
-
         # Check if molweight is required and not provided
         if not random_atm and molweight is None:
             raise ValueError("molweight must be provided when `random_atm` is False.")
 
-        data_dir = os.path.join("data", kind)
+        data_dir = "data"
         os.makedirs(data_dir, exist_ok=True)
         output_path = os.path.join(data_dir, f"{file}.parquet")
 
         parquet_writer = None
         schema = None
 
+        start_time = time.time()
+
         for i in range(int(start), int(end)):
             try:
-                if verbose:
-                    print(f"> Processing planet index: {i}...")
 
                 configuration = self.config.copy()
                 if random_atm:
@@ -196,6 +193,8 @@ class DataGen:
         
         if parquet_writer:
             parquet_writer.close()
+        
+        elapsed_time = str(timedelta(seconds=time.time() - start_time))
+
         if verbose:
-            print(f"> Generation completed for range {start} to {end}.")
-            print(f"> Data successfully saved to {output_path}.")
+            print(f">> Range {start}-{end} done in {elapsed_time}. Saved to {output_path}.")
