@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import pandas as pd
 from scipy.stats import beta
@@ -139,7 +140,11 @@ def modern_earth(config: dict) -> None:
     Gas abundances are provided as a fraction relative to the total mixture in each layer.
     """
     layers = 60
-    modern = pd.read_csv("data/atmos_layers/modern_atm.csv")
+
+    script_dir = os.path.dirname(os.path.realpath(__file__))
+    csv_path = os.path.abspath(os.path.join(script_dir, "..", "..", "data", "atmos_layers", "modern_atm.csv"))
+    modern = pd.read_csv(csv_path)
+
     molecules = ["CO2" , "N2" , "O2" , "H2O", "CO", "C2H6" , 
                 "HCN", "SO2" , "O3" , "CH4" , "N2O", "NH3"]
     
@@ -188,7 +193,11 @@ def after_goe(config: dict) -> None:
         Available at: https://iopscience.iop.org/article/10.3847/1538-3881/ab14e3
     """
     layers = 60
-    goe = pd.read_csv("data/atmos_layers/after_goe.csv")
+
+    script_dir = os.path.dirname(os.path.realpath(__file__))
+    csv_path = os.path.abspath(os.path.join(script_dir, "..", "..", "data", "atmos_layers", "after_goe.csv"))
+    goe = pd.read_csv(csv_path)
+    
     molecules = ["H2O", "N2O", "O3", "CO", "CO2", "O2", "CH4", "N2"]
     HITRAN_DICT = {"H2O": "HIT[1]", "N2O": "HIT[4]", "O3":"HIT[3]", "CO": "HIT[5]",
                     "CO2": "HIT[2]", "O2" : "HIT[7]", "CH4" :"HIT[6]", "N2" : "HIT[22]"}
