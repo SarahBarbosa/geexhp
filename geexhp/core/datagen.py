@@ -29,7 +29,7 @@ class DataGen:
             Path to the PSG configuration file. 
             Defaults to "../geexhp/config/default_habex.config".
         stage : str, optional
-            Geological stage of Earth to consider. Options: "modern", "goe".
+            Geological stage of Earth to consider. Options: "modern", "proterozoic".
             Defaults to "modern".
         instrument : str, optional
             The telescope instrument setting to modify. 
@@ -60,7 +60,7 @@ class DataGen:
         except FileNotFoundError:
             raise FileNotFoundError(f"The configuration file {config_path} was not found.")
         
-        valid_stages = {'modern': geo.modern_earth, 'goe': geo.after_goe}
+        valid_stages = {'modern': geo.modern_earth, 'proterozoic': geo.proterozoic}
         if stage in valid_stages:
             valid_stages[stage](config)
         else:
@@ -129,14 +129,14 @@ class DataGen:
 
             To simplify the generation of this list, you can use the following functions:
             - `geostages.molweight_modern()`: Returns the molecular weights of elements in the modern Earth's atmosphere. 
-            - `geostages.molweight_after_goe()`: Returns the molecular weights of elements in 2.0 Ga after the Great Oxidation Event. 
+            - `geostages.molweight_proterozoic()`: Returns the molecular weights of elements in 2.0 Ga after the Great Oxidation Event. 
         
         Notes
         -----
         - If `random_atm` is True, the atmospheric composition is generated randomly, and the
         `molweight` parameter is not used. This allows flexibility in the function usage depending
-        on the scenario of the atmospheric simulation. The molecules included in the random atmosphere 
-        generation are:
+        on the scenario of the atmospheric simulation (with isothermal layers). 
+        The molecules included in the random atmosphere generation are:
             - H2O (Water vapor)
             - CO2 (Carbon dioxide)
             - CH4 (Methane)
@@ -148,8 +148,8 @@ class DataGen:
             - H2S (Hydrogen sulfide)
         - To run this function in parallel, consider dividing the `start` and `end` range across 
         multiple threads or processes. For example, if generating data for planets 0 to 1000, 
-        you could divide this into chunks like 0-200, 201-400, etc., and run them concurrently 
-        in different threads or processes.
+        you could divide this into chunks like 0-200, 200-400, etc., and run them concurrently 
+        in different threads or processes (see the function on parallel folder).
         """
         # Check if molweight is required and not provided
         if not random_atm and molweight is None:

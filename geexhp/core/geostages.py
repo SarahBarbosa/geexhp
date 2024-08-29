@@ -28,10 +28,10 @@ def molweight_modern() -> np.ndarray:
         64.0638, 47.99820, 16.0425, 44.01280, 17.03052])
     return molecular_weights
 
-def molweight_after_goe() -> np.ndarray:
+def molweight_proterozoic() -> np.ndarray:
     """
     Returns the molecular weights of elements in 2.0 Ga after the 
-    Great Oxidation Event.
+    Great Oxidation Event (Proterozoic Earth).
 
     The molecules included are:
     - H2O : Water
@@ -47,78 +47,6 @@ def molweight_after_goe() -> np.ndarray:
         18.01528, 44.01280, 47.99820, 28.0101, 44.0095, 31.99880, 16.0425, 28.01340 
         ])
     return molecular_weights   
-
-def isothermal_PT(layers: int) -> tuple[np.ndarray, np.ndarray]:
-    """
-    Generates an isothermal pressure-temperature profile for a planetary atmosphere,
-    using a Beta distribution to model atmospheric pressures and temperatures 
-    between values typical for Mars and a theoretical upper limit less favorable than Venus.
-
-    Parameters:
-    -----------
-    layers : int
-        The number of atmospheric layers for which the pressure values are generated.
-        This defines the vertical resolution of the model.
-
-    Returns:
-    --------
-    tuple (np.ndarray, np.ndarray)
-        A tuple containing two arrays:
-        - The first array contains logarithmically spaced pressure values from a near vacuum
-            to a scaled pressure value.
-        - The second array contains a constant temperature value replicated across all layers.
-
-    Physics Context:
-    ----------------
-    - The pressure values are generated to simulate a range for a terrestrial atmosphere, 
-        bounded by extreme low (Mars-like) and moderate high pressures, avoiding extremes 
-        like those on Venus.
-    - The temperature is set using a Beta distribution to represent variability in planetary 
-        atmospheric temperatures, constrained within a range that approximates Mars-like to 
-        ~ 100°C 
-    - This greatly simplifies the forward model and is valid because the reflected light 
-    spectra are not sensitive to the specifics of the temperature (Damiano and Hu, 2022)
-    > https://arxiv.org/pdf/2204.13816
-
-    Beta Distribution Parameters (a, b):
-    ------------------------------------
-    - The parameters 'a' and 'b' are set to 2 and 5 respectively to create a distribution 
-        that is skewed towards lower values (more common) with a longer tail towards higher 
-        values (less common). This helps simulate conditions where typical temperatures and 
-        pressures are low with a possibility of reaching higher values occasionally.
-
-    Scaling Formula:
-    ----------------
-    - The formula used for scaling the Beta distribution output to a specific range is:
-      scaled_value = min_value + (max_value - min_value) * beta_output
-    - This is a standard approach for feature scaling that adjusts the data into a specified 
-        range [min_value, max_value].
-    - More on this can be read about feature scaling on Wikipedia: 
-        https://en.wikipedia.org/wiki/Feature_scaling
-
-    Source:
-    ------
-    Fuller-Rowell, T. (2014). Physical Characteristics and Modeling of Earth’s Thermosphere. 
-    > https://agupubs.onlinelibrary.wiley.com/doi/abs/10.1002/9781118704417.ch2
-    > https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html
-    > https://nssdc.gsfc.nasa.gov/planetary/factsheet/venusfact.html
-    """
-    min_press_earth = 1e-11      # Earth’s upper atmosphere (Fuller-Rowell, 2014)
-    a, b = 2, 5                  # Shape parameters for Beta distribution
-    min_temp = 210               # Approximate Mars-like minimum atmosphere temperature in Kelvin
-    max_temp = 370               # Thermal limits to life on Earth  (Clarke, 2014)
-    min_pres = 0.006             # Approximate Mars surface pressure in bars
-    max_pres = 10.0              # A practical upper limit for pressures (10x Earth), less than Venus (92 bars TO MUCH!)
-
-    # Generate beta-distributed random values for temperature and pressure
-    scaled_temp = min_temp + (max_temp - min_temp) * beta.rvs(a, b)
-    scaled_pres = min_pres + (max_pres - min_pres) * beta.rvs(a, b)
-
-    # Generate logarithmically spaced pressures from a minimum value to a scaled value
-    pressure = np.logspace(np.log10(scaled_pres), np.log10(min_press_earth), num=layers)
-    
-    # Return pressure array and a constant temperature array
-    return pressure, np.ones(len(pressure)) * scaled_temp
 
 def modern_earth(config: dict) -> None:
     """
@@ -167,7 +95,7 @@ def modern_earth(config: dict) -> None:
     config['ATMOSPHERE-UNIT'] = "scl," * (len(molecules) - 1) + 'scl' 
     config['ATMOSPHERE-LAYERS-MOLECULES'] = ",".join(molecules)
 
-def after_goe(config: dict) -> None:
+def proterozoic(config: dict) -> None:
     """
     Processes atmospheric data from a CSV file for a period 2.0 Ga after the Great Oxidation Event (GOE),
     normalizes gas abundances, calculates the mean molecular weight, and updates a configuration dictionary
@@ -207,8 +135,7 @@ def after_goe(config: dict) -> None:
     abun = goe.columns[2:]
     goe[abun] = goe[abun].div(goe[abun].sum(axis=1), axis=0)
 
-    # That's right, right? Mean Molecular Weight Calculation
-    mmw = goe[abun].apply(lambda row: sum(row[col] * molweight_after_goe()[i] for i, col in enumerate(abun)), axis=1).mean()
+    mmw = goe[abun].apply(lambda row: sum(row[col] * molweight_proterozoic()[i] for i, col in enumerate(abun)), axis=1).mean()
         
     for i in range(layers):
         layer_data = [f'{goe["Pressure"][i]}', f'{goe["Temperature"][i]}']
@@ -228,10 +155,9 @@ def after_goe(config: dict) -> None:
 def random_atmosphere(config: dict) -> None:
     """
     Generates a completely random atmospheric composition for planetary modeling and 
-    populates the provided configuration dictionary with the results. This function
-    autonomously calculates random molecular concentrations, normalizes them, and
-    distributes these across specified atmospheric layers without using additional
-    functions from `datamod`.
+    populates the provided configuration dictionary with the results.
+
+    The atmosphere is assumed to be isothermal across all layers.
 
     Parameters
     ----------
@@ -241,26 +167,24 @@ def random_atmosphere(config: dict) -> None:
     Returns
     -------
     None
-
-    Notes
-    -----
-    The atmosphere is assumed to be isothermal across all layers, and molecular
-    concentrations are randomly assigned with a special consideration for "known" and
-    "foreign" molecules. "Known" molecules have a 40% chance to be zero to simulate
-    absence in some scenarios. The function also sets up other necessary atmospheric
-    parameters such as average molecular weight and spectral type configurations.
     """
+    dm.set_spectral_type(config)
+    dm.set_stellar_parameters(config)
+    dm.set_solar_coordinates(config)
+    dm.set_habitable_zone_distance(config)
+    dm.maintain_planetary_atmosphere(config)
+
     layers = 60 
     molecular_weights = {
-        'H2O': 18.01528,  # Water vapor
-        'CO2': 44.0095,   # Carbon dioxide
-        'CH4': 16.0425,   # Methane
-        'O2': 31.99880,   # Oxygen
-        'NH3': 17.03052,  # Ammonia
-        'HCN': 27.0253,   # Hydrogen cyanide
-        'PH3': 33.99758,  # Phosphine
-        'SO2': 64.0638,   # Sulfur dioxide
-        'H2S': 34.0809    # Hydrogen sulfide
+        'H2O': 18.01528,  
+        'CO2': 44.0095,   
+        'CH4': 16.0425,   
+        'O2': 31.99880,   
+        'NH3': 17.03052,  
+        'HCN': 27.0253,   
+        'PH3': 33.99758,  
+        'SO2': 64.0638,   
+        'H2S': 34.0809   
     }
     HITRAN_DICT = {
         'H2O': 'HIT[1]', 'CO2': 'HIT[2]', 'CH4': 'HIT[6]', 
@@ -269,15 +193,12 @@ def random_atmosphere(config: dict) -> None:
     }
 
     # Generate random molecule concentrations
-    known_molecules = ['H2O', 'CO2', 'CH4', 'O2']
-    foreign_molecules = ['NH3', 'HCN', 'PH3', 'SO2', 'H2S']
+    molecules = ['H2O', 'CO2', 'CH4', 'O2', 'NH3', 'HCN', 'PH3', 'SO2', 'H2S']
 
     # Calculate random values for each molecule
     sample = {}
-    for molecule in known_molecules:
-        sample[molecule] = np.random.rand() / 2 if np.random.random() < 0.25 else 0
-    for molecule in foreign_molecules:
-        sample[molecule] = np.random.rand()
+    for molecule in molecules:
+        sample[molecule] = np.random.lognormal(-13, 1)
 
     # Normalize molecule concentrations
     total_concentration = sum(sample.values())
@@ -287,7 +208,8 @@ def random_atmosphere(config: dict) -> None:
     layer_concentrations = {molecule: np.full(layers, concentration) for molecule, concentration in normalized_sample.items()}
 
     # Atmospheric parameters setup
-    pressure, temperature = isothermal_PT(layers)
+    pressure = np.logspace(np.log10(config["ATMOSPHERE-PRESSURE"] / 1000), np.log10(1e-11), num=layers)
+    temperature = np.ones(len(pressure)) * config["ATMOSPHERE-TEMPERATURE"]
 
     # Populate atmospheric layers
     for i in range(layers):
@@ -304,13 +226,3 @@ def random_atmosphere(config: dict) -> None:
     config['ATMOSPHERE-ABUN'] = "1," * (len(sample) - 1) + '1'
     config['ATMOSPHERE-UNIT'] = "scl," * (len(sample) - 1) + 'scl' 
     config['ATMOSPHERE-LAYERS-MOLECULES'] = ",".join(sample.keys())
-    config["ATMOSPHERE-PRESSURE"] = pressure[0] * 1000 # in mbar
-
-    dm.set_spectral_type(config)
-    dm.set_stellar_parameters(config)
-    dm.set_solar_coordinates(config)
-    dm.set_habitable_zone_distance(config)
-    dm.maintain_planetary_atmosphere(config)
-
-
-

@@ -154,24 +154,12 @@ def set_stellar_parameters(config: dict) -> None:
     # 10x greater and lesser the metallicity of the sun (in dex)
     #config["OBJECT-STAR-METALLICITY"] = round(np.random.uniform(-1, 1), 3)
 
-    # THIS IS FOR THE PLANET! (SORRY FOR TO BE HERE!)
-    config["SURFACE-TEMPERATURE"] = float(config["ATMOSPHERE-LAYER-1"].split(",")[1])
-    config["SURFACE-ALBEDO"] = np.random.uniform(0.1, 0.8)
-    config["SURFACE-EMISSIVITY"] = 1 - config["SURFACE-ALBEDO"]
-
 def set_solar_coordinates(config: dict) -> None:
     """
     Randomly sets the sub-solar longitude and latitude.
     """
     config['OBJECT-SOLAR-LONGITUDE'] = np.random.uniform(-360, 360)
     config['OBJECT-SOLAR-LATITUDE'] =  np.random.uniform(-90, 90)
-
-def set_atmospheric_pressure(config: dict) -> None:
-    """
-    Randomly sets the atmospheric pressure within a specified range.
-    """
-    pressure = round(np.random.uniform(500, 1500), 3)
-    config["ATMOSPHERE-PRESSURE"] = pressure
 
 def calculate_luminosity(config: dict) -> float:
     """
@@ -189,20 +177,20 @@ def set_habitable_zone_distance(config: dict) -> None:
     Notes
     -----
     Source: Habitable zones around main-sequence stars... 
-    ([Kopparapu et al. (2013)](https://iopscience.iop.org/article/10.1088/0004-637X/765/2/131/pdf)). 
-    See Equations (2) and (3) and the Table 3 from Kopparapu et al. (2013)
+    ([Kopparapu et al. (2014)](https://iopscience.iop.org/article/10.1088/2041-8205/787/2/L29/pdf)). 
+    See Equation 4 and Table 1 from Kopparapu et al. (2013)
     """
     temp = config['OBJECT-STAR-TEMPERATURE'] - 5780
     luminosity_star = calculate_luminosity(config)
 
     # Recent Venus (lower limit)
-    S_eff_odot = 1.7753  
-    a, b, c, d = 1.4316e-4, 2.9875e-9, -7.5702e-12, -1.1635e-15
+    S_eff_odot = 1.776
+    a, b, c, d = 2.136e-4, 2.533e-8, -1.332e-11, -3.097e-15
     S_eff_lower = S_eff_odot + a * temp + b * temp**2 + c * temp**3 + d * temp**4
 
     # Early Mars (upper limit)
-    S_eff_odot = 0.3179
-    a, b, c, d = 5.4513e-5, 1.5313e-9, -2.7786e-12, -4.8997e-16
+    S_eff_odot = 0.32
+    a, b, c, d = 5.547e-5, 1.526e-9, -2.874e-12, -5.011e-16
     S_eff_upper = S_eff_odot + a * temp + b * temp**2 + c * temp**3 + d * temp**4
 
     # Distance of the habitable zone
@@ -222,24 +210,23 @@ def maintain_planetary_atmosphere(config: dict) -> None:
 
     while not has_atmosphere:
         # Define the planet's radius in Earth radii; targeting terrestrial planets 
-        # up to about 1.7 Earth radii. Based on findings from "The Super-Earth 
-        # Opportunity – Search for Habitable Exoplanets in the 2020s"
-        # Reference: https://arxiv.org/pdf/1903.05258
-        planet_radius = np.random.uniform(0.5, 1.71)
+        # up to about 1.23 Earth radii. Based on findings from "A rocky exoplanet classification method 
+        # and its application to calculating surface pressure and surface temperature"
+        # Reference: https://arxiv.org/abs/2301.03348
+        planet_radius = np.random.uniform(0.3, 1.23)
 
-        # Using mass-radius relationships from Sotin, Grasset & Mocquet (2007) 
-        # to estimate planetary mass.
-        # Reference: https://ui.adsabs.harvard.edu/abs/2007Icar..191..337S/abstract
-        planet_mass = planet_radius ** (1 / 0.306) if planet_radius <= 1 else planet_radius ** (1 / 0.274)
+        # # Calculate planet mass based on planet radius using the relationship
+        # derived from Equation (2) of the paper "A rocky exoplanet classification method 
+        # and its application to calculating surface pressure and surface temperature" 
+        # by McIntyre et al. (2023)
+        planet_mass = planet_radius ** (1 / (0.279 + np.random.uniform(-0.009, 0.009)))
         
         # Calculate planetary gravity (g = GM/r²) in m/s² using the mass and radius 
         # estimates.
         gravity = G.value * (planet_mass * M_earth.value) / (planet_radius * R_earth.value) ** 2
 
-        # Calculate escape velocity from the planet's surface in m/s and convert 
-        # it to km/s.
+        # Calculate escape velocity from the planet's surface in m/s
         escape_velocity = np.sqrt(2 * gravity * planet_radius * R_earth.value)
-        escape_velocity_km = escape_velocity / 1000
 
         # Compute the XUV-driven atmospheric escape, considering the star-planet 
         # distance and stellar luminosity. Reference for insolation calculations: 
@@ -250,18 +237,29 @@ def maintain_planetary_atmosphere(config: dict) -> None:
         # Estimate the critical insolation for atmospheric retention based on escape 
         # velocity, using an empirically derived relationship from Zahnle and 
         # Catling (2017), with approximation from graph analysis.
-        slope_shoreline = np.log10(1e4 / 1e-6) / np.log10(70 / 0.2)
-        insolation_planet = np.exp(slope_shoreline * np.log(escape_velocity_km / 70) + np.log(1e4))
+        # See equation (7) by McIntyre et al. (2023)
+        cosmic_shoreline = (5 * 1e-16) * (escape_velocity) ** 4
 
         # Check if the current insolation is less than the calculated critical 
         # insolation for the planet.
-        if insolation_xuv < insolation_planet:
+        if insolation_xuv < cosmic_shoreline:
             has_atmosphere = True
 
-    # Once a suitable planet is found, set its diameter and surface gravity 
+    # Once a suitable planet is found, set its pressure (in mbar), diameter and surface gravity 
     # in the dictionary.
+    # According to the paper "A rocky exoplanet classification method and its application to calculating 
+    # surface pressure and surface temperature" by McIntyre et al. (2023), Equation (3)
+    config["ATMOSPHERE-PRESSURE"] = 1013.25 * (planet_radius ** (3.168 + np.random.uniform(-0.232, 0.232)))
+    
     config['OBJECT-DIAMETER'] = 2 * planet_radius * R_earth.to(u.km).value 
     config['OBJECT-GRAVITY'] = gravity 
+
+    # See equation (25) by McIntyre et al. (2023) for surface temperature
+    temperature_analogue = 41.9 * cosmic_shoreline ** (1 / 4) + 33.85
+    config["ATMOSPHERE-TEMPERATURE"] = temperature_analogue
+    config["SURFACE-TEMPERATURE"] = temperature_analogue
+    config["SURFACE-ALBEDO"] = np.random.uniform(0.1, 0.8)
+    config["SURFACE-EMISSIVITY"] = 1 - config["SURFACE-ALBEDO"]
 
 def set_instrument(config: dict, instrument: str) -> None:
     """
@@ -373,9 +371,8 @@ def random_planet(config: dict, molweight: list, layers: int = 60) -> None:
     5. Calculate and set the stellar parameters including radius and temperature 
         based on the spectral type.
     6. Set random solar coordinates for the planet relative to its star.
-    7. Set a random atmospheric pressure within a realistic range.
-    8. Calculate the distance of the habitable zone based on the stellar parameters.
-    9. Simulate planetary characteristics to ensure the planet can maintain an 
+    7. Calculate the distance of the habitable zone based on the stellar parameters.
+    8. Simulate planetary characteristics to ensure the planet can maintain an 
         atmosphere.
 
     """
@@ -385,7 +382,6 @@ def random_planet(config: dict, molweight: list, layers: int = 60) -> None:
     set_spectral_type(config)
     set_stellar_parameters(config)
     set_solar_coordinates(config)
-    set_atmospheric_pressure(config)
     set_habitable_zone_distance(config)
     maintain_planetary_atmosphere(config)
 

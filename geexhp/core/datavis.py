@@ -7,26 +7,30 @@ from matplotlib_inline import backend_inline
 from matplotlib import lines as mlines
 
 
-def configure_matplotlib() -> None:
+def configure_matplotlib(oldschool: bool = False) -> None:
     """
     Configures matplotlib parameters.
     """
     backend_inline.set_matplotlib_formats("svg") 
-    plt.rcParams.update({
-        "xtick.top": True,          
-        "ytick.right": True,        
-        "xtick.direction": "in",    
-        "ytick.direction": "in",    
-        "font.size": 12,            
-        "font.family": "Lato",      
-        "axes.labelsize": 12,  
-        "axes.titlesize": 12,  
-        "legend.fontsize": 10,  
-        "xtick.labelsize": 10,  
-        "ytick.labelsize": 10,  
-        "xtick.minor.visible": True,  
-        "ytick.minor.visible": True  
-    })
+
+    if oldschool:
+        import smplotlib
+    else:
+        plt.rcParams.update({
+            "xtick.top": True,          
+            "ytick.right": True,        
+            "xtick.direction": "in",    
+            "ytick.direction": "in",    
+            "font.size": 12,            
+            "font.family": "Lato",      
+            "axes.labelsize": 12,  
+            "axes.titlesize": 12,  
+            "legend.fontsize": 10,  
+            "xtick.labelsize": 10,  
+            "ytick.labelsize": 10,  
+            "xtick.minor.visible": True,  
+            "ytick.minor.visible": True  
+        })
 
 
 def plot_spectrum(df: pd.DataFrame, label: str, index: int = None, ax: plt.Axes = None, **kwargs) -> plt.Axes:
@@ -125,21 +129,15 @@ def label_line(line: mlines.Line2D, x: float, label: str = None, align: bool = T
     # Set a bunch of keyword arguments
     if "color" not in kwargs:
         kwargs["color"] = line.get_color()
-
     if "horizontalalignment" not in kwargs and "ha" not in kwargs:
         kwargs["ha"] = "center"
-
     if "verticalalignment" not in kwargs and "va" not in kwargs:
         kwargs["va"] = "center"
-
     if "backgroundcolor" not in kwargs:
         kwargs["backgroundcolor"] = ax.get_facecolor()
-
     if "clip_on" not in kwargs:
         kwargs["clip_on"] = True
-
     if "zorder" not in kwargs:
         kwargs["zorder"] = 2.5
-
     ax.text(10**x if ax.get_xscale() == 'log' else x, y, label, rotation=trans_angle, **kwargs)
 
