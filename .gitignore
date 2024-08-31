@@ -15,5 +15,6 @@ geexhp.egg-info/
 
 # Ignorando
 data/moderna10k.parquet
+parallel/data/
 examples/kawashima_data/
 ecospeclib-all/
