@@ -47,7 +47,7 @@ def random_atmospheric_layers(config: dict, layers: int) -> None:
     Modify the atmospheric layers configuration by multiplying each column (starting 
     from the third element in each entry) with a random factor. Each column has a 
     25% chance to get a random factor of zero, otherwise a random factor between 0 
-    and 1.
+    and 2.
 
     Parameters
     ----------
@@ -206,60 +206,60 @@ def maintain_planetary_atmosphere(config: dict) -> None:
     semi_major_axis = config['OBJECT-STAR-DISTANCE']
     star_luminosity = calculate_luminosity(config)
 
-    has_atmosphere = False
+    # Define the planet's radius in Earth radii; targeting terrestrial planets 
+    # up to about 1.23 Earth radii. Based on findings from "A rocky exoplanet classification method 
+    # and its application to calculating surface pressure and surface temperature"
+    # Reference: https://arxiv.org/abs/2301.03348
+    planet_radius = np.random.uniform(0.3, 1.23)
 
-    while not has_atmosphere:
-        # Define the planet's radius in Earth radii; targeting terrestrial planets 
-        # up to about 1.23 Earth radii. Based on findings from "A rocky exoplanet classification method 
-        # and its application to calculating surface pressure and surface temperature"
-        # Reference: https://arxiv.org/abs/2301.03348
-        planet_radius = np.random.uniform(0.3, 1.23)
-
-        # # Calculate planet mass based on planet radius using the relationship
-        # derived from Equation (2) of the paper "A rocky exoplanet classification method 
-        # and its application to calculating surface pressure and surface temperature" 
-        # by McIntyre et al. (2023)
-        planet_mass = planet_radius ** (1 / (0.279 + np.random.uniform(-0.009, 0.009)))
+    # # Calculate planet mass based on planet radius using the relationship
+    # derived from Equation (2) of the paper "A rocky exoplanet classification method 
+    # and its application to calculating surface pressure and surface temperature" 
+    # by McIntyre et al. (2023)
+    planet_mass = planet_radius ** (1 / (0.279 + np.random.uniform(-0.009, 0.009)))
         
-        # Calculate planetary gravity (g = GM/r²) in m/s² using the mass and radius 
-        # estimates.
-        gravity = G.value * (planet_mass * M_earth.value) / (planet_radius * R_earth.value) ** 2
+    # Calculate planetary gravity (g = GM/r²) in m/s² using the mass and radius 
+    # estimates.
+    gravity = G.value * (planet_mass * M_earth.value) / (planet_radius * R_earth.value) ** 2
 
-        # Calculate escape velocity from the planet's surface in m/s
-        escape_velocity = np.sqrt(2 * gravity * planet_radius * R_earth.value)
+    # Calculate escape velocity from the planet's surface in m/s
+    escape_velocity = np.sqrt(2 * gravity * planet_radius * R_earth.value)
 
-        # Compute the XUV-driven atmospheric escape, considering the star-planet 
-        # distance and stellar luminosity. Reference for insolation calculations: 
-        # Zahnle and Catling (2017), particularly their Equation (27)
-        # https://arxiv.org/pdf/1702.03386
-        insolation_xuv = (1 ** 2 / semi_major_axis ** 2) * (star_luminosity / L_sun.value) ** 0.4
+    # Compute the XUV-driven atmospheric escape, considering the star-planet 
+    # distance and stellar luminosity. Reference for insolation calculations: 
+    # Zahnle and Catling (2017), particularly their Equation (27)
+    # https://arxiv.org/pdf/1702.03386
+    real_insolation = (1 ** 2 / semi_major_axis ** 2) * (star_luminosity / L_sun.value) ** 0.4
 
-        # Estimate the critical insolation for atmospheric retention based on escape 
-        # velocity, using an empirically derived relationship from Zahnle and 
-        # Catling (2017), with approximation from graph analysis.
-        # See equation (7) by McIntyre et al. (2023)
-        cosmic_shoreline = (5 * 1e-16) * (escape_velocity) ** 4
+    # Estimate the critical insolation for atmospheric retention based on escape 
+    # velocity, using an empirically derived relationship from Zahnle and 
+    # Catling (2017), with approximation from graph analysis.
+    # See equation (7) by McIntyre et al. (2023)
+    cosmic_shoreline = (5 * 1e-16) * (escape_velocity) ** 4
 
-        # Check if the current insolation is less than the calculated critical 
-        # insolation for the planet.
-        if insolation_xuv < cosmic_shoreline:
-            has_atmosphere = True
+    # Check if the real insolation is less than the calculated critical insolation for the planet
+    # This condition ensures that the planet is below the Cosmic Shoreline.
+    # If the planet receives less energy (insolation) than the critical threshold defined by 
+    # the Cosmic Shoreline, it means the planet has enough gravitational pull to retain its atmosphere.
+    # In this case, we proceed to store the planet's properties in the config dictionary.
+    if real_insolation < cosmic_shoreline:
+        # According to McIntyre et al. (2023), Equation (3) in mbar
+        config["ATMOSPHERE-PRESSURE"] = 1013.25 * (planet_radius ** (3.168 + np.random.uniform(-0.232, 0.232)))
+        config['OBJECT-DIAMETER'] = 2 * planet_radius * R_earth.to(u.km).value
+        config['OBJECT-GRAVITY'] = gravity
 
-    # Once a suitable planet is found, set its pressure (in mbar), diameter and surface gravity 
-    # in the dictionary.
-    # According to the paper "A rocky exoplanet classification method and its application to calculating 
-    # surface pressure and surface temperature" by McIntyre et al. (2023), Equation (3)
-    config["ATMOSPHERE-PRESSURE"] = 1013.25 * (planet_radius ** (3.168 + np.random.uniform(-0.232, 0.232)))
-    
-    config['OBJECT-DIAMETER'] = 2 * planet_radius * R_earth.to(u.km).value 
-    config['OBJECT-GRAVITY'] = gravity 
-
-    # See equation (25) by McIntyre et al. (2023) for surface temperature
-    temperature_analogue = 41.9 * cosmic_shoreline ** (1 / 4) + 33.85
-    config["ATMOSPHERE-TEMPERATURE"] = temperature_analogue
-    config["SURFACE-TEMPERATURE"] = temperature_analogue
-    config["SURFACE-ALBEDO"] = np.random.uniform(0.1, 0.8)
-    config["SURFACE-EMISSIVITY"] = 1 - config["SURFACE-ALBEDO"]
+        # See equation (25) by McIntyre et al. (2023) for surface temperature
+        temperature_analogue = 41.9 * cosmic_shoreline ** (1 / 4) + 33.85
+        config["ATMOSPHERE-TEMPERATURE"] = temperature_analogue
+        config["SURFACE-TEMPERATURE"] = temperature_analogue
+        config["SURFACE-ALBEDO"] = np.random.uniform(0.1, 0.8)
+        config["SURFACE-EMISSIVITY"] = 1 - config["SURFACE-ALBEDO"]
+    else:
+        # If the real insolation is greater than or equal to the critical insolation,
+        # the planet is above the Cosmic Shoreline and cannot retain a significant atmosphere.
+        # Therefore, we call the function again recursively to generate a new planet configuration
+        # that might meet the criteria for atmosphere retention.
+        maintain_planetary_atmosphere(config)
 
 def set_instrument(config: dict, instrument: str) -> None:
     """
