@@ -4,51 +4,26 @@ import pandas as pd
 from scipy.stats import beta
 from geexhp.core import datamod as dm
 
-def molweight_modern() -> np.ndarray:
+def molweightlist() -> np.ndarray:
     """
-    Returns the molecular weights of elements in the modern Earth's atmosphere.
+    Returns the molecular weights of main molecules.
 
     The molecules included are:
-    - CO2 : Carbon Dioxide
-    - N2  : Nitrogen
-    - O2  : Oxygen
-    - H2O : Water
-    - CO  : Carbon Monoxide
-    - C2H6: Ethane
-    - HCN : Hydrogen Cyanide
-    - SO2 : Sulfur Dioxide
-    - O3  : Ozone
-    - CH4 : Methane
-    - N2O : Nitrous Oxide
-    - NH3 : Ammonia
+    - CO2  : Carbon Dioxide
+    - O2   : Oxygen
+    - H2O  : Water
+    - CO   : Carbon Monoxide
+    - O3   : Ozone
+    - CH4  : Methane
+    - N2O  : Nitrous Oxide
+    - N2   : Nitrogen
     """
     # Information about molecules (Reference: https://pt.webqc.org/mmcalc.php)
     molecular_weights = np.array([
-        44.0095, 28.01340, 31.99880, 18.01528, 28.0101, 30.0690, 27.0253, 
-        64.0638, 47.99820, 16.0425, 44.01280, 17.03052])
+        44.0095, 31.99880, 18.01528, 28.0101, 47.99820, 16.0425, 44.01280, 28.01340])
     return molecular_weights
 
-def molweight_proterozoic() -> np.ndarray:
-    """
-    Returns the molecular weights of elements in 2.0 Ga after the 
-    Great Oxidation Event (Proterozoic Earth).
-
-    The molecules included are:
-    - H2O : Water
-    - N2O : Nitrous Oxide
-    - O3  : Ozone
-    - CO  : Carbon Monoxide
-    - CO2 : Carbon Dioxide
-    - O2  : Oxygen
-    - CH4 : Methane
-    - N2  : Nitrogen
-    """
-    molecular_weights = np.array([
-        18.01528, 44.01280, 47.99820, 28.0101, 44.0095, 31.99880, 16.0425, 28.01340 
-        ])
-    return molecular_weights   
-
-def modern_earth(config: dict) -> None:
+def modern(config: dict) -> None:
     """
     Calculate atmospheric parameters for a modern Earth simulation.
 
@@ -70,18 +45,16 @@ def modern_earth(config: dict) -> None:
     layers = 60
 
     script_dir = os.path.dirname(os.path.realpath(__file__))
-    csv_path = os.path.abspath(os.path.join(script_dir, "..", "..", "data", "atmos_layers", "modern_atm.csv"))
+    csv_path = os.path.abspath(os.path.join(script_dir, "..", "..", "data", "atmos_layers", "modern.csv"))
     modern = pd.read_csv(csv_path)
 
-    molecules = ["CO2" , "N2" , "O2" , "H2O", "CO", "C2H6" , 
-                "HCN", "SO2" , "O3" , "CH4" , "N2O", "NH3"]
+    molecules = ["CO2", "O2", "H2O", "CO", "O3", "CH4", "N2O", "N2"]
     
     # Mapping molecules to HITRAN database indices
     # https://hitran.org/lbl/
-    HITRAN_DICT = {"CO2": "HIT[2]", "N2" : "HIT[22]", "O2" : "HIT[7]", 
-                    "H2O": "HIT[1]", "CO": "HIT[5]", "C2H6": "HIT[27]",
-                    "HCN": "HIT[23]", "SO2": "HIT[9]", "O3":"HIT[3]", 
-                    "CH4" :"HIT[6]", "N2O": "HIT[4]", "NH3" : "HIT[11]"}
+    HITRAN_DICT = {"CO2": "HIT[2]", "O2" : "HIT[7]", "H2O": "HIT[1]",
+                    "CO": "HIT[5]", "O3":"HIT[3]", "CH4" :"HIT[6]", 
+                    "N2O": "HIT[4]", "N2" : "HIT[22]"}
         
     for i in range(layers):
         layer_data = [f'{modern["Pressure"][i]}', f'{modern["Temperature"][i]}']
@@ -123,23 +96,22 @@ def proterozoic(config: dict) -> None:
     layers = 60
 
     script_dir = os.path.dirname(os.path.realpath(__file__))
-    csv_path = os.path.abspath(os.path.join(script_dir, "..", "..", "data", "atmos_layers", "after_goe.csv"))
-    goe = pd.read_csv(csv_path)
+    csv_path = os.path.abspath(os.path.join(script_dir, "..", "..", "data", "atmos_layers", "proterozoic.csv"))
+    proterozoic = pd.read_csv(csv_path)
     
-    molecules = ["H2O", "N2O", "O3", "CO", "CO2", "O2", "CH4", "N2"]
-    HITRAN_DICT = {"H2O": "HIT[1]", "N2O": "HIT[4]", "O3":"HIT[3]", "CO": "HIT[5]",
-                    "CO2": "HIT[2]", "O2" : "HIT[7]", "CH4" :"HIT[6]", "N2" : "HIT[22]"}
+    molecules = ["CO2", "O2", "H2O", "CO", "O3", "CH4", "N2O", "N2"]
+    HITRAN_DICT = {"CO2": "HIT[2]", "O2" : "HIT[7]", "H2O": "HIT[1]",
+                    "CO": "HIT[5]", "O3":"HIT[3]", "CH4" :"HIT[6]", 
+                    "N2O": "HIT[4]", "N2" : "HIT[22]"}
     
-    # Unit sum normalization at each layer
-    goe["N2"] = np.full(60, 0.781)
-    abun = goe.columns[2:]
-    goe[abun] = goe[abun].div(goe[abun].sum(axis=1), axis=0)
+    abun = proterozoic.columns[2:]
+    proterozoic[abun] = proterozoic[abun].div(proterozoic[abun].sum(axis=1), axis=0)
 
-    mmw = goe[abun].apply(lambda row: sum(row[col] * molweight_proterozoic()[i] for i, col in enumerate(abun)), axis=1).mean()
+    mmw = proterozoic[abun].apply(lambda row: sum(row[col] * molweightlist()[i] for i, col in enumerate(abun)), axis=1).mean()
         
     for i in range(layers):
-        layer_data = [f'{goe["Pressure"][i]}', f'{goe["Temperature"][i]}']
-        layer_data += [f'{goe[molecule][i]}' for molecule in molecules]
+        layer_data = [f'{proterozoic["Pressure"][i]}', f'{proterozoic["Temperature"][i]}']
+        layer_data += [f'{proterozoic[molecule][i]}' for molecule in molecules]
         config[f'ATMOSPHERE-LAYER-{i + 1}'] = ','.join(layer_data)
 
     config['ATMOSPHERE-WEIGHT'] = mmw
@@ -149,8 +121,8 @@ def proterozoic(config: dict) -> None:
     config['ATMOSPHERE-ABUN'] = "1," * (len(molecules) - 1) + '1'
     config['ATMOSPHERE-UNIT'] = "scl," * (len(molecules) - 1) + 'scl' 
     config['ATMOSPHERE-LAYERS-MOLECULES'] = ",".join(molecules)
-    config["ATMOSPHERE-PRESSURE"] = goe["Pressure"][0] * 1000 # in mbar
-    config["SURFACE-TEMPERATURE"] = goe["Temperature"][0] # in K
+    config["ATMOSPHERE-PRESSURE"] = proterozoic["Pressure"][0] * 1000   # in mbar
+    config["SURFACE-TEMPERATURE"] = proterozoic["Temperature"][0] # in K
 
 def random_atmosphere(config: dict) -> None:
     """
@@ -192,22 +164,19 @@ def random_atmosphere(config: dict) -> None:
         'PH3': 'HIT[28]', 'SO2': 'HIT[9]', 'H2S': 'HIT[31]'
     }
 
-    # Generate random molecule concentrations
     molecules = ['H2O', 'CO2', 'CH4', 'O2', 'NH3', 'HCN', 'PH3', 'SO2', 'H2S']
 
-    # Calculate random values for each molecule
     sample = {}
     for molecule in molecules:
         sample[molecule] = np.random.lognormal(-13, 1)
 
-    # Normalize molecule concentrations
     total_concentration = sum(sample.values())
     normalized_sample = {molecule: value / total_concentration for molecule, value in sample.items()}
-
-    # Replicate concentrations across all layers
     layer_concentrations = {molecule: np.full(layers, concentration) for molecule, concentration in normalized_sample.items()}
 
     # Atmospheric parameters setup
+    # 1e-11 = Earth’s upper atmosphere (Fuller-Rowell, 2014) in bar
+    # Fuller-Rowell, T. (2014). Physical Characteristics and Modeling of Earth’s Thermosphere. 
     pressure = np.logspace(np.log10(config["ATMOSPHERE-PRESSURE"] / 1000), np.log10(1e-11), num=layers)
     temperature = np.ones(len(pressure)) * config["ATMOSPHERE-TEMPERATURE"]
 
