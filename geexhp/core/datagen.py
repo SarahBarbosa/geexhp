@@ -60,7 +60,7 @@ class DataGen:
         except FileNotFoundError:
             raise FileNotFoundError(f"The configuration file {config_path} was not found.")
         
-        valid_stages = {'modern': geo.modern_earth, 'proterozoic': geo.proterozoic}
+        valid_stages = {'modern': geo.modern, 'proterozoic': geo.proterozoic}
         if stage in valid_stages:
             valid_stages[stage](config)
         else:
@@ -127,9 +127,7 @@ class DataGen:
             `random_atm` is False. It should be in the order specified by 
             `config["ATMOSPHERE-LAYERS-MOLECULES"]`.
 
-            To simplify the generation of this list, you can use the following functions:
-            - `geostages.molweight_modern()`: Returns the molecular weights of elements in the modern Earth's atmosphere. 
-            - `geostages.molweight_proterozoic()`: Returns the molecular weights of elements in 2.0 Ga after the Great Oxidation Event. 
+            To simplify the generation of this list, you can use `geostages.molweightlist()`.
         
         Notes
         -----
