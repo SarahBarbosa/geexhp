@@ -15,7 +15,7 @@ def generate_data(start, final, dg_instance):
     """
     file_name = f"{MODE}_{start}-{final}"
     random_atm = True if MODE == "random" else False
-    molweight = geostages.molweightlist() if not random_atm else None
+    molweight = geostages.molweightlist(MODE) if not random_atm else None
     
     dg_instance.generator(
         start=start,
