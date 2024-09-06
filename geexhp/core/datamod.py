@@ -198,11 +198,18 @@ def set_habitable_zone_distance(config: dict) -> None:
     upper_dist = np.sqrt((luminosity_star / L_sun.value) / S_eff_upper)
     config['OBJECT-STAR-DISTANCE'] = np.random.uniform(lower_dist, upper_dist)
 
-def maintain_planetary_atmosphere(config: dict) -> None:
+def maintain_planetary_atmosphere(config: dict, attempts: int = 5) -> None:
     """
     Simulates to find a planet size that can maintain an atmosphere. 
     References are included for each scientific principle used.
+
+    The number of attempts to try generating a planet with atmosphere. 
+    Recommended between 3 to 5 attempts for balancing efficiency and success rate.
+    More attempts may slow execution without significantly improving success.
     """
+    if attempts == 0:
+        raise ValueError("Failed to find a suitable planet configuration.")
+
     semi_major_axis = config['OBJECT-STAR-DISTANCE']
     star_luminosity = calculate_luminosity(config)
 
@@ -225,11 +232,11 @@ def maintain_planetary_atmosphere(config: dict) -> None:
     # Calculate escape velocity from the planet's surface in m/s
     escape_velocity = np.sqrt(2 * gravity * planet_radius * R_earth.value)
 
-    # Compute the XUV-driven atmospheric escape, considering the star-planet 
+    # Compute the insolation, considering the star-planet 
     # distance and stellar luminosity. Reference for insolation calculations: 
-    # Zahnle and Catling (2017), particularly their Equation (27)
+    # Zahnle and Catling (2017), particularly their Equation (4)
     # https://arxiv.org/pdf/1702.03386
-    real_insolation = (1 ** 2 / semi_major_axis ** 2) * (star_luminosity / L_sun.value) ** 0.4
+    real_insolation = (1 ** 2 / semi_major_axis ** 2) * (star_luminosity / L_sun.value)
 
     # Estimate the critical insolation for atmospheric retention based on escape 
     # velocity, using an empirically derived relationship from Zahnle and 
@@ -259,7 +266,8 @@ def maintain_planetary_atmosphere(config: dict) -> None:
         # the planet is above the Cosmic Shoreline and cannot retain a significant atmosphere.
         # Therefore, we call the function again recursively to generate a new planet configuration
         # that might meet the criteria for atmosphere retention.
-        maintain_planetary_atmosphere(config)
+        # Recursively call the function, reducing the number of remaining attempts
+        maintain_planetary_atmosphere(config, attempts - 1)
 
 def set_instrument(config: dict, instrument: str) -> None:
     """

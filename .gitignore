@@ -17,4 +17,6 @@ geexhp.egg-info/
 data/moderna10k.parquet
 parallel/data/
 examples/kawashima_data/
+examples/arney_data/
 ecospeclib-all/
+playground.ipynb
