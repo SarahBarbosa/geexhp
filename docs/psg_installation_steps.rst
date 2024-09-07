@@ -1,8 +1,11 @@
-# Steps to Install Docker, PSG, and Specific Packages on Ubuntu
+Steps to Install Docker, PSG, and Specific Packages on Ubuntu
+=============================================================
 
-1. **Install Docker:**
+1. Install Docker:
+------------------
 
-    ```bash
+.. code-block:: bash
+
     # Update the system
     sudo apt update && sudo apt upgrade
     
@@ -21,38 +24,41 @@
     # Start Docker
     sudo systemctl start docker
     sudo usermod -aG docker ${USER}
-    ```
 
-2. **Pull the PSG Image:**
+2. Pull the PSG Image:
+----------------------
 
-    ```bash
+.. code-block:: bash
+
     docker logout
     docker pull nasapsg/psg-amd
     docker tag nasapsg/psg-amd psg
-    ```
 
-3. **Start the PSG Container:**
+3. Start the PSG Container:
+---------------------------
 
-    ```bash
+.. code-block:: bash
+
     docker run -d --name psg -p 127.0.0.1:3000:80 psg
-    ```
 
-4. **Install Specific Packages Inside the Container:**
+4. Install Specific Packages Inside the Container:
+--------------------------------------------------
 
-    ```bash
+.. code-block:: bash
+
     docker exec -it psg /bin/bash
     curl http://localhost:3000/index.php?install=corrkmedmain
     curl http://localhost:3000/index.php?install=corrkmedtrace
-    ```
 
-5. **Update the PROGRAMSAMD Package:**
+5. Update the PROGRAMSAMD Package:
+----------------------------------
 
-    ```bash
+.. code-block:: bash
+
     curl http://localhost:3000/index.php?update=programsamd
-    ```
 
-## Disk Usage:
+Disk Usage:
+-----------
 
 - The images take up **2.406 GB**.
 - The active container is using **74.97 GB**, which includes PSG and installed packages.
-
