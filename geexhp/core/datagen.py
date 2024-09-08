@@ -2,6 +2,7 @@ import os
 import time
 from datetime import timedelta
 import pandas as pd
+import numpy as np
 
 import pyarrow as pa
 import pyarrow.parquet as pq
@@ -52,7 +53,7 @@ class DataGen:
     def _set_config(self, config_path: str, stage: str, instrument: str):
         """
         Sets the configuration for the PSG based on a specified file, 
-        eological stage, and instrument settings.
+        geological stage, and instrument settings.
         """
         try:
             with open(config_path, "rb") as f:
@@ -99,7 +100,7 @@ class DataGen:
             return self.config.get(key)
         return self.config 
     
-    def generator(self, start: int, end: int, random_atm: bool, verbose: bool, file: str, molweight: list = None) -> None:
+    def generator(self, start: int, end: int, random_atm: bool, verbose: bool, file: str, molweight: list = None, noise: bool = False) -> None:
         """
         Generates a dataset using the PSG for a specified number of planets 
         and saves it to a Parquet file. The dataset generation can include random atmosphere
@@ -125,9 +126,15 @@ class DataGen:
         molweight : list of float, optional
             A list of molecular weights for the molecules. This parameter is required if 
             `random_atm` is False. It should be in the order specified by 
-            `config["ATMOSPHERE-LAYERS-MOLECULES"]`.
+            `config["ATMOSPHERE-LAYERS-MOLECULES"]`. To simplify the generation of this list, 
+            you can use `geostages.molweightlist()`.
+        noise : bool, optional
+            Flag to indicate whether to include the noisy data in the generated DataFrame. 
+            If True, it will add a new column of noise that originates from telescope observation 
+            with a distance assumption of 3 parsecs. The noise is generated using a Gaussian 
+            distribution, where the mean is the total model and the standard deviation is the 1-sigma noise.
 
-            To simplify the generation of this list, you can use `geostages.molweightlist()`.
+            
         
         Notes
         -----
@@ -142,8 +149,7 @@ class DataGen:
             - NH3 (Ammonia)
             - HCN (Hydrogen cyanide)
             - PH3 (Phosphine)
-            - SO2 (Sulfur dioxide)
-            - H2S (Hydrogen sulfide)
+            - H2 (Hydrogen molecule)
         - To run this function in parallel, consider dividing the `start` and `end` range across 
         multiple threads or processes. For example, if generating data for planets 0 to 1000, 
         you could divide this into chunks like 0-200, 200-400, etc., and run them concurrently 
@@ -173,10 +179,18 @@ class DataGen:
                 
                 spectrum = self.psg.run(configuration)
                 df = pd.DataFrame({
+                    **{key: [value] for key, value in configuration.items()},
                     "WAVELENGTH": [spectrum["spectrum"][:, 0].tolist()],
                     "ALBEDO": [spectrum["spectrum"][:, 1].tolist()],
-                    **{key: [value] for key, value in configuration.items()}
                 })
+
+                if noise:
+                    noisy_albedo = np.random.normal(
+                        loc=spectrum["spectrum"][:, 1],   # Total model (ALBEDO)
+                        scale=spectrum["spectrum"][:, 2]  # Noise (1-sigma)
+                    )
+                    df["NOISE"] = [spectrum["spectrum"][:, 2].tolist()]
+                    df["NOISY_ALBEDO"] = [noisy_albedo.tolist()]
                 
                 if parquet_writer is None:
                     schema = pa.Table.from_pandas(df).schema
