@@ -2,7 +2,7 @@ import os
 from typing import List, Tuple
 
 NUM_THREADS = os.cpu_count()
-NPLANETS = 1_000
+NPLANETS = 2_500
 
 def threadranges(nplanets: int, num_threads: int) -> List[Tuple[int, int]]:
     """
@@ -54,5 +54,5 @@ if __name__ == "__main__":
     
     script_dir = os.path.dirname(os.path.realpath(__file__))
     bash_script_path = os.path.join(script_dir, f"N_{NPLANETS}_multithread_pc.sh")
-    #os.system(f"{bash_script_path}")
+    os.system(f"{bash_script_path}")
 

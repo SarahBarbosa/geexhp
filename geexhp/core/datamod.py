@@ -128,8 +128,10 @@ def set_spectral_type(config: dict) -> None:
 
 def set_stellar_parameters(config: dict) -> None:
     """
-    Sets the radius and temperature of the star based on its spectral type.
-    Source: https://www.pas.rochester.edu/~emamajek/EEM_dwarf_UBVIJHK_colors_Teff.dat
+    Sets key stellar parameters such as radius, temperature, and magnitude 
+    based on the star's spectral type. The function updates the 'config' 
+    dictionary with randomized values for these parameters, within the ranges 
+    associated with the spectral type provided. 
     """
     class_star = config['OBJECT-STAR-TYPE']
     params = {
@@ -148,7 +150,10 @@ def set_stellar_parameters(config: dict) -> None:
     config['GEOMETRY-STELLAR-TEMPERATURE'] = star_temperature
     config["GEOMETRY-STELLAR-MAGNITUDE"] = star_mag
 
-    # Motivation and source: High metallicity and non-equilibrium chemistry... 
+    # Set the planet's distance from the observer to 3 parsecs (fixed value)
+    config["GEOMETRY-OBS-ALTITUDE"] = 3
+
+    # (REMOVED) Motivation and source: High metallicity and non-equilibrium chemistry... 
     # (Madhusudhan1 and Seager 2011)
     # https://iopscience.iop.org/article/10.1088/0004-637X/729/1/41/meta
     # 10x greater and lesser the metallicity of the sun (in dex)
@@ -208,7 +213,7 @@ def maintain_planetary_atmosphere(config: dict, attempts: int = 5) -> None:
     More attempts may slow execution without significantly improving success.
     """
     if attempts == 0:
-        raise ValueError("Failed to find a suitable planet configuration.")
+        raise ValueError("Failed to find a suitable planet configuration to maintain an atmosphere.")
 
     semi_major_axis = config['OBJECT-STAR-DISTANCE']
     star_luminosity = calculate_luminosity(config)
