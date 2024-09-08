@@ -33,9 +33,9 @@ def configure_matplotlib(oldschool: bool = False) -> None:
         })
 
 
-def plot_spectrum(df: pd.DataFrame, label: str, index: int = None, ax: plt.Axes = None, **kwargs) -> plt.Axes:
+def plot_spectrum(df: pd.DataFrame, label: str, index: int = None, ax: plt.Axes = None, noise: bool = False, **kwargs) -> plt.Axes:
     """
-    Plots the albedo spectrum of a planet on the provided or newly created axes.
+    Plots the albedo spectrum of a exoplanet.
 
     Parameters
     ----------
@@ -50,9 +50,11 @@ def plot_spectrum(df: pd.DataFrame, label: str, index: int = None, ax: plt.Axes 
     ax : plt.Axes, optional
         Existing matplotlib Axes object to plot on. If None, a new figure and axes will be created. 
         Default is None.
+    noise : bool, optional
+        If True, will also plot the noisy data with error bars. Default is False.
     **kwargs : dict
         Additional keyword arguments passed to the plot function.
-
+    
     Returns
     -------
     ax : plt.Axes
@@ -64,14 +66,30 @@ def plot_spectrum(df: pd.DataFrame, label: str, index: int = None, ax: plt.Axes 
     if index is not None:
         wavelength = df.iloc[index]["WAVELENGTH"]
         albedo = df.iloc[index]["ALBEDO"]
+        if noise:
+            noisy_albedo = df.iloc[index]["NOISY_ALBEDO"]
+            noise_err = df.iloc[index]["NOISE"]
     else:
         wavelength = df["WAVELENGTH"]
         albedo = df["ALBEDO"]
+        if noise:
+            noisy_albedo = df["NOISY_ALBEDO"]
+            noise_err = df["NOISE"]
 
-    ax.plot(wavelength, albedo, label=label, **kwargs)
+    if noise:
+        _, caps, bars = ax.errorbar(wavelength, noisy_albedo, yerr=noise_err, fmt=".", capsize=2, capthick=2, zorder=1)
+        ax.plot(wavelength, albedo, color="tab:orange", label=f"{label} (Noisy)", **kwargs)
+        [bar.set_alpha(0.1) for bar in bars]
+        [cap.set_alpha(0.1) for cap in caps]
+    else:
+        ax.plot(wavelength, albedo, label=label, **kwargs)
+
     ax.set(xlabel="Wavelength [$\mu$m]", ylabel="Apparent Albedo")
+    ax.set_ylim(-0.01, albedo.max())
     ax.legend()
+    
     return ax
+
 
 
 def label_line(line: mlines.Line2D, x: float, label: str = None, align: bool = True, **kwargs) -> None:
