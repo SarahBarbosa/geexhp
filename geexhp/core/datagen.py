@@ -100,7 +100,7 @@ class DataGen:
             return self.config.get(key)
         return self.config 
     
-    def generator(self, start: int, end: int, random_atm: bool, verbose: bool, file: str, molweight: list = None, noise: bool = False) -> None:
+    def generator(self, start: int, end: int, random_atm: bool, verbose: bool, file: str, molweight: list = None) -> None:
         """
         Generates a dataset using the PSG for a specified number of planets 
         and saves it to a Parquet file. The dataset generation can include random atmosphere
@@ -127,14 +127,7 @@ class DataGen:
             A list of molecular weights for the molecules. This parameter is required if 
             `random_atm` is False. It should be in the order specified by 
             `config["ATMOSPHERE-LAYERS-MOLECULES"]`. To simplify the generation of this list, 
-            you can use `geostages.molweightlist()`.
-        noise : bool, optional
-            Flag to indicate whether to include the noisy data in the generated DataFrame. 
-            If True, it will add a new column of noise that originates from telescope observation 
-            with a distance assumption of 3 parsecs. The noise is generated using a Gaussian 
-            distribution, where the mean is the total model and the standard deviation is the 1-sigma noise.
-
-            
+            you can use `geostages.molweightlist()`.            
         
         Notes
         -----
@@ -154,6 +147,9 @@ class DataGen:
         multiple threads or processes. For example, if generating data for planets 0 to 1000, 
         you could divide this into chunks like 0-200, 200-400, etc., and run them concurrently 
         in different threads or processes (see the function on parallel folder).
+        - The noise column comes from the telescope observation with a distance assumption of 3 parsecs. 
+        The noise is generated using a Gaussian distribution, where the mean is the total model and the 
+        standard deviation is the 1-sigma noise.
         """
         # Check if molweight is required and not provided
         if not random_atm and molweight is None:
@@ -178,20 +174,19 @@ class DataGen:
                     dm.random_planet(configuration, molweight)
                 
                 spectrum = self.psg.run(configuration)
+                noisy_albedo = np.random.normal(
+                    loc=spectrum["spectrum"][:, 1],   # Total model (ALBEDO)
+                    scale=spectrum["spectrum"][:, 2]  # Noise (1-sigma)
+                    )
+
                 df = pd.DataFrame({
                     **{key: [value] for key, value in configuration.items()},
                     "WAVELENGTH": [spectrum["spectrum"][:, 0].tolist()],
                     "ALBEDO": [spectrum["spectrum"][:, 1].tolist()],
+                    "NOISE": [spectrum["spectrum"][:, 2].tolist()],
+                    "NOISY_ALBEDO": [noisy_albedo.tolist()]
                 })
 
-                if noise:
-                    noisy_albedo = np.random.normal(
-                        loc=spectrum["spectrum"][:, 1],   # Total model (ALBEDO)
-                        scale=spectrum["spectrum"][:, 2]  # Noise (1-sigma)
-                    )
-                    df["NOISE"] = [spectrum["spectrum"][:, 2].tolist()]
-                    df["NOISY_ALBEDO"] = [noisy_albedo.tolist()]
-                
                 if parquet_writer is None:
                     schema = pa.Table.from_pandas(df).schema
                     parquet_writer = pq.ParquetWriter(output_path, schema)
