@@ -1,7 +1,7 @@
 Steps to Install Docker, PSG, and Specific Packages on Ubuntu
 =============================================================
 
-1. Install Docker:
+1. Install Docker
 ------------------
 
 .. code-block:: bash
@@ -25,7 +25,7 @@ Steps to Install Docker, PSG, and Specific Packages on Ubuntu
     sudo systemctl start docker
     sudo usermod -aG docker ${USER}
 
-2. Pull the PSG Image:
+2. Pull the PSG Image
 ----------------------
 
 .. code-block:: bash
@@ -34,28 +34,23 @@ Steps to Install Docker, PSG, and Specific Packages on Ubuntu
     docker pull nasapsg/psg-amd
     docker tag nasapsg/psg-amd psg
 
-3. Start the PSG Container:
+3. Start the PSG Container
 ---------------------------
 
 .. code-block:: bash
 
     docker run -d --name psg -p 127.0.0.1:3000:80 psg
 
-4. Install Specific Packages Inside the Container:
+4. Update the PROGRAMSAMD Package and install Specific Packages Inside the Container
 --------------------------------------------------
 
 .. code-block:: bash
 
-    docker exec -it psg /bin/bash
+    curl http://localhost:3000/index.php?update=programsamd
     curl http://localhost:3000/index.php?install=corrkmedmain
     curl http://localhost:3000/index.php?install=corrkmedtrace
 
-5. Update the PROGRAMSAMD Package:
-----------------------------------
-
-.. code-block:: bash
-
-    curl http://localhost:3000/index.php?update=programsamd
+For more information, see the official documentation: https://psg.gsfc.nasa.gov/helpapi.php#installation
 
 Disk Usage:
 -----------
