@@ -8,7 +8,7 @@ This guide explains how to generate random planetary datasets based on different
 
 Loading the Dataset Generator
 =============================
-To generate random planetary datasets, you need to create a `DataGen` object using a configuration file and specifying a URL for the PSG API. This URL can point to either a local or a remote API, depending on how you run the PSG.
+To generate random planetary datasets, you need to create a ``DataGen`` object using a configuration file and specifying a URL for the PSG API. This URL can point to either a local or a remote API, depending on how you run the PSG.
 
 If you're running PSG locally inside a Docker container, the API URL will usually be something like `http://127.0.0.1:3000/api.php`.
 
@@ -17,7 +17,7 @@ Once the Docker container is running, you can configure the URL and dynamically 
 .. code-block:: python
 
     import os
-    from geexhp import datagen, geostages
+    from geexhp import datagen
 
     # USE THIS FILE PATH!
     script_dir = os.getcwd()
@@ -27,11 +27,11 @@ Once the Docker container is running, you can configure the URL and dynamically 
 
 Era-Specific Customization
 ==========================
-By default, `datagen.DataGen` uses the "modern" era if no specific era is mentioned. The "modern" era represents recent Earth-like conditions. However, you can change this to generate data for different geological eras such as "proterozoic" or "archean."
+By default, ``datagen.DataGen``` uses the "modern" era if no specific era is mentioned. The "modern" era represents recent Earth-like conditions. However, you can change this to generate data for different geological eras such as "proterozoic" or "archean."
 
 Changing to Other Eras
 ----------------------
-To generate datasets for different eras, you must specify the `stage` parameter.
+To generate datasets for different eras, you must specify the ``stage`` parameter.
 
 .. code-block:: python
     
@@ -43,23 +43,25 @@ To generate datasets for different eras, you must specify the `stage` parameter.
 
 Adjusting Molecular Weights for Each Era
 ----------------------------------------
-For accurate simulation, ensure that the molecular weights used match the era being generated. You can retrieve the appropriate molecular weights using the `geostages.molweightlist` function, passing the era name:
+For accurate simulation, ensure that the molecular weights used match the era being generated. You can retrieve the appropriate molecular weights using the ``geostages.molweightlist`` function, passing the era name:
 
 .. code-block:: python
 
+    from geexhp import geostages
+
     # Molecular weights for Modern Earth
-    molweight = geostages.molweightlist(era="modern")
+    molweight_modern = geostages.molweightlist(era="modern")
 
     # For Proterozoic era
-    molweight = geostages.molweightlist(era="proterozoic")
+    molweight_proterozoic = geostages.molweightlist(era="proterozoic")
 
     # And for for Archean era
-    molweight = geostages.molweightlist(era="archean")
+    molweight_archean = geostages.molweightlist(era="archean")
 
 Generating Random Data for Different Geological Eras
 =====================================================
 
-Parameters for `dg.generator`
+Parameters for ``dg.generator``
 -----------------------------
 
 - `start`: The starting index for the range of planets to generate data for.
@@ -78,49 +80,46 @@ Example for Generating Data in Different Eras
 
     # Modern Era
     dg.generator(
-        start=0,   
-        end=8,     
+        start=0, end=8,     # A dataset with 8 planets  
         random_atm=False,
         verbose=True,
         file="modern_0-8",  # Just a example
-        molweight=geostages.molweightlist("modern"),  
+        molweight=molweight_modern,  
     )
 
     # Proterozoic Era
     dg_proterozoic.generator(
-        start=0,
-        end=8,
+        start=0, end=8,
         random_atm=False,
         verbose=True,
         file="proterozoic_0-8",
-        molweight=geostages.molweightlist("proterozoic"),
+        molweight=molweight_proterozoic,
     )
 
     # Archean Era
     dg_archean.generator(
-        start=0,
-        end=8,
+        start=0, end=8,
         random_atm=False,
         verbose=True,
         file="archean_0-8",
-        molweight=geostages.molweightlist("archean"),  
+        molweight=molweight_archean,  
     )
 
 Generating Random Planets with an Isothermal Profile
 ====================================================
-For certain simulations, you may want to generate planets with a completely random atmospheric composition that is assumed to be isothermal across all layers. In this case, set the `random_atm` parameter to `True`. When `random_atm=True`, the `molweight` parameter is not required, as the atmospheric composition is randomly generated.
+For certain simulations, you may want to generate planets with a completely random atmospheric composition that is assumed to be isothermal across all layers. In this case, set the ``random_atm`` parameter to ``True``. When ``random_atm=True``, the ``molweight`` parameter is not required, as the atmospheric composition is randomly generated.
 
 Molecules in Random Atmosphere Generation
 -----------------------------------------
 The random atmosphere generation includes the following molecules:
-- H₂O (Water vapor)
-- CO₂ (Carbon dioxide)
-- CH₄ (Methane)
-- O₂ (Oxygen)
-- NH₃ (Ammonia)
-- HCN (Hydrogen cyanide)
-- PH₃ (Phosphine)
-- H₂ (Hydrogen molecule)
+* H₂O (Water vapor)
+* CO₂ (Carbon dioxide)
+* CH₄ (Methane)
+* O₂ (Oxygen)
+* NH₃ (Ammonia)
+* HCN (Hydrogen cyanide)
+* PH₃ (Phosphine)
+* H₂ (Hydrogen molecule)
 
 Example Code
 ------------
@@ -129,31 +128,29 @@ To generate planets with an isothermal profile:
 .. code-block:: python
 
     dg.generator(
-        start=start,  # Start index for the range of planets
-        end=final,    # End index for the range of planets
-        random_atm=True,  # Random atmosphere generation enabled
+        start=0, end=8,
+        random_atm=True,    # Random atmosphere generation enabled
         verbose=True,
-        file=f"random_{start}-{final}"  # Output file
+        file=f"random_0-8"  # Output file
     )
 
 Visualizing the Data
 ====================
-After generating the datasets, use the `datavis` library to visualize the spectra of the generated planets.
+After generating the datasets, use the ``datavis`` library to visualize the spectra of the generated planets.
 
 Configuring Matplotlib for Visualizations
 -----------------------------------------
-Before visualizing the spectra, you can configure `matplotlib` parameters using the `datavis.configure_matplotlib` function. 
-This allows you to customize the appearance of the plots. The function provides a flexible way to configure either a modern or 
-an "old-school" style for the plots.
+Before visualizing the spectra, you can configure matplotlib parameters using the ``datavis.configure_matplotlib`` function. 
+This allows you to customize the appearance of the plots. The function provides a flexible way to configure either a modern or an "old-school" style for the plots.
 
 .. code-block:: python
 
     from geexhp import datavis
     datavis.configure_matplotlib(oldschool=False)
 
-- **`oldschool` parameter:**  
-    - If `oldschool=True`, it imports `smplotlib` for traditional plotting styles.
-    - If `oldschool=False`, it updates various `matplotlib` settings for a more modern appearance.
+* ``oldschool`` parameter:
+    * If ``oldschool=True``, it imports ``smplotlib`` for traditional plotting styles.
+    * If ``oldschool=False``, it updates various ``matplotlib`` settings for a more modern appearance (my style, feel free to be an artist too)
 
 The, you can plot the spectra:
 
@@ -166,7 +163,7 @@ The, you can plot the spectra:
     index = np.random.randint(0, len(data))  # Just a example..
     datavis.plot_spectrum(data, label=f"index={{index}}", index=index)
 
-Or, if you want visualize the noise data, use `noise=True` parameter:
+Or, if you want visualize the noise data, use ``noise=True`` parameter:
 
 .. code-block:: python
 
