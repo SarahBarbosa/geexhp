@@ -64,14 +64,14 @@ Generating Random Data for Different Geological Eras
 Parameters for ``dg.generator``
 -----------------------------
 
-- `start`: The starting index for the range of planets to generate data for.
-- `end`: The ending index for the range of planets to generate data for.
-- `random_atm`: Set to `True` to generate random atmospheres, or `False` to use a fixed configuration.
-- `verbose`: When `True`, enables detailed output during the data generation process.
-- `file`: The output file name, which stores the generated dataset.
-- `molweight`: The molecular weights specific to the geological era.
+- ``start``: The starting index for the range of planets to generate data for.
+- ``end``: The ending index for the range of planets to generate data for.
+- ``random_atm``: Set to ``True`` to generate random atmospheres, or ``False`` to use a fixed configuration.
+- ``verbose``: When ``True``, enables detailed output during the data generation process.
+- ``file``: The output file name, which stores the generated dataset.
+- ``molweight``: The molecular weights specific to the geological era.
 
-In a multi-threaded or parallel, you can split this range `(start,end)` among different threads to speed up the generation process.
+In a multi-threaded or parallel, you can split this range ``(start,end)`` among different threads to speed up the generation process.
 
 Example for Generating Data in Different Eras
 ---------------------------------------------
@@ -111,7 +111,9 @@ For certain simulations, you may want to generate planets with a completely rand
 
 Molecules in Random Atmosphere Generation
 -----------------------------------------
+
 The random atmosphere generation includes the following molecules:
+
 * H₂O (Water vapor)
 * CO₂ (Carbon dioxide)
 * CH₄ (Methane)
@@ -131,7 +133,7 @@ To generate planets with an isothermal profile:
         start=0, end=8,
         random_atm=True,    # Random atmosphere generation enabled
         verbose=True,
-        file=f"random_0-8"  # Output file
+        file="random_0-8"  # Output file
     )
 
 Visualizing the Data
@@ -167,6 +169,6 @@ Or, if you want visualize the noise data, use ``noise=True`` parameter:
 
 .. code-block:: python
 
-    datavis.plot_spectrum(data, label=f"index={{index}}", index=index, noise=True)
+    datavis.plot_spectrum(data, label=f"index={index}", index=index, noise=True)
 
 The noise column comes from the telescope observation with a distance assumption of 3 parsecs. The noise is generated using a Gaussian distribution, where the mean is the total model and the standard deviation is the 1-sigma noise.
