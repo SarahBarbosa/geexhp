@@ -1,4 +1,4 @@
-from geexhp import datagen, geostages
+from geexhp import datagen, stages
 import os
 import sys
 import concurrent.futures
@@ -6,29 +6,22 @@ import concurrent.futures
 # Global variable to control the mode of data generation
 # Possible values: 'modern', 'proterozoic', 'archean', 'random'
 MODE = "modern"
-NOISE = True
 
 def generate_data(start, final, dg_instance):
     """
     Generates data for planets in the specified range using the provided atmospheric model.
     
-    The behavior is controlled by the global MODE variable and the global NOISE variable.
+    The behavior is controlled by the global MODE variable.
     """
-    if NOISE:
-        file_name = f"{MODE}_{start}-{final}_noise"
-    else:
-        file_name = f"{MODE}_{start}-{final}"
+    file_name = f"{MODE}_{start}-{final}"
     random_atm = True if MODE == "random" else False
-    molweight = geostages.molweightlist(MODE) if not random_atm else None
     
     dg_instance.generator(
         start=start,
         end=final,
         random_atm=random_atm,
         verbose=True,
-        file=file_name,
-        molweight=molweight,
-        noise=NOISE
+        output_file=file_name,
     )
 
 if __name__ == "__main__":
