@@ -3,7 +3,7 @@ import pandas as pd
 from math import atan2, degrees
 
 import matplotlib.pyplot as plt
-from matplotlib_inline import backend_inline
+#from matplotlib_inline import backend_inline
 from matplotlib import lines as mlines
 
 
@@ -11,7 +11,7 @@ def configure_matplotlib(oldschool: bool = False) -> None:
     """
     Configures matplotlib parameters.
     """
-    backend_inline.set_matplotlib_formats("svg") 
+    #backend_inline.set_matplotlib_formats("svg") 
 
     if oldschool:
         import smplotlib
@@ -85,7 +85,7 @@ def plot_spectrum(df: pd.DataFrame, label: str, index: int = None, ax: plt.Axes 
         ax.plot(wavelength, albedo, label=label, **kwargs)
 
     ax.set(xlabel="Wavelength [$\mu$m]", ylabel="Apparent Albedo")
-    ax.set_ylim(-0.01, albedo.max())
+    ax.set_ylim(-0.001, albedo.max())
     ax.legend()
     
     return ax
