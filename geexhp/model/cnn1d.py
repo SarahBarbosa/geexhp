@@ -147,7 +147,7 @@ class ConvolutionalNetwork:
         """
         checkpoint_path = f"{checkpoint_path}/weights.weights.h5"
 
-        lr_scheduler = tf.keras.callbacks.LearningRateScheduler(lambda epoch: 1e-4 * 10**(epoch / 20))
+        lr_scheduler = tf.keras.callbacks.LearningRateScheduler(lambda epoch: 1e-6 * 10**(epoch / 30))
 
         optimizer = tf.keras.optimizers.Adam(learning_rate=1e-4, clipnorm=0.5)
         self.model.compile(optimizer=optimizer, loss='mse')
@@ -156,9 +156,8 @@ class ConvolutionalNetwork:
             monitor='val_loss', patience=patience, restore_best_weights=True
         )
 
-        cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,
-                                                        save_weights_only=True,
-                                                        verbose=1)
+        cp_callback = tf.keras.callbacks.ModelCheckpoint(
+            filepath=checkpoint_path, save_weights_only=True,verbose=1)
 
         self.model.save_weights(checkpoint_path.format(epoch=0))       
 
@@ -182,7 +181,7 @@ class ConvolutionalNetwork:
     
     def load_model(self, file_path):
         """Load the model from SavedModel."""
-        self.model = tf.keras.layers.TFSMLayer(file_path, call_endpoint='serving_default')
+        self.model = tf.keras.models.load_model(file_path)
 
     def evaluate(self, X_test, y_test, feature_names, scaler=None, plot=True, additional_metrics=True):
         """
@@ -300,18 +299,18 @@ class CNNHyperparameterTuner:
         """
 
         # Define tunable hyperparameters
-        conv_layers = hp.Int('conv_layers', min_value=1, max_value=3, step=1)
+        conv_layers = hp.Int('conv_layers', min_value=1, max_value=5, step=1)
         dense_layers = hp.Int('dense_layers', min_value=1, max_value=3, step=1)
         dropout_rate = hp.Float('dropout_rate', min_value=0.0, max_value=0.5, step=0.1)
-        learning_rate = hp.Float('learning_rate', min_value=1e-5, max_value=1e-2, sampling='log')
-        
+        learning_rate = hp.Float('learning_rate', min_value=1e-6, max_value=1e-2, sampling='log')
+
         # Input layer
         inputs = tf.keras.Input(shape=self.input_shape, name="Albedo")
 
         # Add Conv1D layers
         x = inputs
         for i in range(conv_layers):
-            filters = hp.Int(f'filters_{i}', min_value=32, max_value=256, step=32)
+            filters = hp.Int(f'filters_{i}', min_value=8, max_value=256, step=32)
             kernel_size = hp.Int(f'kernel_size_{i}', min_value=3, max_value=7, step=2)
             x = tf.keras.layers.Conv1D(filters=filters, kernel_size=kernel_size, strides=1)(x)
             x = tf.keras.layers.BatchNormalization()(x)
@@ -325,7 +324,7 @@ class CNNHyperparameterTuner:
 
         # Add Dense layers
         for i in range(dense_layers):
-            units = hp.Int(f'units_{i}', min_value=64, max_value=512, step=64)
+            units = hp.Int(f'units_{i}', min_value=8, max_value=512, step=64)
             x = tf.keras.layers.Dense(units)(x)
             x = tf.keras.layers.ReLU()(x)
             if dropout_rate > 0:
@@ -340,7 +339,7 @@ class CNNHyperparameterTuner:
 
         return model
 
-    def tune_model(self, X_train, y_train, max_trials=10, executions_per_trial=2):
+    def tune_model(self, X_train, y_train):
         """
         Tunes the CNN model using Keras Tuner.
 
@@ -350,10 +349,6 @@ class CNNHyperparameterTuner:
             Training input data.
         y_train : array-like
             Training output data.
-        max_trials : int, optional
-            Maximum number of hyperparameter configurations to try.
-        executions_per_trial : int, optional
-            Number of executions per trial for each hyperparameter configuration.
 
         Returns
         --------
@@ -363,8 +358,8 @@ class CNNHyperparameterTuner:
         tuner = kt.Hyperband(
             self.build_model,
             objective='val_loss',
-            max_epochs=10,
-            hyperband_iterations=2,
+            max_epochs=5,
+            hyperband_iterations=1,
             factor=3,
             directory='my_dir',
             project_name='cnn_tuning'
@@ -379,9 +374,40 @@ class CNNHyperparameterTuner:
 
         # Build the model with the optimal hyperparameters
         best_model = self.build_model(best_hps)
-        
+
         # Train the best model
         _ = best_model.fit(X_train, y_train, validation_split=0.2, epochs=10)
+
+        return best_model
+
+    def reload_tuner(self):
+        """
+        Reload the tuner from the 'my_dir/cnn_tuning' directory to resume or retrieve the best model.
+        """
+        # Reload the tuner from the specified directory
+        tuner = kt.Hyperband(
+            self.build_model,
+            objective='val_loss',
+            max_epochs=20,
+            hyperband_iterations=1,
+            factor=3,
+            directory='my_dir',
+            project_name='cnn_tuning'
+        )
+
+        # Reload search results from the folder
+        tuner.reload()
+
+        return tuner
+
+    def get_best_model(self):
+        """
+        Retrieves the best model from the reloaded tuner.
+        """
+        tuner = self.reload_tuner()
+
+        # Get the best model
+        best_model = tuner.get_best_models(num_models=1)[0]
 
         return best_model
 
