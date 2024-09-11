@@ -12,7 +12,7 @@ from sklearn import metrics
 
 class ConvolutionalNetwork:
     """
-    A flexible Convolutional Neural Network (CNN) class.
+    Convolutional Neural Network (CNN) class.
     
     Attributes
     -----------
@@ -24,6 +24,7 @@ class ConvolutionalNetwork:
         Each tuple represents a convolutional layer, containing:
         - number of filters
         - kernel size
+        - pool size
     dense_layers : list of int
         Each integer represents the number of neurons in a fully connected (dense) layer.
     activation : Activation function
@@ -48,22 +49,9 @@ class ConvolutionalNetwork:
         # Build the CNN model
         self.model = self._build_model()
 
-    def _add_conv_layer(self, x, filters, kernel_size):
+    def _add_conv_layer(self, x, filters, kernel_size, pool_size):
         """
         Adds a Conv1D layer to the model with optional batch normalization and dropout.
-
-        Parameters
-        -----------
-        x : Tensor
-            Input tensor to the layer.
-        filters : int
-            Number of filters for the Conv1D layer.
-        kernel_size : int
-            Size of the convolutional kernel.
-
-        Returns
-        --------
-        Tensor : Output tensor after applying Conv1D, activation, batch normalization, and dropout.
         """
         x = tf.keras.layers.Conv1D(filters=filters, kernel_size=kernel_size, strides=1)(x)
         x = tf.keras.layers.BatchNormalization()(x)
@@ -73,7 +61,7 @@ class ConvolutionalNetwork:
         x = tf.keras.layers.BatchNormalization()(x)
         x = self.activation(x)
 
-        x = tf.keras.layers.MaxPooling1D(pool_size=5, strides=2)(x)
+        x = tf.keras.layers.MaxPooling1D(pool_size=pool_size, strides=2)(x)
 
         if self.dropout_rate > 0:
             x = tf.keras.layers.Dropout(self.dropout_rate)(x)
@@ -83,17 +71,6 @@ class ConvolutionalNetwork:
     def _add_dense_layer(self, x, units):
         """
         Adds a Dense layer to the model with optional dropout.
-
-        Parameters
-        -----------
-        x : Tensor
-            Input tensor to the layer.
-        units : int
-            Number of units for the dense layer.
-
-        Returns
-        --------
-        Tensor : Output tensor after applying the Dense layer and activation function.
         """
         x = tf.keras.layers.Dense(units)(x)
         x = self.activation(x)
@@ -108,15 +85,15 @@ class ConvolutionalNetwork:
         inputs = tf.keras.Input(shape=self.input_shape, name="Albedo")
 
         x = inputs
-        for filters, kernel_size in self.conv_layers:
-            x = self._add_conv_layer(x, filters, kernel_size)
+        for filters, kernel_size, pool_size in self.conv_layers:
+            x = self._add_conv_layer(x, filters, kernel_size, pool_size)
         
         x = tf.keras.layers.Flatten()(x)
 
         for units in self.dense_layers:
             x = self._add_dense_layer(x, units)
 
-        outputs = tf.keras.layers.Dense(self.output_units)(x)
+        outputs = tf.keras.layers.Dense(self.output_units, activation='sigmoid')(x)
         model = tf.keras.Model([inputs], outputs)
 
         return model
@@ -147,8 +124,6 @@ class ConvolutionalNetwork:
         """
         checkpoint_path = f"{checkpoint_path}/weights.weights.h5"
 
-        lr_scheduler = tf.keras.callbacks.LearningRateScheduler(lambda epoch: 1e-6 * 10**(epoch / 30))
-
         optimizer = tf.keras.optimizers.Adam(learning_rate=1e-4, clipnorm=0.5)
         self.model.compile(optimizer=optimizer, loss='mse')
 
@@ -164,7 +139,7 @@ class ConvolutionalNetwork:
         history = self.model.fit(
             X_train, y_train, validation_split=0.2,
             epochs=epochs, batch_size=batch_size,
-            callbacks=[lr_scheduler,early_stopping, cp_callback],
+            callbacks=[early_stopping, cp_callback],
             verbose=1
         )
         
@@ -277,137 +252,79 @@ class ConvolutionalNetwork:
         plt.show()
 
 
-class CNNHyperparameterTuner:
+class HyperparameterTuningBayesian:
+    def __init__(self, input_shape, output_units, max_trials=10, executions_per_trial=1):
+        self.input_shape = input_shape  # Shape of input (e.g., (2304, 1))
+        self.output_units = output_units  # Number of output units (e.g., 17)
+        self.max_trials = max_trials  # Number of different hyperparameter sets to try
+        self.executions_per_trial = executions_per_trial  # Number of times to try each set
 
-    def __init__(self, input_shape, output_units):
-        self.input_shape = input_shape
-        self.output_units = output_units
+        # Keras Tuner Bayesian Optimization search
+        self.tuner = kt.BayesianOptimization(
+            self.build_model,  # Model-building function
+            objective="val_loss",  # Objective to minimize
+            max_trials=self.max_trials,  # Number of trials
+            executions_per_trial=self.executions_per_trial,  # How many times to run each trial
+            directory="hyperparam_search",  # Directory to store results
+            project_name="cnn_bayesian_tuning"
+        )
 
     def build_model(self, hp):
-        """
-        Builds a CNN model with tunable hyperparameters.
+        # Define a hyperparameter search space for each element
+        conv_layers = []
+        for i in range(5):  # Search space for 3 convolutional layers
+            filters = hp.Int(f"conv_{i}_filters", min_value=16, max_value=128, step=16)
+            kernel_size = hp.Int(f"conv_{i}_kernel_size", min_value=3, max_value=17, step=2)
+            pool_size = hp.Int(f"conv_{i}_pool_size", min_value=2, max_value=32, step=2)
+            conv_layers.append((filters, kernel_size, pool_size))
 
-        Parameters
-        -----------
-        hp : keras_tuner.HyperParameters
-            HyperParameters object used to define the tunable hyperparameters.
+        # Dense layer units search space
+        dense_units = [
+            hp.Int(f"dense_{i}_units", min_value=32, max_value=256, step=32) for i in range(3)
+        ]
 
-        Returns
-        --------
-        model : keras.Model
-            Compiled CNN model.
-        """
+        # Dropout rate search space
+        dropout_rate = hp.Float("dropout_rate", min_value=0.0, max_value=0.5, step=0.1)
 
-        # Define tunable hyperparameters
-        conv_layers = hp.Int('conv_layers', min_value=1, max_value=5, step=1)
-        dense_layers = hp.Int('dense_layers', min_value=1, max_value=3, step=1)
-        dropout_rate = hp.Float('dropout_rate', min_value=0.0, max_value=0.5, step=0.1)
-        learning_rate = hp.Float('learning_rate', min_value=1e-6, max_value=1e-2, sampling='log')
+        # Learning rate search space
+        learning_rate = hp.Float("learning_rate", min_value=1e-5, max_value=1e-2, sampling="log")
 
-        # Input layer
-        inputs = tf.keras.Input(shape=self.input_shape, name="Albedo")
+        # Build model using the hyperparameters
+        model = ConvolutionalNetwork(
+            input_shape=self.input_shape,
+            output_units=self.output_units,
+            conv_layers=conv_layers,
+            dense_layers=dense_units,
+            activation=tf.keras.layers.ReLU(),
+            dropout_rate=dropout_rate
+        )._build_model()
 
-        # Add Conv1D layers
-        x = inputs
-        for i in range(conv_layers):
-            filters = hp.Int(f'filters_{i}', min_value=8, max_value=256, step=32)
-            kernel_size = hp.Int(f'kernel_size_{i}', min_value=3, max_value=7, step=2)
-            x = tf.keras.layers.Conv1D(filters=filters, kernel_size=kernel_size, strides=1)(x)
-            x = tf.keras.layers.BatchNormalization()(x)
-            x = tf.keras.layers.ReLU()(x)
-            x = tf.keras.layers.MaxPooling1D(pool_size=5, strides=2)(x)
-            if dropout_rate > 0:
-                x = tf.keras.layers.Dropout(dropout_rate)(x)
-
-        # Flatten the output from convolutional layers
-        x = tf.keras.layers.Flatten()(x)
-
-        # Add Dense layers
-        for i in range(dense_layers):
-            units = hp.Int(f'units_{i}', min_value=8, max_value=512, step=64)
-            x = tf.keras.layers.Dense(units)(x)
-            x = tf.keras.layers.ReLU()(x)
-            if dropout_rate > 0:
-                x = tf.keras.layers.Dropout(dropout_rate)(x)
-
-        # Output layer
-        outputs = tf.keras.layers.Dense(self.output_units)(x)
-
-        # Create and compile the model
-        model = tf.keras.Model(inputs=inputs, outputs=outputs)
-        model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate), loss='mse')
+        # Compile the model
+        optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
+        model.compile(optimizer=optimizer, loss="mse")
 
         return model
 
-    def tune_model(self, X_train, y_train):
-        """
-        Tunes the CNN model using Keras Tuner.
+    def search(self, X_train, y_train, epochs=50, batch_size=250):
+        # Define early stopping to prevent overfitting
+        early_stopping = tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=10)
 
-        Parameters
-        -----------
-        X_train : array-like
-            Training input data.
-        y_train : array-like
-            Training output data.
-
-        Returns
-        --------
-        best_model : keras.Model
-            The best model found by Keras Tuner.
-        """
-        tuner = kt.Hyperband(
-            self.build_model,
-            objective='val_loss',
-            max_epochs=5,
-            hyperband_iterations=1,
-            factor=3,
-            directory='my_dir',
-            project_name='cnn_tuning'
+        # Start the hyperparameter search
+        self.tuner.search(
+            X_train,
+            y_train,
+            validation_split=0.2,
+            epochs=epochs,
+            batch_size=batch_size,
+            callbacks=[early_stopping],
+            verbose=1
         )
 
-        early_stopping = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=5)
-
-        tuner.search(X_train, y_train, validation_split=0.2, epochs=10, callbacks=[early_stopping])
-
-        # Get the optimal hyperparameters
-        best_hps = tuner.get_best_hyperparameters(num_trials=1)[0]
-
-        # Build the model with the optimal hyperparameters
-        best_model = self.build_model(best_hps)
-
-        # Train the best model
-        _ = best_model.fit(X_train, y_train, validation_split=0.2, epochs=10)
-
-        return best_model
-
-    def reload_tuner(self):
-        """
-        Reload the tuner from the 'my_dir/cnn_tuning' directory to resume or retrieve the best model.
-        """
-        # Reload the tuner from the specified directory
-        tuner = kt.Hyperband(
-            self.build_model,
-            objective='val_loss',
-            max_epochs=20,
-            hyperband_iterations=1,
-            factor=3,
-            directory='my_dir',
-            project_name='cnn_tuning'
-        )
-
-        # Reload search results from the folder
-        tuner.reload()
-
-        return tuner
+        # Get the best hyperparameters
+        best_hp = self.tuner.get_best_hyperparameters()[0]
+        return best_hp
 
     def get_best_model(self):
-        """
-        Retrieves the best model from the reloaded tuner.
-        """
-        tuner = self.reload_tuner()
-
-        # Get the best model
-        best_model = tuner.get_best_models(num_models=1)[0]
-
-        return best_model
+        # Return the best model from the search
+        return self.tuner.get_best_models(num_models=1)[0]
 
