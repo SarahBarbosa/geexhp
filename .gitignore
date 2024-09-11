@@ -16,8 +16,6 @@ geexhp.egg-info/
 # Ignorando
 data/*.parquet
 models/*.npy
-models/X_test_scaled.npy
-models/X_train_scaled.npy
 models/*.h5
 parallel/data/
 examples/kawashima_data/
