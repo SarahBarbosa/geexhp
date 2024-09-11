@@ -41,23 +41,6 @@ To generate datasets for different eras, you must specify the ``stage`` paramete
     # Archean Era
     dg_archean = datagen.DataGen(url="http://127.0.0.1:3000/api.php", config=config_path, stage="archean")
 
-Adjusting Molecular Weights for Each Era
-----------------------------------------
-For accurate simulation, ensure that the molecular weights used match the era being generated. You can retrieve the appropriate molecular weights using the ``geostages.molweightlist`` function, passing the era name:
-
-.. code-block:: python
-
-    from geexhp import geostages
-
-    # Molecular weights for Modern Earth
-    molweight_modern = geostages.molweightlist(era="modern")
-
-    # For Proterozoic era
-    molweight_proterozoic = geostages.molweightlist(era="proterozoic")
-
-    # And for for Archean era
-    molweight_archean = geostages.molweightlist(era="archean")
-
 Generating Random Data for Different Geological Eras
 =====================================================
 
@@ -68,41 +51,21 @@ Parameters for ``dg.generator``
 - ``end``: The ending index for the range of planets to generate data for.
 - ``random_atm``: Set to ``True`` to generate random atmospheres, or ``False`` to use a fixed configuration.
 - ``verbose``: When ``True``, enables detailed output during the data generation process.
-- ``file``: The output file name, which stores the generated dataset.
-- ``molweight``: The molecular weights specific to the geological era.
+- ``output_file``: The output file name, which stores the generated dataset.
 
 In a multi-threaded or parallel, you can split this range ``(start,end)`` among different threads to speed up the generation process.
 
-Example for Generating Data in Different Eras
----------------------------------------------
+Example 
+-------
 
 .. code-block:: python
 
-    # Modern Era
-    dg.generator(
+    # Modern Era 
+    dg.generator(           # Or dg_proterozoic or dg_archean
         start=0, end=8,     # A dataset with 8 planets  
         random_atm=False,
         verbose=True,
         file="modern_0-8",  # Just a example
-        molweight=molweight_modern,  
-    )
-
-    # Proterozoic Era
-    dg_proterozoic.generator(
-        start=0, end=8,
-        random_atm=False,
-        verbose=True,
-        file="proterozoic_0-8",
-        molweight=molweight_proterozoic,
-    )
-
-    # Archean Era
-    dg_archean.generator(
-        start=0, end=8,
-        random_atm=False,
-        verbose=True,
-        file="archean_0-8",
-        molweight=molweight_archean,  
     )
 
 Generating Random Planets with an Isothermal Profile
@@ -129,11 +92,11 @@ To generate planets with an isothermal profile:
 
 .. code-block:: python
 
-    dg.generator(
+    dg.generator(           # It doesn't matter the stage here
         start=0, end=8,
         random_atm=True,    # Random atmosphere generation enabled
         verbose=True,
-        file="random_0-8"  # Output file
+        file="random_0-8"   # Output file
     )
 
 Visualizing the Data

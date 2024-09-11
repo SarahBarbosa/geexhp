@@ -12,7 +12,7 @@ from pypsg import PSG
 from collections import OrderedDict
 from typing import Any, Optional
 
-from geexhp.core import geostages as geo
+from geexhp.core import stages as st
 from geexhp.core import datamod as dm
 
 
@@ -34,11 +34,12 @@ class DataGen:
             Defaults to "modern".
         instrument : str, optional
             The telescope instrument setting to modify. 
-            Options are 'HWC', 'SS-NIR', 'SS-UV', 'SS-Vis'. Defaults to 'HWC'.
+            Options are "HWC", "SS-NIR", "SS-UV", "SS-Vis". Defaults to "HWC".
         """
         self.url = url
         self.psg = self._connect_psg()
         self.config = self._set_config(config, stage, instrument)
+        self.stage = stage
 
     def _connect_psg(self) -> PSG:
         """
@@ -61,7 +62,7 @@ class DataGen:
         except FileNotFoundError:
             raise FileNotFoundError(f"The configuration file {config_path} was not found.")
         
-        valid_stages = {'modern': geo.modern, 'proterozoic': geo.proterozoic, 'archean': geo.archean}
+        valid_stages = {"modern": st.modern, "proterozoic": st.proterozoic, "archean": st.archean}
         if stage in valid_stages:
             valid_stages[stage](config)
         else:
@@ -100,7 +101,7 @@ class DataGen:
             return self.config.get(key)
         return self.config 
     
-    def generator(self, start: int, end: int, random_atm: bool, verbose: bool, file: str, molweight: list = None) -> None:
+    def generator(self, start: int, end: int, random_atm: bool, verbose: bool, output_file: str) -> None:
         """
         Generates a dataset using the PSG for a specified number of planets 
         and saves it to a Parquet file. The dataset generation can include random atmosphere
@@ -117,24 +118,17 @@ class DataGen:
         end : int
             The ending index for the range of planets to generate data for.
         random_atm : bool
-            Flag to indicate whether to generate random atmospheric compositions. If True, 
-            `molweight` is not required and will be ignored.
+            Flag to indicate whether to generate random atmospheric compositions.
         verbose : bool
             Flag to indicate whether to print output messages.
-        file : str, optional
-            The filename to save the data.
-        molweight : list of float, optional
-            A list of molecular weights for the molecules. This parameter is required if 
-            `random_atm` is False. It should be in the order specified by 
-            `config["ATMOSPHERE-LAYERS-MOLECULES"]`. To simplify the generation of this list, 
-            you can use `geostages.molweightlist()`.            
+        output_file : str
+            The filename to save the data.       
         
         Notes
         -----
-        - If `random_atm` is True, the atmospheric composition is generated randomly, and the
-        `molweight` parameter is not used. This allows flexibility in the function usage depending
-        on the scenario of the atmospheric simulation (with isothermal layers). 
-        The molecules included in the random atmosphere generation are:
+        - If `random_atm` is True, the atmospheric composition is generated randomly. This allows 
+        flexibility in the function usage depending on the scenario of the atmospheric simulation 
+        (with isothermal layers). The molecules included in the random atmosphere generation are:
             - H2O (Water vapor)
             - CO2 (Carbon dioxide)
             - CH4 (Methane)
@@ -150,14 +144,15 @@ class DataGen:
         - The noise column comes from the telescope observation with a distance assumption of 3 parsecs. 
         The noise is generated using a Gaussian distribution, where the mean is the total model and the 
         standard deviation is the 1-sigma noise.
-        """
-        # Check if molweight is required and not provided
-        if not random_atm and molweight is None:
-            raise ValueError("molweight must be provided when `random_atm` is False.")
+        """       
+        if self.stage == "modern" or self.stage == "proterozoic":
+            molweight = st.molweightlist(era="modern")
+        else:
+            molweight = st.molweightlist(era="archean")      
 
         data_dir = "data"
         os.makedirs(data_dir, exist_ok=True)
-        output_path = os.path.join(data_dir, f"{file}.parquet")
+        output_path = os.path.join(data_dir, f"{output_file}.parquet")
 
         parquet_writer = None
         schema = None
@@ -169,7 +164,7 @@ class DataGen:
 
                 configuration = self.config.copy()
                 if random_atm:
-                    geo.random_atmosphere(configuration)
+                    st.random_atmosphere(configuration)
                 else:
                     dm.random_planet(configuration, molweight)
                 
