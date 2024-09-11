@@ -1,1 +1,4 @@
 *.parquet filter=lfs diff=lfs merge=lfs -text
+*.npy filter=lfs diff=lfs merge=lfs -text
+models/X_test_scaled.npy filter=lfs diff=lfs merge=lfs -text
+models/X_train_scaled.npy filter=lfs diff=lfs merge=lfs -text
