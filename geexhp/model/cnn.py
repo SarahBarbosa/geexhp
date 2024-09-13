@@ -307,7 +307,6 @@ class HyperTuningBayCNN:
         """
         Inverse transforms the scaled predictions to the original scale.
         """
-        epsilon = 1e-6
         n_iter, samples, abundance_outputs = predictions['abundance'].shape
         n_iter, samples, planetary_outputs = predictions['planetary'].shape
 
@@ -318,8 +317,7 @@ class HyperTuningBayCNN:
         # Inverse transform abundance predictions
         for i in range(abundance_outputs):
             scaler = y_scalers_abundance[i]
-            data = predictions['abundance'][:, :, i].reshape(-1, 1)
-            scaled_preds = scaler.inverse_transform(data)
+            abundance_preds_inv[:, :, i] = scaler.inverse_transform(predictions['abundance'][:, :, i])
 
         # Inverse transform planetary predictions
         for i in range(planetary_outputs):
