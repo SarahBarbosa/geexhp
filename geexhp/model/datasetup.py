@@ -96,7 +96,7 @@ def normalize_data(X_train, X_test, y_train_abundance, y_test_abundance,
         y_train_abundance_scaled = np.zeros_like(y_train_abundance)
         y_test_abundance_scaled = np.zeros_like(y_test_abundance)
         for i in range(num_abundance_features):
-            scaler = MinMaxScaler(feature_range=(0, 1))
+            scaler = StandardScaler()
             y_train_abundance_scaled[:, i] = scaler.fit_transform(y_train_abundance[:, i].reshape(-1, 1)).flatten()
             y_test_abundance_scaled[:, i] = scaler.transform(y_test_abundance[:, i].reshape(-1, 1)).flatten()
             y_scalers_abundance.append(scaler)
