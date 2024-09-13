@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 #from matplotlib_inline import backend_inline
 from matplotlib import lines as mlines
 
+import corner
+
 
 def configure_matplotlib(oldschool: bool = False) -> None:
     """
@@ -158,4 +160,78 @@ def label_line(line: mlines.Line2D, x: float, label: str = None, align: bool = T
     if "zorder" not in kwargs:
         kwargs["zorder"] = 2.5
     ax.text(10**x if ax.get_xscale() == 'log' else x, y, label, rotation=trans_angle, **kwargs)
+
+def _get_normalisation_weight(len_current_samples, len_of_longest_samples):
+    return np.ones(len_current_samples) * (len_of_longest_samples / len_current_samples)
+
+def overlaid_corner(samples_list, sample_labels, feature_names, true_values=None, filename='corner_plot.png'):
+    """
+    Plots multiple corner plots overlaid on top of each other.
+    """
+    CORNER_KWARGS = dict(
+        smooth=0.9,
+        label_kwargs=dict(fontsize=12),
+        title_kwargs=dict(fontsize=12),
+        quantiles=[0.16, 0.5, 0.84],
+        levels=(1 - np.exp(-0.5), 1 - np.exp(-2), 1 - np.exp(-9 / 2.)),
+        plot_density=False,
+        plot_datapoints=False,
+        fill_contours=True,
+        show_titles=True,
+        max_n_ticks=3,
+        title_fmt=".2E"
+    )
+
+    n = len(samples_list)
+    _, ndim = samples_list[0].shape
+    max_len = max([len(s) for s in samples_list])
+    cmap = plt.cm.get_cmap('gist_rainbow', n)
+    colors = [cmap(i) for i in range(n)]
+
+    # Determine the range for each dimension
+    plot_range = []
+    for dim in range(ndim):
+        dim_min = min([np.min(samples_list[i][:, dim]) for i in range(n)])
+        dim_max = max([np.max(samples_list[i][:, dim]) for i in range(n)])
+        plot_range.append((dim_min, dim_max))
+
+    CORNER_KWARGS.update(range=plot_range)
+    CORNER_KWARGS.update(labels=feature_names)
+
+    # First corner plot
+    fig = corner.corner(
+        samples_list[0],
+        color=colors[0],
+        **CORNER_KWARGS
+    )
+
+    # Overlay additional corner plots
+    for idx in range(1, n):
+        fig = corner.corner(
+            samples_list[idx],
+            fig=fig,
+            weights=_get_normalisation_weight(len(samples_list[idx]), max_len),
+            color=colors[idx],
+            **CORNER_KWARGS
+        )
+
+    # Plot true values if provided
+    if true_values is not None:
+        axes = np.array(fig.axes).reshape((ndim, ndim))
+        for i in range(ndim):
+            ax = axes[i, i]
+            ax.axvline(true_values[i], color='black', linestyle='--')
+
+    # Add legend
+    plt.legend(
+        handles=[
+            mlines.Line2D([], [], color=colors[i], label=sample_labels[i])
+            for i in range(n)
+        ],
+        fontsize=12, frameon=False,
+        bbox_to_anchor=(1, ndim), loc="upper right"
+    )
+
+    plt.savefig(filename)
+    plt.show()
 
