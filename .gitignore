@@ -1,11 +1,17 @@
 # Diretório do ambiente virtual Python
 psg-venv/
+.venv/
+venv/
+env/
 
 # Configurações do Visual Studio Code
 .vscode/
 
 # Bytecode Python
 __pycache__/
+*.pyc
+*.pyo
+*.pyd
 
 # Variáveis de ambiente
 .env
@@ -13,12 +19,34 @@ __pycache__/
 # Informações do pacote egg
 geexhp.egg-info/
 
-# Ignorando
+# Ignorar logs e arquivos temporários
+*.log
+*.tmp
+*.bak
+*.swp
+*.swo
+
+# Cache pip
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Arquivos de dados e modelos
 data/*.parquet
+models/*.pkl
 models/*.npy
+models/*.joblib
 models/*.h5
 parallel/data/
 examples/kawashima_data/
 examples/arney_data/
 ecospeclib-all/
+examples/hyperparam_search
+
+# Ignorar playground e outros arquivos temporários
 playground.ipynb
+*.jar
+
+# Arquivos de backup e temporários de editores
+*.bak
+*.orig
+*~
