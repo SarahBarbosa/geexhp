@@ -6,17 +6,26 @@ import tensorflow as tf
 import kerastuner as kt
 from sklearn import metrics
 
+from geexhp.model import datasetup as dset
+
 import matplotlib.pyplot as plt
 
 class MCDropout(tf.keras.layers.Dropout):
     def call(self, inputs, training=None):
         return super().call(inputs, training=True)
 
+class ManualStop(tf.keras.callbacks.Callback):
+    def on_epoch_end(self, epoch, logs=None):
+        stop = input("Do you want to stop training? (yes/no): ")
+        if stop.lower() == 'yes':
+            print("Stopping training manually...")
+            self.model.stop_training = True
+
 class HyperTuningBayCNN:
-    def __init__(self, input_shape, abundance_units, planetary_units):
+    def __init__(self, input_shape, output_units, outputs_list):
         self.input_shape = input_shape
-        self.abundance_units = abundance_units
-        self.planetary_units = planetary_units
+        self.output_units = output_units
+        self.outputs_list = outputs_list
         self.best_hps = None
         self.best_model = None
         self.history = None
@@ -26,47 +35,61 @@ class HyperTuningBayCNN:
         x = inputs
 
         # Convolutional Layers
-        for i in range(hp.Int('conv_layers', 2, 6)):
+        for i in range(hp.Int('conv_layers', 1, 3)):
             x = tf.keras.layers.Conv1D(
-                filters=hp.Int(f'filters_{i}', min_value=32, max_value=256, step=32),
-                kernel_size=hp.Choice(f'kernel_size_{i}', values=[3, 5, 7]),
-                activation=hp.Choice('activation_conv', ['relu', 'swish']) 
+                filters=hp.Int(f'filters_{i}', min_value=16, max_value=128, step=16),
+                kernel_size=hp.Choice(f'kernel_size_{i}', values=[3, 5, 7, 9]),
+                activation="swish"
+            )(x)
+            x = tf.keras.layers.Conv1D(
+                filters=hp.Int(f'filters_{i}', min_value=16, max_value=128, step=16),
+                kernel_size=hp.Choice(f'kernel_size_{i}', values=[3, 5, 7, 9]),
+                activation="swish"
             )(x)
             x = tf.keras.layers.MaxPooling1D(pool_size=2)(x)
-            x = MCDropout(hp.Float(f'dropout_rate_{i}', 0.1, 0.4, step=0.1))(x)
+            x = tf.keras.layers.BatchNormalization()(x)
+            x = MCDropout(hp.Float(f'dropout_rate_{i}', 0.1, 0.3, step=0.1))(x)
             
         x = tf.keras.layers.Flatten()(x)
 
         # Dense Layers
-        for i in range(hp.Int('dense_layers', 1, 4)):
+        for i in range(hp.Int('dense_layers', 1, 3)):
             x = tf.keras.layers.Dense(
                 units=hp.Int(f'units_{i}', min_value=64, max_value=512, step=64),
-                activation=hp.Choice('activation_dense', ['relu', 'swish']) 
+                activation="swish",
+                kernel_regularizer=tf.keras.regularizers.l2(1e-5)
             )(x)
-            x = MCDropout(hp.Float(f'dropout_rate_dense_{i}', 0.1, 0.4, step=0.1))(x)
+            x = MCDropout(hp.Float(f'dropout_rate_dense_{i}', 0.1, 0.3, step=0.1))(x)
 
         # Output Layers
-        abundance_output = tf.keras.layers.Dense(self.abundance_units, activation='linear', name='abundance_output')(x)
-        planetary_output = tf.keras.layers.Dense(self.planetary_units, activation='linear', name='planetary_output')(x)
+        outputs = {}
+        for _, output_name in enumerate(self.outputs_list):
+            output = tf.keras.layers.Dense(
+                units=1,
+                activation='linear',
+                name=output_name
+            )(x)
+            outputs[output_name] = output
 
         # Compile Model with Cosine Learning Rate Schedule
         lr_schedule = tf.keras.optimizers.schedules.CosineDecayRestarts(
-            initial_learning_rate=hp.Float('learning_rate', 1e-4, 1e-2, sampling='LOG'),
+            initial_learning_rate=hp.Float('learning_rate', 1e-5, 1e-2, sampling='LOG'),
             first_decay_steps=10,
             t_mul=2.0, m_mul=0.9, alpha=0.1
         )
 
-        model = tf.keras.Model(inputs=inputs, outputs=[abundance_output, planetary_output])
+        losses = {output_name: 'mse' for output_name in self.outputs_list}
+
+        model = tf.keras.Model(inputs=inputs, outputs=outputs)
         model.compile(
             optimizer=tf.keras.optimizers.Adam(learning_rate=lr_schedule),
-            loss={'abundance_output': 'mse', 'planetary_output': 'mse'},
-            loss_weights={'abundance_output': 0.6, 'planetary_output': 0.4}  # Balance losses
+            loss=losses,
         )
 
         return model
 
 
-    def search(self, X_train, y_train_abundance, y_train_planetary, max_trials=50, search_epochs=3):
+    def search(self, train_dataset, validation_dataset, max_trials=50, search_epochs=3):
         # Keras Tuner Bayesian Optimization search
         tuner = kt.BayesianOptimization(
             self.build_model,
@@ -77,8 +100,8 @@ class HyperTuningBayCNN:
         )
 
         tuner.search(
-            X_train, {'abundance_output': y_train_abundance, 'planetary_output': y_train_planetary},
-            validation_split=0.2,
+            train_dataset,
+            validation_data=validation_dataset,
             epochs=search_epochs
         )
 
@@ -86,23 +109,7 @@ class HyperTuningBayCNN:
         self.best_hps = tuner.get_best_hyperparameters(num_trials=1)[0]
         return self.best_hps
 
-    # def show_best_parameters(self):
-    #     """
-    #     Displays the best hyperparameters found during the search.
-    #     """
-    #     if self.best_hps:
-    #         print(f"Best number of convolutional layers: {self.best_hps.get('conv_layers')}")
-    #         print(f"Best number of dense layers: {self.best_hps.get('dense_layers')}")
-    #         print(f"Best dropout rate: {self.best_hps.get('dropout_rate')}")
-    #         print(f"Best learning rate: {self.best_hps.get('learning_rate')}")
-    #         print(f"Best filters: {self.best_hps.get('filters')}")
-    #         print(f"Best units: {self.best_hps.get('units')}")
-    #         print(f"Best kernel size: {self.best_hps.get('kernel_size')}")
-    #     else:
-    #         print("No hyperparameters found. Run the search method first.")
-    
-    def fit_best_model(self, train_dataset, validation_dataset, epochs=100, patience=20, 
-                    train_steps_per_epoch=None, validation_steps=None):
+    def fit_best_model(self, train_dataset, validation_dataset, epochs=100, patience=5):
         
         if not self.best_hps:
             raise ValueError("No best hyperparameters found. Please run the 'search' method first.")
@@ -111,89 +118,55 @@ class HyperTuningBayCNN:
 
         early_stopping = tf.keras.callbacks.EarlyStopping(
             monitor='val_loss', patience=patience, restore_best_weights=True)
-
-        # reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(
-        #     monitor='val_loss', factor=0.5, patience=5, min_lr=1e-6)
+        
+        manual_stop = ManualStop()  # manual stopping callback
 
         self.history = self.best_model.fit(
             train_dataset,
             epochs=epochs,
-            steps_per_epoch=train_steps_per_epoch,
             validation_data=validation_dataset,
-            validation_steps=validation_steps,
-            callbacks=[early_stopping],
-            verbose=2
+            callbacks=[early_stopping, manual_stop],
+            verbose=1
         )
 
         return self.best_model, self.history
 
 
-    def evaluate(self, test_dataset, feature_names_abundance, feature_names_planetary,
-                y_scalers_abundance=None, y_scalers_planetary=None, plot=True, additional_metrics=True):
-        """
-        Evaluates the model using a tf.data.Dataset, returning evaluation metrics and optional plots.
-        """
+    def evaluate(self, test_dataset, feature_names, y_scalers, plot=True, additional_metrics=True):
         if self.best_model is None:
-            raise ValueError("No model is trained yet. Please run 'fit_best_model' first.")
+            raise ValueError("Nenhum modelo foi treinado ainda. Por favor, execute 'fit_best_model' primeiro.")
 
-        # Initialize lists to collect true and predicted values
-        y_true_abundance_list = []
-        y_pred_abundance_list = []
-        y_true_planetary_list = []
-        y_pred_planetary_list = []
+        # Inicializar listas para coletar valores verdadeiros e predições
+        y_true_dict = {name: [] for name in self.outputs_list}
+        y_pred_dict = {name: [] for name in self.outputs_list}
 
-        # Iterate over the test dataset to collect predictions and true values
+        # Iterar sobre o test_dataset para coletar predições e valores verdadeiros
         for X_batch, y_batch in test_dataset:
-            # Make predictions
+            # Fazer predições
             y_pred_batch = self.best_model.predict(X_batch, verbose=0)
             
-            # Extract true values
-            y_true_abundance_batch = y_batch['abundance_output']
-            y_true_planetary_batch = y_batch['planetary_output']
-            
-            # Extract predicted values
-            y_pred_abundance_batch = y_pred_batch[0]
-            y_pred_planetary_batch = y_pred_batch[1]
-            
             # Append to lists
-            y_true_abundance_list.append(y_true_abundance_batch.numpy())
-            y_pred_abundance_list.append(y_pred_abundance_batch)
-            y_true_planetary_list.append(y_true_planetary_batch.numpy())
-            y_pred_planetary_list.append(y_pred_planetary_batch)
-        
-        # Concatenate the lists
-        y_true_abundance = np.concatenate(y_true_abundance_list, axis=0)
-        y_pred_abundance = np.concatenate(y_pred_abundance_list, axis=0)
-        y_true_planetary = np.concatenate(y_true_planetary_list, axis=0)
-        y_pred_planetary = np.concatenate(y_pred_planetary_list, axis=0)
-       
-        # Inverse transform abundances
-        if y_scalers_abundance:
-            for i, scaler in enumerate(y_scalers_abundance):
-                # First, inverse the scaling
-                y_true_abundance[:, i] = scaler.inverse_transform(y_true_abundance[:, i].reshape(-1, 1)).flatten()
-                y_pred_abundance[:, i] = scaler.inverse_transform(y_pred_abundance[:, i].reshape(-1, 1)).flatten()
-                
-        # Inverse transform planetary parameters
-        if y_scalers_planetary:
-            for i, scaler in enumerate(y_scalers_planetary):
-                y_true_planetary[:, i] = scaler.inverse_transform(y_true_planetary[:, i].reshape(-1, 1)).flatten()
-                y_pred_planetary[:, i] = scaler.inverse_transform(y_pred_planetary[:, i].reshape(-1, 1)).flatten()
-        
-        # Evaluate abundances
-        results_abundance = self._evaluate_outputs(
-            y_true_abundance, y_pred_abundance, feature_names_abundance, plot, additional_metrics, title='Abundances'
-        )
-        
-        # Evaluate planetary parameters
-        results_planetary = self._evaluate_outputs(
-            y_true_planetary, y_pred_planetary, feature_names_planetary, plot, additional_metrics, title='Planetary Parameters'
-        )
-        
-        return {'Abundances': results_abundance, 'Planetary Parameters': results_planetary}
+            for name in self.outputs_list:
+                y_true_dict[name].extend(y_batch[name].numpy())
+                y_pred_dict[name].extend(y_pred_batch[name])
 
+        # Converter listas em arrays numpy
+        y_true = np.column_stack([y_true_dict[name] for name in self.outputs_list])
+        y_pred = np.column_stack([y_pred_dict[name] for name in self.outputs_list])
 
-    def _evaluate_outputs(self, y_true, y_pred, feature_names, plot, additional_metrics, title):
+        # Inverter a transformação dos outputs (individualmente para cada scaler)
+        y_true_inv = np.column_stack([y_scalers[idx].inverse_transform(y_true[:, idx].reshape(-1, 1)).ravel()
+                                    for idx in range(len(self.outputs_list))])
+        y_pred_inv = np.column_stack([y_scalers[idx].inverse_transform(y_pred[:, idx].reshape(-1, 1)).ravel()
+                                    for idx in range(len(self.outputs_list))])
+
+        # Avaliar outputs
+        results = self._evaluate_outputs(
+            y_true_inv, y_pred_inv, feature_names, plot, additional_metrics)
+
+        return results
+
+    def _evaluate_outputs(self, y_true, y_pred, feature_names, plot, additional_metrics):
         r2_scores = []
         mae_scores = []
         rmse_scores = []
@@ -233,8 +206,7 @@ class HyperTuningBayCNN:
             if total_plots > num_outputs:
                 for i in range(num_outputs, total_plots):
                     fig.delaxes(axs.flatten()[i])
-        
-            plt.suptitle(title)
+
             plt.tight_layout()
             plt.show()
         
@@ -284,44 +256,33 @@ class HyperTuningBayCNN:
         print(f"Model loaded from {file_path}")
     
     def predict_with_uncertainty(self, X, n_iter=100):
-        """
-        Generates predictions with uncertainty estimates using Monte Carlo Dropout.
-        """
         if self.best_model is None:
-            raise ValueError("No model is trained yet. Please run 'fit_best_model' first.")
+            raise ValueError("Nenhum modelo foi treinado ainda. Por favor, execute 'fit_best_model' primeiro.")
 
-        predictions = {'abundance': [], 'planetary': []}
+        predictions_list = {name: [] for name in self.outputs_list}
         for _ in range(n_iter):
             preds = self.best_model.predict(X, batch_size=32, verbose=0)
-            # preds is a list [abundance_preds, planetary_preds]
-            predictions['abundance'].append(preds[0])
-            predictions['planetary'].append(preds[1])
+            for name in self.outputs_list:
+                predictions_list[name].append(preds[name])
         
-        # Convert lists to numpy arrays
-        predictions['abundance'] = np.array(predictions['abundance'])  # Shape: (n_iter, samples, abundance_outputs)
-        predictions['planetary'] = np.array(predictions['planetary'])  # Shape: (n_iter, samples, planetary_outputs)
-        
-        return predictions
+        # Converter listas em arrays numpy
+        predictions_array = {name: np.array(predictions_list[name]) for name in self.outputs_list}
+
+        return predictions_array
     
-    def inverse_transform_predictions(self, predictions, y_scalers_abundance, y_scalers_planetary):
+    def inverse_transform_predictions(self, predictions, y_scalers):
         """
         Inverse transforms the scaled predictions to the original scale.
         """
-        n_iter, samples, abundance_outputs = predictions['abundance'].shape
-        n_iter, samples, planetary_outputs = predictions['planetary'].shape
+        n_iter, samples, output_units = predictions.shape
 
-        # Initialize arrays
-        abundance_preds_inv = np.zeros((n_iter, samples, abundance_outputs))
-        planetary_preds_inv = np.zeros((n_iter, samples, planetary_outputs))
+        # Initialize array for inverse transformed predictions
+        predictions_inv = np.zeros_like(predictions)
 
-        # Inverse transform abundance predictions
-        for i in range(abundance_outputs):
-            scaler = y_scalers_abundance[i]
-            abundance_preds_inv[:, :, i] = scaler.inverse_transform(predictions['abundance'][:, :, i])
+        # Inverse transform each output separately using its corresponding scaler
+        for idx in range(output_units):
+            # Reshape for inverse transform
+            pred_reshaped = predictions[:, :, idx].reshape(-1, 1)
+            predictions_inv[:, :, idx] = y_scalers[idx].inverse_transform(pred_reshaped).reshape(n_iter, samples)
 
-        # Inverse transform planetary predictions
-        for i in range(planetary_outputs):
-            scaler = y_scalers_planetary[i]
-            planetary_preds_inv[:, :, i] = scaler.inverse_transform(predictions['planetary'][:, :, i])
-
-        return {'abundance': abundance_preds_inv, 'planetary': planetary_preds_inv}
+        return predictions_inv

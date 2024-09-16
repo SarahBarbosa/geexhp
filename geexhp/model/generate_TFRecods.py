@@ -35,6 +35,7 @@ def save_features(planet_name, planet_dic):
       'ALBEDO' : float_feature_list(planet_dic['ALBEDO']),          # list of floats
 
       'ATMOSPHERE-PRESSURE' : _float_feature(planet_dic['ATMOSPHERE-PRESSURE']),  # float
+      'ATMOSPHERE-TEMPERATURE': _float_feature(planet_dic['ATMOSPHERE-TEMPERATURE']),   # MISSING HERE!
       'OBJECT-DIAMETER' : _float_feature(planet_dic['OBJECT-DIAMETER']),          # float
       'OBJECT-GRAVITY' : _float_feature(planet_dic['OBJECT-GRAVITY']),            # float
 
@@ -48,6 +49,7 @@ def save_features(planet_name, planet_dic):
       'N2' : _float_feature(planet_dic['N2']),      # float
       'N2O' : _float_feature(planet_dic['N2O']),    # float
       'NH3' : _float_feature(planet_dic['NH3']),    # float
+      'O2' : _float_feature(planet_dic['O2']),      # float MISSING HERE!
       'O3' : _float_feature(planet_dic['O3']),      # float
       'PH3' : _float_feature(planet_dic['PH3']),    # float
   }

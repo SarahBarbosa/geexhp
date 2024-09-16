@@ -10,3 +10,4 @@ pip install -e .
 
 - [ ] Create ~ 1 million data points with noise (~250,000 per type) using APOLO.
 - [ ] Add clouds/haze to the same (?) data.
+- [ ] Use low-resolution data 
