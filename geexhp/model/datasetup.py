@@ -41,6 +41,7 @@ def combine_parquet(folder: str, keyword: str, output_file: bool = False) -> pd.
 
     return combineddf
 
+
 def _extract(row, sorted_molecules):
     """
     Function to map molecules to abundances for each row.
@@ -63,106 +64,3 @@ def extract_abundances(df: pd.DataFrame) -> pd.DataFrame:
     abun_df = df.apply(lambda row: _extract(row, sorted_molecules), axis=1, result_type="expand")
     abun_df.columns = [f"{molecule}" for molecule in sorted_molecules]
     return pd.concat([df, abun_df], axis=1)
-
-def normalize_data(X_train, X_test, y_train_abundance, y_test_abundance,
-                   y_train_planetary, y_test_planetary,
-                   x_scaler=None, y_scalers_abundance=None, y_scalers_planetary=None):
-    """
-    Normalizes input data (X_train and X_test) and handles separate outputs for 
-    abundances and planetary parameters.
-    """
-    # Input Scaler
-    if x_scaler is None:
-        x_scaler = StandardScaler()
-    
-    # Flatten X for scaling
-    num_train_samples, num_features = X_train.shape
-    num_test_samples = X_test.shape[0]
-    X_train_flat = X_train.reshape(num_train_samples, -1)
-    X_test_flat = X_test.reshape(num_test_samples, -1)
-    
-    # Fit and transform X
-    X_train_scaled = x_scaler.fit_transform(X_train_flat)
-    X_test_scaled = x_scaler.transform(X_test_flat)
-    
-    # Reshape X back to original shape for Conv1D layers
-    X_train_scaled = X_train_scaled.reshape(num_train_samples, num_features, 1)
-    X_test_scaled = X_test_scaled.reshape(num_test_samples, num_features, 1)
-    
-    # Output Scalers for Abundances
-    num_abundance_features = y_train_abundance.shape[1]
-    if y_scalers_abundance is None:
-        y_scalers_abundance = []
-        y_train_abundance_scaled = np.zeros_like(y_train_abundance)
-        y_test_abundance_scaled = np.zeros_like(y_test_abundance)
-        for i in range(num_abundance_features):
-            scaler = StandardScaler()
-            y_train_abundance_scaled[:, i] = scaler.fit_transform(y_train_abundance[:, i].reshape(-1, 1)).flatten()
-            y_test_abundance_scaled[:, i] = scaler.transform(y_test_abundance[:, i].reshape(-1, 1)).flatten()
-            y_scalers_abundance.append(scaler)
-    else:
-        y_train_abundance_scaled = np.zeros_like(y_train_abundance)
-        y_test_abundance_scaled = np.zeros_like(y_test_abundance)
-        for i in range(num_abundance_features):
-            scaler = y_scalers_abundance[i]
-            y_train_abundance_scaled[:, i] = scaler.transform(y_train_abundance[:, i].reshape(-1, 1)).flatten()
-            y_test_abundance_scaled[:, i] = scaler.transform(y_test_abundance[:, i].reshape(-1, 1)).flatten()
-    
-    # Output Scalers for Planetary Parameters
-    num_planetary_features = y_train_planetary.shape[1]
-    if y_scalers_planetary is None:
-        y_scalers_planetary = []
-        y_train_planetary_scaled = np.zeros_like(y_train_planetary)
-        y_test_planetary_scaled = np.zeros_like(y_test_planetary)
-        for i in range(num_planetary_features):
-            scaler = StandardScaler()
-            y_train_planetary_scaled[:, i] = scaler.fit_transform(y_train_planetary[:, i].reshape(-1, 1)).flatten()
-            y_test_planetary_scaled[:, i] = scaler.transform(y_test_planetary[:, i].reshape(-1, 1)).flatten()
-            y_scalers_planetary.append(scaler)
-    else:
-        y_train_planetary_scaled = np.zeros_like(y_train_planetary)
-        y_test_planetary_scaled = np.zeros_like(y_test_planetary)
-        for i in range(num_planetary_features):
-            scaler = y_scalers_planetary[i]
-            y_train_planetary_scaled[:, i] = scaler.transform(y_train_planetary[:, i].reshape(-1, 1)).flatten()
-            y_test_planetary_scaled[:, i] = scaler.transform(y_test_planetary[:, i].reshape(-1, 1)).flatten()
-    
-    # Print shapes for debugging
-    print(f"Train input shape: {X_train_scaled.shape}")
-    print(f"Test input shape: {X_test_scaled.shape}")
-    print(f"Train abundance labels shape: {y_train_abundance_scaled.shape}")
-    print(f"Test abundance labels shape: {y_test_abundance_scaled.shape}")
-    print(f"Train planetary labels shape: {y_train_planetary_scaled.shape}")
-    print(f"Test planetary labels shape: {y_test_planetary_scaled.shape}")
-    
-    return (X_train_scaled, X_test_scaled,
-            y_train_abundance_scaled, y_test_abundance_scaled,
-            y_train_planetary_scaled, y_test_planetary_scaled,
-            x_scaler, y_scalers_abundance, y_scalers_planetary)
-
-def _float_feature(value):
-    """Returns a float_list from a float / double or iterable of floats."""
-    if isinstance(value, (list, np.ndarray)):
-        return tf.train.Feature(float_list=tf.train.FloatList(value=value))
-    else:
-        return tf.train.Feature(float_list=tf.train.FloatList(value=[value]))
-
-def serialize_example(input_albedo, abundance_labels, planetary_labels):
-    """
-    Creates a tf.train.Example message ready to be written to a file.
-    """
-    feature = {
-        'input_albedo': _float_feature(input_albedo.flatten()),
-        'abundance_labels': _float_feature(abundance_labels),
-        'planetary_labels': _float_feature(planetary_labels),
-    }
-    example_proto = tf.train.Example(features=tf.train.Features(feature=feature))
-    return example_proto.SerializeToString()
-
-def write_tfrecords(filename, X_data, y_abundance_data, y_planetary_data):
-    with tf.io.TFRecordWriter(filename) as writer:
-        for i in range(len(X_data)):
-            example = serialize_example(X_data[i], y_abundance_data[i], y_planetary_data[i])
-            writer.write(example)
-    print(f"Data successfully written to {filename}")
-
