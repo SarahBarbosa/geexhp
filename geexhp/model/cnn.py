@@ -14,12 +14,24 @@ class MCDropout(tf.keras.layers.Dropout):
     def call(self, inputs, training=None):
         return super().call(inputs, training=True)
 
-class ManualStop(tf.keras.callbacks.Callback):
-    def on_epoch_end(self, epoch, logs=None):
-        stop = input("Do you want to stop training? (yes/no): ")
-        if stop.lower() == 'yes':
-            print("Stopping training manually...")
-            self.model.stop_training = True
+# class ManualStop(tf.keras.callbacks.Callback):
+#     def on_epoch_end(self, epoch, logs=None):
+#         stop = input("Do you want to stop training? (yes/no): ")
+#         if stop.lower() == 'yes':
+#             print("Stopping training manually...")
+#             self.model.stop_training = True
+
+# class CustomLoss(tf.keras.losses.Loss):
+#     def __init__(self, alpha=10.0):
+#         super().__init__()
+#         self.alpha = alpha
+
+#     def call(self, y_true, y_pred):
+#         zero_mask = tf.cast(tf.equal(y_true, 0.0), tf.float32)
+#         non_zero_mask = tf.cast(tf.not_equal(y_true, 0.0), tf.float32)
+#         zero_loss = self.alpha * tf.square(y_pred) * zero_mask
+#         non_zero_loss = tf.square(y_pred - y_true) * non_zero_mask
+#         return tf.reduce_mean(zero_loss + non_zero_loss)
 
 class HyperTuningBayCNN:
     def __init__(self, input_shape, output_units, outputs_list):
@@ -67,6 +79,7 @@ class HyperTuningBayCNN:
             output = tf.keras.layers.Dense(
                 units=1,
                 activation='linear',
+                kernel_regularizer=tf.keras.regularizers.l1(1e-5),
                 name=output_name
             )(x)
             outputs[output_name] = output
@@ -77,15 +90,22 @@ class HyperTuningBayCNN:
             first_decay_steps=10,
             t_mul=2.0, m_mul=0.9, alpha=0.1
         )
+        
+        # def false_positive_rate(y_true, y_pred):
+        #     zero_mask = tf.cast(tf.equal(y_true, 0.0), tf.float32)
+        #     false_positives = tf.cast(tf.greater(y_pred, 0.0), tf.float32) * zero_mask
+        #     return tf.reduce_sum(false_positives) / (tf.reduce_sum(zero_mask) + 1e-8)
+
 
         losses = {output_name: 'mse' for output_name in self.outputs_list}
+        #metrics = {output_name: [false_positive_rate] for output_name in self.outputs_list}
 
         model = tf.keras.Model(inputs=inputs, outputs=outputs)
         model.compile(
             optimizer=tf.keras.optimizers.Adam(learning_rate=lr_schedule),
             loss=losses,
+            #metrics=metrics
         )
-
         return model
 
 
@@ -119,13 +139,13 @@ class HyperTuningBayCNN:
         early_stopping = tf.keras.callbacks.EarlyStopping(
             monitor='val_loss', patience=patience, restore_best_weights=True)
         
-        manual_stop = ManualStop()  # manual stopping callback
+        #manual_stop = ManualStop()  # manual stopping callback
 
         self.history = self.best_model.fit(
             train_dataset,
             epochs=epochs,
             validation_data=validation_dataset,
-            callbacks=[early_stopping, manual_stop],
+            callbacks=[early_stopping],
             verbose=1
         )
 
