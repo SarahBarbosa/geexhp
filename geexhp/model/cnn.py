@@ -6,7 +6,7 @@ import tensorflow as tf
 import kerastuner as kt
 from sklearn import metrics
 
-from geexhp.model import datasetup as dset
+#from geexhp.model import datasetup as dset
 
 import matplotlib.pyplot as plt
 
@@ -288,7 +288,11 @@ class HyperTuningBayCNN:
         # Converter listas em arrays numpy
         predictions_array = {name: np.array(predictions_list[name]) for name in self.outputs_list}
 
-        return predictions_array
+        # Compute mean and uncertainty
+        mean_predictions = {name: np.mean(pred_array, axis=0) for name, pred_array in predictions_array.items()}
+        uncertainty = {name: np.std(pred_array, axis=0) for name, pred_array in predictions_array.items()}
+
+        return predictions_array, mean_predictions, uncertainty
     
     def inverse_transform_predictions(self, predictions, y_scalers):
         """
