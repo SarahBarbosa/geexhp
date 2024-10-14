@@ -1,3 +1,5 @@
+import os
+
 import numpy as np
 import pandas as pd
 from math import ceil
@@ -204,9 +206,9 @@ class HyperTuningBayCNN:
                 rmse_scores.append(round(rmse, 2))
         
         if plot:
-            num_cols = 3
+            num_cols = 6
             num_rows = ceil(num_outputs / num_cols)
-            fig, axs = plt.subplots(num_rows, num_cols, figsize=(5 * num_cols, 4 * num_rows))
+            fig, axs = plt.subplots(num_rows, num_cols, figsize=(3 * num_cols, 3 * num_rows))
         
             for i in range(num_outputs):
                 row, col = divmod(i, num_cols)
@@ -227,7 +229,13 @@ class HyperTuningBayCNN:
                 for i in range(num_outputs, total_plots):
                     fig.delaxes(axs.flatten()[i])
 
+            folder_path = "../images/"
+            if not os.path.exists(folder_path):
+                os.makedirs(folder_path)
+
             plt.tight_layout()
+            print(f"Saving figure in {folder_path}")
+            plt.savefig(os.path.join(folder_path, "evaluate_plot.png"), dpi = 100, bbox_inches='tight')
             plt.show()
         
         results = {'R² scores': r2_scores}

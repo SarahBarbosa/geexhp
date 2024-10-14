@@ -145,10 +145,10 @@ class DataGen:
         The noise is generated using a Gaussian distribution, where the mean is the total model and the 
         standard deviation is the 1-sigma noise.
         """       
-        if self.stage == "modern" or self.stage == "proterozoic":
-            molweight = st.molweightlist(era="modern")
+        if self.stage in ["modern", "proterozoic"]:
+                molweight = st.molweightlist(era="modern")
         else:
-            molweight = st.molweightlist(era="archean")      
+            molweight = st.molweightlist(era="archean")        
 
         data_dir = "data"
         os.makedirs(data_dir, exist_ok=True)
@@ -169,11 +169,19 @@ class DataGen:
                     dm.random_planet(configuration, molweight)
                 
                 spectrum = self.psg.run(configuration)
-                noisy_albedo = np.random.normal(
-                    loc=spectrum["spectrum"][:, 1],   # Total model (ALBEDO)
-                    scale=spectrum["spectrum"][:, 2]  # Noise (1-sigma)
-                    )
+                noise = spectrum["spectrum"][:, 2]
 
+                finite_noise = noise[np.isfinite(noise)]
+                if finite_noise.size > 0:
+                    max_finite_noise = np.max(finite_noise)
+                else:
+                    max_finite_noise = 1e-10
+
+                noise[np.isinf(noise)] = max_finite_noise
+                noisy_albedo = np.random.normal(
+                    loc=spectrum["spectrum"][:, 1],   # Total model (ALBEDO) 
+                    scale=noise)                      # Noise (1-sigma)
+                
                 df = pd.DataFrame({
                     **{key: [value] for key, value in configuration.items()},
                     "WAVELENGTH": [spectrum["spectrum"][:, 0].tolist()],
