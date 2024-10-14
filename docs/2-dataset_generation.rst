@@ -65,7 +65,7 @@ Example
         start=0, end=8,     # A dataset with 8 planets  
         random_atm=False,
         verbose=True,
-        file="modern_0-8",  # Just a example
+        output_file="modern_0-8",  # Just a example
     )
 
 Generating Random Planets with an Isothermal Profile
@@ -96,7 +96,7 @@ To generate planets with an isothermal profile:
         start=0, end=8,
         random_atm=True,    # Random atmosphere generation enabled
         verbose=True,
-        file="random_0-8"   # Output file
+        output_file="random_0-8"   # Output file
     )
 
 Visualizing the Data
