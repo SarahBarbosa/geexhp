@@ -15,10 +15,9 @@ from typing import Any, Optional
 from geexhp.core import stages as st
 from geexhp.core import datamod as dm
 
-
 class DataGen:
     def __init__(self, url: str, config: str = "geexhp/config/default_habex.config", 
-                    stage: str = "modern", instrument: str = "HWC") -> None:
+            stage: str = "modern") -> None:
         """
         Initializes the DataGen class to manage the generation of data from the PSG server.
 
@@ -27,89 +26,151 @@ class DataGen:
         url : str
             URL of the PSG server.
         config : str, optional
-            Path to the PSG configuration file. 
-            Defaults to "../geexhp/config/default_habex.config".
+            Path to the PSG configuration file. Defaults to "geexhp/config/default_habex.config".
         stage : str, optional
-            Geological stage of Earth to consider. Options: "modern", "proterozoic", "archean".
+            Geological stage of Earth to consider. Options are "modern", "proterozoic", "archean".
             Defaults to "modern".
-        instrument : str, optional
-            The telescope instrument setting to modify. 
-            Options are "HWC", "SS-NIR", "SS-UV", "SS-Vis". Defaults to "HWC".
         """
         self.url = url
         self.psg = self._connect_psg()
-        self.config = self._set_config(config, stage, instrument)
         self.stage = stage
+        self.config = self._set_config(config, self.stage)
 
-    def _connect_psg(self) -> PSG:
+    def _connect_psg(self, timeout_seconds: int = 2000) -> PSG:
         """
         Establishes a connection to the PSG server.
         """
         try:
-            psg = PSG(server_url=self.url, timeout_seconds=2000)
+            psg = PSG(server_url=self.url, timeout_seconds=timeout_seconds)
             return psg
-        except Exception as e:
-            raise ConnectionError(f"Connection error. Please try again. Details: {str(e)}")
+        except (ConnectionError, TimeoutError) as e:
+            raise ConnectionError(f"Failed to connect to the PSG server. Details: {e}")
 
-    def _set_config(self, config_path: str, stage: str, instrument: str):
+    def _set_config(self, config_path: str, stage: str) -> OrderedDict:
         """
-        Sets the configuration for the PSG based on a specified file, 
-        geological stage, and instrument settings.
+        Loads the PSG configuration and applies the specified geological stage settings.
         """
         try:
             with open(config_path, "rb") as f:
                 config = OrderedDict(msgpack.unpack(f, raw=False))
-        except FileNotFoundError:
-            raise FileNotFoundError(f"The configuration file {config_path} was not found.")
+        except FileNotFoundError as e:
+            raise FileNotFoundError(f"Configuration file not found at '{config_path}'.") from e
         
-        valid_stages = {"modern": st.modern, "proterozoic": st.proterozoic, "archean": st.archean}
+        valid_stages = {
+            "modern": st.modern,
+            "proterozoic": st.proterozoic,
+            "archean": st.archean
+        }
         if stage in valid_stages:
             valid_stages[stage](config)
         else:
-            raise ValueError(f"Stage must be one of {list(valid_stages.keys())}.")
+            valid_options = ", ".join(valid_stages.keys())
+            raise ValueError(f"Invalid stage '{stage}'. Must be one of: {valid_options}.")
 
-        valid_instruments = ["HWC", "SS-NIR", "SS-UV", "SS-Vis"]
-        if instrument not in valid_instruments:
-            raise ValueError(f"Instrument must be one of {valid_instruments}.")
-        
-        if instrument != "SS-Vis":
-            dm.set_instrument(config, instrument)
-        
         return config
     
     def get_config(self, key: Optional[str] = None, value: Optional[Any] = None) -> Any:
         """
         Accesses or modifies the current instance configuration.
 
+        If a `key` is provided without a `value`, returns the value associated with the `key`.
+        If both `key` and `value` are provided, updates the configuration with the new `value`.
+        If no `key` is provided, returns the entire configuration dictionary.
+
         Parameters
         ----------
-        key : Optional[str]
-            The configuration key to access or modify. If None, the entire configuration is 
-            returned.
-        value : Optional[Any]
-            The value to update in the configuration. If None, the current value of the key is returned.
+        key : Optional[str], optional
+            The configuration key to access or modify. If None, the entire configuration is returned.
+        value : Optional[Any], optional
+            The value to set for the given `key`. If None, no update is performed.
 
         Returns
         -------
         Any
-            The value of the configuration for the provided key, or the entire configuration if 
-            no key is provided.
+            The value associated with the `key` after any updates, or the entire configuration 
+            if no `key` is provided.
         """
         if key is not None:
+            if key not in self.config:
+                raise KeyError(f"Configuration key '{key}' not found.")
             if value is not None:
-                self.config[key] = value 
-            return self.config.get(key)
-        return self.config 
+                self.config[key] = value
+            return self.config[key]
+        else:
+            return self.config.copy()
+
     
+    def _generate_spectrum_for_instrument(self, config: dict, instrument: str):
+        """
+        Generates the spectrum for a specific instrument using PSG.
+        """
+        config_instrument = config.copy()
+        if instrument != "SS-Vis":
+            dm.set_instrument(config_instrument, instrument)
+        # For "SS-Vis", we assume default settings are appropriate
+
+        spectrum = self.psg.run(config_instrument)
+        wavelengths = spectrum["spectrum"][:, 0]
+        albedo = spectrum["spectrum"][:, 1]
+        noise = spectrum["spectrum"][:, 2]
+
+        finite_noise = noise[np.isfinite(noise)]
+        if finite_noise.size > 0:
+            max_finite_noise = np.max(finite_noise)
+
+        noise[np.isinf(noise)] = max_finite_noise
+        noisy_albedo = np.random.normal(
+            loc=albedo,   # Total model (ALBEDO) 
+            scale=noise)  # Noise (1-sigma)
+
+        return wavelengths, albedo, noise, noisy_albedo
+
+    def _process_planet(self, index: int, random_atm: bool, molweight: dict, instruments: list):
+        """
+        Processes a single planet by generating spectra for all instruments.
+        """
+        configuration = self.config.copy()
+        if random_atm:
+            st.random_atmosphere(configuration)
+        else:
+            dm.random_planet(configuration, molweight)
+
+        # Dictionaries to store data for each instrument
+        wavelength_data = {}
+        albedo_data = {}
+        noise_data = {}
+        noisy_albedo_data = {}
+
+        for instrument in instruments:
+            try:
+                wavelengths, albedo, noise, noisy_albedo = self._generate_spectrum_for_instrument(
+                    configuration, instrument)
+                # Store data in dictionaries
+                wavelength_data[instrument] = wavelengths.tolist()
+                albedo_data[instrument] = albedo.tolist()
+                noise_data[instrument] = noise.tolist()
+                noisy_albedo_data[instrument] = noisy_albedo.tolist()
+            except Exception as e:
+                print(f"Error processing instrument {instrument} for planet index {index}: {e}")
+                # Skip this instrument if there's an error
+                continue
+
+        # Build the DataFrame row
+        df_dict = {key: [value] for key, value in configuration.items()}
+        for instrument in instruments:
+            if instrument in wavelength_data:
+                df_dict[f"WAVELENGTH_{instrument}"] = [wavelength_data[instrument]]
+                df_dict[f"ALBEDO_{instrument}"] = [albedo_data[instrument]]
+                df_dict[f"NOISE_{instrument}"] = [noise_data[instrument]]
+                df_dict[f"NOISY_ALBEDO_{instrument}"] = [noisy_albedo_data[instrument]]
+
+        df = pd.DataFrame(df_dict)
+        return df
+
     def generator(self, start: int, end: int, random_atm: bool, verbose: bool, output_file: str) -> None:
         """
         Generates a dataset using the PSG for a specified number of planets 
-        and saves it to a Parquet file. The dataset generation can include random atmosphere
-        configurations if specified.
-
-        This function is designed to be used in a multithreaded environment. When running in 
-        parallel, ensure that the `start` and `end` parameters are appropriately divided across 
-        threads to avoid overlapping ranges.
+        and saves it to a Parquet file.
 
         Parameters
         ----------
@@ -122,11 +183,11 @@ class DataGen:
         verbose : bool
             Flag to indicate whether to print output messages.
         output_file : str
-            The filename to save the data.       
-        
+            The filename to save the data.  
+
         Notes
         -----
-        - If `random_atm` is True, the atmospheric composition is generated randomly. This allows 
+        - If random_atm is True, the atmospheric composition is generated randomly. This allows 
         flexibility in the function usage depending on the scenario of the atmospheric simulation 
         (with isothermal layers). The molecules included in the random atmosphere generation are:
             - H2O (Water vapor)
@@ -137,16 +198,16 @@ class DataGen:
             - HCN (Hydrogen cyanide)
             - PH3 (Phosphine)
             - H2 (Hydrogen molecule)
-        - To run this function in parallel, consider dividing the `start` and `end` range across 
+        - To run this function in parallel, consider dividing the start and end range across 
         multiple threads or processes. For example, if generating data for planets 0 to 1000, 
         you could divide this into chunks like 0-200, 200-400, etc., and run them concurrently 
         in different threads or processes (see the function on parallel folder).
         - The noise column comes from the telescope observation with a distance assumption of 3 parsecs. 
         The noise is generated using a Gaussian distribution, where the mean is the total model and the 
-        standard deviation is the 1-sigma noise.
+        standard deviation is the 1-sigma noise.   
         """       
         if self.stage in ["modern", "proterozoic"]:
-                molweight = st.molweightlist(era="modern")
+            molweight = st.molweightlist(era="modern")
         else:
             molweight = st.molweightlist(era="archean")        
 
@@ -159,36 +220,11 @@ class DataGen:
 
         start_time = time.time()
 
+        instruments = ["HWC", "SS-NIR", "SS-UV", "SS-Vis"]
+
         for i in range(int(start), int(end)):
             try:
-
-                configuration = self.config.copy()
-                if random_atm:
-                    st.random_atmosphere(configuration)
-                else:
-                    dm.random_planet(configuration, molweight)
-                
-                spectrum = self.psg.run(configuration)
-                noise = spectrum["spectrum"][:, 2]
-
-                finite_noise = noise[np.isfinite(noise)]
-                if finite_noise.size > 0:
-                    max_finite_noise = np.max(finite_noise)
-                else:
-                    max_finite_noise = 1e-10
-
-                noise[np.isinf(noise)] = max_finite_noise
-                noisy_albedo = np.random.normal(
-                    loc=spectrum["spectrum"][:, 1],   # Total model (ALBEDO) 
-                    scale=noise)                      # Noise (1-sigma)
-                
-                df = pd.DataFrame({
-                    **{key: [value] for key, value in configuration.items()},
-                    "WAVELENGTH": [spectrum["spectrum"][:, 0].tolist()],
-                    "ALBEDO": [spectrum["spectrum"][:, 1].tolist()],
-                    "NOISE": [spectrum["spectrum"][:, 2].tolist()],
-                    "NOISY_ALBEDO": [noisy_albedo.tolist()]
-                })
+                df = self._process_planet(i, random_atm, molweight, instruments)
 
                 if parquet_writer is None:
                     schema = pa.Table.from_pandas(df).schema
