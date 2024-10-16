@@ -19,11 +19,7 @@ Once the Docker container is running, you can configure the URL and dynamically 
     import os
     from geexhp import datagen
 
-    # USE THIS FILE PATH!
-    script_dir = os.getcwd()
-    config_path = os.path.abspath(os.path.join(script_dir, "..", "geexhp", "config", "default_habex.config"))
-
-    dg = datagen.DataGen(url="http://127.0.0.1:3000/api.php", config=config_path)
+    dg = datagen.DataGen(url="http://127.0.0.1:3000/api.php")
 
 Era-Specific Customization
 ==========================
@@ -36,10 +32,10 @@ To generate datasets for different eras, you must specify the ``stage`` paramete
 .. code-block:: python
     
     # Proterozoic Era
-    dg_proterozoic = datagen.DataGen(url="http://127.0.0.1:3000/api.php", config=config_path, stage="proterozoic")
+    dg_proterozoic = datagen.DataGen(url="http://127.0.0.1:3000/api.php", stage="proterozoic")
 
     # Archean Era
-    dg_archean = datagen.DataGen(url="http://127.0.0.1:3000/api.php", config=config_path, stage="archean")
+    dg_archean = datagen.DataGen(url="http://127.0.0.1:3000/api.php", stage="archean")
 
 Generating Random Data for Different Geological Eras
 =====================================================
@@ -117,21 +113,33 @@ This allows you to customize the appearance of the plots. The function provides 
     * If ``oldschool=True``, it imports ``smplotlib`` for traditional plotting styles.
     * If ``oldschool=False``, it updates various ``matplotlib`` settings for a more modern appearance (my style, feel free to be an artist too)
 
-The, you can plot the spectra:
+The `datavis.plot_spectrum`` function has been enhanced to allow plotting spectra from multiple instruments.
+
+* Parameters Explained: 
+    * ``df``: The DataFrame containing the spectrum data.
+    * ``label``: Optional label for the plot legend. If not provided, the instrument names are used.
+    * ``index``: The index of the planet in the DataFrame. If None, assumes the DataFrame contains data for a single planet.
+    * ``instruments``: A string or list of instrument names to plot. Valid instruments are "HWC", "SS-UV", "SS-Vis", and "SS-NIR". If None, the function plots HWC data on one plot and combines SS instruments on a separate plot.
+    * ``ax``: An Axes object or list of Axes to plot on. If None, new figures and axes are created.
+    * ``noise``: If True, plots the noisy data with error bars.
+    * ``**kwargs``: Additional keyword arguments passed to the plotting functions for further customization.
 
 .. code-block:: python
 
-    import numpy as np
-    import pandas as pd
+    # Assume 'data' is your DataFrame containing the spectra data
+    # Plot HWC data for the planet at index 1
+    datavis.plot_spectrum(data, label="Planet X", index=1, instruments="HWC");
 
-    data = pd.read_parquet("data/modern_0-8.parquet")
-    index = np.random.randint(0, len(data))  # Just a example..
-    datavis.plot_spectrum(data, label=f"index={{index}}", index=index)
+    # Plot SS instruments data for the planet at index 1
+    datavis.plot_spectrum(data, label="Planet X", index=1, noise=True, instruments=["SS-UV", "SS-Vis", "SS-NIR"]);
+
+    # Plot HWC and combined SS instruments on separate plots
+    datavis.plot_spectrum(data, index=1);
 
 Or, if you want visualize the noise data, use ``noise=True`` parameter:
 
 .. code-block:: python
 
-    datavis.plot_spectrum(data, label=f"index={index}", index=index, noise=True)
+    datavis.plot_spectrum(data, label="Planet X", index=1, noise=True)
 
 The noise column comes from the telescope observation with a distance assumption of 3 parsecs. The noise is generated using a Gaussian distribution, where the mean is the total model and the standard deviation is the 1-sigma noise.
