@@ -46,8 +46,8 @@ def random_atmospheric_layers(config: dict, layers: int) -> None:
     """
     Modify the atmospheric layers configuration by multiplying each column (starting 
     from the third element in each entry) with a random factor. Each column has a 
-    25% chance to get a random factor of zero, otherwise a random factor between 0 
-    and 2.
+    30% chance to get a random factor of zero, otherwise a random factor between 0 
+    and 10.
 
     Parameters
     ----------
@@ -66,7 +66,7 @@ def random_atmospheric_layers(config: dict, layers: int) -> None:
 
     # Generate random factors for each type of gas with 25% chance of being zero
     num_gases = len(config[f"ATMOSPHERE-LAYER-1"].split(",")) - 2
-    random_factors = [0 if np.random.random() < 0.25 else np.random.uniform(0, 2) for _ in range(num_gases)]
+    random_factors = [0 if np.random.random() < 0.30 else np.random.uniform(0, 10) for _ in range(num_gases)]
 
     # Iterate over each key in the dictionary and modify the values accordingly
     for i in range(layers):
@@ -261,7 +261,7 @@ def maintain_planetary_atmosphere(config: dict, attempts: int = 5) -> None:
         config['OBJECT-GRAVITY'] = gravity
 
         # See equation (25) by McIntyre et al. (2023) for surface temperature
-        temperature_analogue = 41.9 * cosmic_shoreline ** (1 / 4) + 33.85
+        temperature_analogue = 41.9 * real_insolation ** (1 / 4) + 33.85
         config["ATMOSPHERE-TEMPERATURE"] = temperature_analogue
         config["SURFACE-TEMPERATURE"] = temperature_analogue
         config["SURFACE-ALBEDO"] = np.random.uniform(0.1, 0.8)

@@ -10,7 +10,7 @@ import pyarrow.parquet as pq
 import msgpack
 from pypsg import PSG
 from collections import OrderedDict
-from typing import Any, Optional
+from typing import Any, Optional, Union, List
 
 from geexhp.core import stages as st
 from geexhp.core import datamod as dm
@@ -99,7 +99,6 @@ class DataGen:
         else:
             return self.config.copy()
 
-    
     def _generate_spectrum_for_instrument(self, config: dict, instrument: str):
         """
         Generates the spectrum for a specific instrument using PSG.
@@ -127,7 +126,7 @@ class DataGen:
 
     def _process_planet(self, index: int, random_atm: bool, molweight: dict, instruments: list):
         """
-        Processes a single planet by generating spectra for all instruments.
+        Processes a single planet by generating spectra for all selected instruments.
         """
         configuration = self.config.copy()
         if random_atm:
@@ -145,17 +144,14 @@ class DataGen:
             try:
                 wavelengths, albedo, noise, noisy_albedo = self._generate_spectrum_for_instrument(
                     configuration, instrument)
-                # Store data in dictionaries
                 wavelength_data[instrument] = wavelengths.tolist()
                 albedo_data[instrument] = albedo.tolist()
                 noise_data[instrument] = noise.tolist()
                 noisy_albedo_data[instrument] = noisy_albedo.tolist()
             except Exception as e:
                 print(f"Error processing instrument {instrument} for planet index {index}: {e}")
-                # Skip this instrument if there's an error
                 continue
 
-        # Build the DataFrame row
         df_dict = {key: [value] for key, value in configuration.items()}
         for instrument in instruments:
             if instrument in wavelength_data:
@@ -167,7 +163,8 @@ class DataGen:
         df = pd.DataFrame(df_dict)
         return df
 
-    def generator(self, start: int, end: int, random_atm: bool, verbose: bool, output_file: str) -> None:
+    def generator(self, start: int, end: int, random_atm: bool, verbose: bool, output_file: str, 
+                instruments: Optional[Union[str, List[str]]] = "all") -> None:
         """
         Generates a dataset using the PSG for a specified number of planets 
         and saves it to a Parquet file.
@@ -184,6 +181,11 @@ class DataGen:
             Flag to indicate whether to print output messages.
         output_file : str
             The filename to save the data.  
+        instruments : Optional[Union[str, List[str]]], optional
+            The instrument(s) to generate data for. Options are:
+                - "all": All instruments (default)
+                - "SS": All "SS" instruments ("SS-NIR", "SS-UV", "SS-Vis")
+                - Specific instrument name(s) as a string or list (e.g., "HWC", ["SS-NIR", "SS-Vis"])
 
         Notes
         -----
@@ -211,6 +213,24 @@ class DataGen:
         else:
             molweight = st.molweightlist(era="archean")        
 
+        valid_instruments = ["HWC", "SS-NIR", "SS-UV", "SS-Vis"]
+        if instruments == "all":
+            instruments_list = valid_instruments
+        elif instruments == "SS":
+            instruments_list = ["SS-NIR", "SS-UV", "SS-Vis"]
+        elif isinstance(instruments, str):
+            if instruments in valid_instruments:
+                instruments_list = [instruments]
+            else:
+                raise ValueError(f"Invalid instrument '{instruments}'. Valid options are: {valid_instruments}")
+        elif isinstance(instruments, list):
+            for inst in instruments:
+                if inst not in valid_instruments:
+                    raise ValueError(f"Invalid instrument '{inst}' in list. Valid options are: {valid_instruments}")
+            instruments_list = instruments
+        else:
+            raise ValueError("Invalid instruments parameter. Must be a string or list of strings.")
+
         data_dir = "data"
         os.makedirs(data_dir, exist_ok=True)
         output_path = os.path.join(data_dir, f"{output_file}.parquet")
@@ -220,11 +240,9 @@ class DataGen:
 
         start_time = time.time()
 
-        instruments = ["HWC", "SS-NIR", "SS-UV", "SS-Vis"]
-
         for i in range(int(start), int(end)):
             try:
-                df = self._process_planet(i, random_atm, molweight, instruments)
+                df = self._process_planet(i, random_atm, molweight, instruments_list)
 
                 if parquet_writer is None:
                     schema = pa.Table.from_pandas(df).schema
