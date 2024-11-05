@@ -48,6 +48,11 @@ Parameters for ``dg.generator``
 - ``random_atm``: Set to ``True`` to generate random atmospheres, or ``False`` to use a fixed configuration.
 - ``verbose``: When ``True``, enables detailed output during the data generation process.
 - ``output_file``: The output file name, which stores the generated dataset.
+- ``instruments``: Specifies the instrument(s) to generate data for. Options are:
+    - ``"all"``: Processes all instruments (default behavior).
+    - ``"SS"``: Processes all "SS" instruments ("SS-NIR", "SS-UV", "SS-Vis").
+    - Specific instrument name as a string (e.g., ``"HWC"``, ``"SS-NIR"``).
+    - List of instrument names (e.g., [``"SS-NIR"``, ``"SS-Vis"``]).
 
 In a multi-threaded or parallel, you can split this range ``(start,end)`` among different threads to speed up the generation process.
 
@@ -62,6 +67,7 @@ Example
         random_atm=False,
         verbose=True,
         output_file="modern_0-8",  # Just a example
+        instruments="all"   # Processes all instruments (default)
     )
 
 Generating Random Planets with an Isothermal Profile
