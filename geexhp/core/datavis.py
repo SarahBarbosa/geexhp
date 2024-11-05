@@ -100,6 +100,11 @@ def _plot_instruments(df, label, index, instruments, ax, noise, **kwargs):
     color_cycle = plt.rcParams['axes.prop_cycle'].by_key()['color']
     color_map = {instr: color_cycle[i % len(color_cycle)] for i, instr in enumerate(instruments)}
 
+    noisy_label_added = False
+    noisy_label = "Noisy Data"
+
+    custom_color = kwargs.get('color', None)
+
     for instrument in instruments:
         wavelength_col = f"WAVELENGTH_{instrument}"
         albedo_col = f"ALBEDO_{instrument}"
@@ -112,19 +117,28 @@ def _plot_instruments(df, label, index, instruments, ax, noise, **kwargs):
 
             instr_label = f"{label} ({instrument})" if label else f"{instrument}"
 
+            plot_color = custom_color if custom_color else color_map[instrument]
+            noisy_color = 'tab:gray'
+
             if noise and noisy_albedo_col in df_row and noise_col in df_row:
                 noisy_albedo = np.array(df_row[noisy_albedo_col])
                 noise_err = np.array(df_row[noise_col])
 
+                if not noisy_label_added:
+                    noisy_legend_label = noisy_label
+                    noisy_label_added = True
+                else:
+                    noisy_legend_label = '_nolegend_'
+
                 (_, caps, bars) = ax.errorbar(
                     wavelength, noisy_albedo, yerr=noise_err, fmt='.', capsize=2, capthick=2,
-                    color=color_map[instrument], label=f"{instr_label} - Noisy", zorder=1, **kwargs)
-                [bar.set_alpha(0.2) for bar in bars]
-                [cap.set_alpha(0.2) for cap in caps]
+                    color=noisy_color, label=noisy_legend_label, zorder=1, alpha=0.1, **kwargs)
+                [bar.set_alpha(0.3) for bar in bars]
+                [cap.set_alpha(0.3) for cap in caps]
 
-                ax.plot(wavelength, albedo, color=color_map[instrument], label=instr_label, **kwargs)
+                ax.plot(wavelength, albedo, color=plot_color, label=instr_label, **{k: v for k, v in kwargs.items() if k != 'color'})
             else:
-                ax.plot(wavelength, albedo, color=color_map[instrument], label=instr_label, **kwargs)
+                ax.plot(wavelength, albedo, color=plot_color, label=instr_label, **{k: v for k, v in kwargs.items() if k != 'color'})
         else:
             print(f"Data for instrument '{instrument}' not found in DataFrame.")
 
