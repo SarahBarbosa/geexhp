@@ -5,7 +5,9 @@ import concurrent.futures
 
 # Global variable to control the mode of data generation
 # Possible values: 'modern', 'proterozoic', 'archean', 'random'
+# Instruments: "SS-NIR", "SS-UV", "SS-Vis", "B-NIR", "B-UV", "B-Vis"
 MODE = "modern"
+INSTR = "all"
 
 def generate_data(start, final, dg_instance):
     """
@@ -22,6 +24,7 @@ def generate_data(start, final, dg_instance):
         random_atm=random_atm,
         verbose=True,
         output_file=file_name,
+        instruments=INSTR
     )
 
 if __name__ == "__main__":

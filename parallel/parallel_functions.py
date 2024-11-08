@@ -2,7 +2,7 @@ import os
 from typing import List, Tuple
 
 NUM_THREADS = os.cpu_count()
-NPLANETS = 2_500
+NPLANETS = 20
 
 def threadranges(nplanets: int, num_threads: int) -> List[Tuple[int, int]]:
     """
