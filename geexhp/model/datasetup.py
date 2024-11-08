@@ -1,9 +1,6 @@
 import os
 import glob
-import numpy as np
 import pandas as pd
-from sklearn.preprocessing import StandardScaler, MinMaxScaler
-import tensorflow as tf
 
 def combine_parquet(folder: str, keyword: str, output_file: bool = False) -> pd.DataFrame:
     file_pattern = os.path.join(folder, f'*{keyword}*.parquet')

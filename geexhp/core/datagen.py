@@ -106,7 +106,6 @@ class DataGen:
         config_instrument = config.copy()
         if instrument != "SS-Vis":
             dm.set_instrument(config_instrument, instrument)
-        # For "SS-Vis", we assume default settings are appropriate
 
         spectrum = self.psg.run(config_instrument)
         wavelengths = spectrum["spectrum"][:, 0]
@@ -185,7 +184,8 @@ class DataGen:
             The instrument(s) to generate data for. Options are:
                 - "all": All instruments (default)
                 - "SS": All "SS" instruments ("SS-NIR", "SS-UV", "SS-Vis")
-                - Specific instrument name(s) as a string or list (e.g., "HWC", ["SS-NIR", "SS-Vis"])
+                - "LUVOIR": All LUVOIR B instruments ("B-NIR", "B-UV", "B-Vis")
+                - Specific instrument name(s) as a string or list (e.g., "B-NIR", ["SS-NIR", "SS-Vis"])
 
         Notes
         -----
@@ -213,11 +213,13 @@ class DataGen:
         else:
             molweight = st.molweightlist(era="archean")        
 
-        valid_instruments = ["HWC", "SS-NIR", "SS-UV", "SS-Vis"]
+        valid_instruments = ["B-NIR", "B-UV", "B-Vis", "SS-NIR", "SS-UV", "SS-Vis"]
         if instruments == "all":
             instruments_list = valid_instruments
         elif instruments == "SS":
             instruments_list = ["SS-NIR", "SS-UV", "SS-Vis"]
+        elif instruments == "LUVOIR":
+            instruments_list = ["B-NIR", "B-UV", "B-Vis"]
         elif isinstance(instruments, str):
             if instruments in valid_instruments:
                 instruments_list = [instruments]
