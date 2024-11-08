@@ -49,8 +49,7 @@ def plot_spectrum(df: pd.DataFrame, label: Optional[str] = None, index: Optional
         Index of the planet in the DataFrame. If None, assumes the DataFrame directly contains
         the spectrum data without needing to specify an index.
     instruments : str or list of str, optional
-        Instrument(s) to plot. If None, plots HWC data on one plot and combines SS instruments
-        on a separate plot.
+        Instrument(s) to plot. If None, plots available LUVOIR and SS instruments.
     ax : matplotlib.axes.Axes or list of Axes, optional
         Axes object(s) to plot on. If None, new figures and axes will be created.
     noise : bool, optional
@@ -66,26 +65,61 @@ def plot_spectrum(df: pd.DataFrame, label: Optional[str] = None, index: Optional
     if instruments is not None and isinstance(instruments, str):
         instruments = [instruments]
 
+    if index is not None:
+        df_row = df.iloc[index]
+    else:
+        df_row = df
+
     if instruments is None:
-        # Default behavior: plot HWC data on one plot and combine SS instruments on another plot
-        instruments_hwc = ["HWC"]
+        instruments_b = ["B-UV", "B-Vis", "B-NIR"]
         instruments_ss = ["SS-UV", "SS-Vis", "SS-NIR"]
 
-        _, axes = plt.subplots(1, 2, figsize=(10, 5))
+        available_instruments_b = [
+            instr for instr in instruments_b
+            if f"WAVELENGTH_{instr}" in df_row and f"ALBEDO_{instr}" in df_row
+        ]
+        available_instruments_ss = [
+            instr for instr in instruments_ss
+            if f"WAVELENGTH_{instr}" in df_row and f"ALBEDO_{instr}" in df_row
+        ]
 
-        _plot_instruments(df, label, index, instruments_hwc, axes[0], noise, **kwargs)
-        axes[0].set_title("The HabEx Workforce Camera (HWC)")
+        num_plots = sum(bool(lst) for lst in [available_instruments_b, available_instruments_ss])
 
-        _plot_instruments(df, label, index, instruments_ss, axes[1], noise, **kwargs)
-        axes[1].set_title("Combined The HabEx StarShade (SS)")
+        if num_plots == 0:
+            print("No instrument data available to plot.")
+            return []
+
+        _, axes = plt.subplots(1, num_plots, figsize=(5 * num_plots, 5))
+        if num_plots == 1:
+            axes = [axes]
+
+        plot_idx = 0
+        if available_instruments_b:
+            _plot_instruments(df, label, index, available_instruments_b, axes[plot_idx], noise, **kwargs)
+            axes[plot_idx].set_title("Combined LUVOIR B Instruments")
+            plot_idx += 1
+
+        if available_instruments_ss:
+            _plot_instruments(df, label, index, available_instruments_ss, axes[plot_idx], noise, **kwargs)
+            axes[plot_idx].set_title("Combined The HabEx StarShade (SS)")
+            plot_idx += 1
 
         plt.tight_layout()
         return axes
     else:
+        available_instruments = [
+            instr for instr in instruments
+            if f"WAVELENGTH_{instr}" in df_row and f"ALBEDO_{instr}" in df_row
+        ]
+
+        if not available_instruments:
+            print("Specified instrument data not found in DataFrame.")
+            return []
+
         if ax is None:
             _, ax = plt.subplots()
 
-        _plot_instruments(df, label, index, instruments, ax, noise, **kwargs)
+        _plot_instruments(df, label, index, available_instruments, ax, noise, **kwargs)
         return [ax]
 
 def _plot_instruments(df, label, index, instruments, ax, noise, **kwargs):
@@ -136,11 +170,13 @@ def _plot_instruments(df, label, index, instruments, ax, noise, **kwargs):
                 [bar.set_alpha(0.3) for bar in bars]
                 [cap.set_alpha(0.3) for cap in caps]
 
-                ax.plot(wavelength, albedo, color=plot_color, label=instr_label, **{k: v for k, v in kwargs.items() if k != 'color'})
+                ax.plot(wavelength, albedo, color=plot_color, label=instr_label,
+                        **{k: v for k, v in kwargs.items() if k != 'color'})
             else:
-                ax.plot(wavelength, albedo, color=plot_color, label=instr_label, **{k: v for k, v in kwargs.items() if k != 'color'})
+                ax.plot(wavelength, albedo, color=plot_color, label=instr_label,
+                        **{k: v for k, v in kwargs.items() if k != 'color'})
         else:
-            print(f"Data for instrument '{instrument}' not found in DataFrame.")
+            print(f"Data for instrument '{instrument}' not found in DataFrame. Skipping.")
 
     ax.set_xlabel("Wavelength [$\\mu$m]")
     ax.set_ylabel("Apparent Albedo")

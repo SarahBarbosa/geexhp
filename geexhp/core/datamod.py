@@ -46,7 +46,7 @@ def random_atmospheric_layers(config: dict, layers: int) -> None:
     """
     Modify the atmospheric layers configuration by multiplying each column (starting 
     from the third element in each entry) with a random factor. Each column has a 
-    30% chance to get a random factor of zero, otherwise a random factor between 0 
+    20% chance to get a random factor of zero, otherwise a random factor between 0 
     and 10.
 
     Parameters
@@ -66,7 +66,7 @@ def random_atmospheric_layers(config: dict, layers: int) -> None:
 
     # Generate random factors for each type of gas with 25% chance of being zero
     num_gases = len(config[f"ATMOSPHERE-LAYER-1"].split(",")) - 2
-    random_factors = [0 if np.random.random() < 0.30 else np.random.uniform(0, 10) for _ in range(num_gases)]
+    random_factors = [0 if np.random.random() < 0.20 else np.random.uniform(0, 10) for _ in range(num_gases)]
 
     # Iterate over each key in the dictionary and modify the values accordingly
     for i in range(layers):
@@ -264,7 +264,11 @@ def maintain_planetary_atmosphere(config: dict, attempts: int = 5) -> None:
         temperature_analogue = 41.9 * real_insolation ** (1 / 4) + 33.85
         config["ATMOSPHERE-TEMPERATURE"] = temperature_analogue
         config["SURFACE-TEMPERATURE"] = temperature_analogue
-        config["SURFACE-ALBEDO"] = np.random.uniform(0.1, 0.8)
+
+        # HABEX FINAL REPORT: https://www.jpl.nasa.gov/habex/pdf/HabEx-Final-Report-Public-Release-LINKED-0924.pdf
+        # The albedo can reasonably be assumed to be between 0.06 and 0.96. Earth-size HZ planets with a lower albedo, 
+        # if they exist, would actually be impossible to detect in the first place.
+        config["SURFACE-ALBEDO"] = np.random.uniform(0.06, 0.96)
         config["SURFACE-EMISSIVITY"] = 1 - config["SURFACE-ALBEDO"]
     else:
         # If the real insolation is greater than or equal to the critical insolation,
@@ -285,7 +289,7 @@ def set_instrument(config: dict, instrument: str) -> None:
         The dictionary of settings to be modified.
     instrument : str
         The telescope instrument for which settings need to be modified. 
-        Valid options are 'HWC', 'SS-NIR', 'SS-UV', and 'SS-Vis'.
+        Valid options are 'SS-NIR', 'SS-UV', 'SS-Vis', 'B-NIR', 'B-UV', 'B-Vis'
 
     Notes
     -----
@@ -296,69 +300,105 @@ def set_instrument(config: dict, instrument: str) -> None:
     if instrument == "SS-Vis":
         pass
 
-    valid_instruments = ['HWC', 'SS-NIR', 'SS-UV', 'SS-Vis']
+    valid_instruments = ["SS-NIR", "SS-UV", "SS-Vis", "B-NIR", "B-UV", "B-Vis"]
     if instrument not in valid_instruments:
         raise ValueError(f"Instrument must be one of {valid_instruments}.")
     
-    if instrument == "HWC":
-        config['GENERATOR-INSTRUMENT'] = """
-        HabEx_HWC-Spec: The HabEx Workforce Camera (HWC) has two channels that can simultaneously observe the same field of view: 
-        an optical channel using delta-doped CCD detectors providing access from 370 nm to 950 nm (QE:0.9), and a near-IR channel 
-        using Hawaii-4RG HgCdTe (QE:0.9) arrays providing good throughput from 950 µm to 1.8 µm. The imaging mode can provide 
-        spectroscopy (RP<10) via filters at high-throughput, while a grating delivering RP=1000 is assumed to reduce the throughput 
-        by 50%.
-        """
-        config['GENERATOR-RANGE1'] = 0.2    # From UV! (Just a modification...)
-        config['GENERATOR-RANGE2'] = 2.00   # Another modification!
-        config['GENERATOR-RESOLUTION'] = 1000
-        config['GENERATOR-TELESCOPE'] = "SINGLE"
-        config['GENERATOR-TELESCOPE1'] = 1
-        config['GENERATOR-TELESCOPE2'] = 2.0
-        config['GENERATOR-TELESCOPE3'] = 1.0
-        config['GENERATOR-NOISEOTEMP'] = 250
-        config['GENERATOR-NOISEOEFF'] = '0.000@0.325,0.003@0.337,0.016@0.348,0.067@0.353,0.183@0.365,0.222@0.370,0.240@0.381,\
-            0.251@0.401,0.273@0.421,0.302@0.454,0.312@0.508,0.302@0.620,0.283@0.714,0.258@0.793,0.248@0.836,0.261@0.905,0.280@0.955, \
-                0.287@1.004,0.295@1.131,0.302@1.291,0.314@1.426,0.321@1.561,0.330@1.693,0.335@1.800'
-        config['GENERATOR-NOISEFRAMES'] = 10
-        config['GENERATOR-NOISETIME'] = 3600  
-        config['GENERATOR-NOISEPIXELS'] = 8
-        config['GENERATOR-CONT-STELLAR'] = 'Y'
-    
     elif instrument == "SS-NIR":
-        config['GENERATOR-INSTRUMENT'] = """
-        HabEx_SS-NIR: The HabEx StarShade (SS) will provide extraordinary high-contrast capabilities from the UV (0.2 to 0.45 um), to the 
-        visible (0.45 to 1um), and to the infrared (0.975 to 1.8 um). By limiting the number of optical surfaces, this configuration provides 
-        high optical throughput (0.2 to 0.4) across this broad of wavelengths, while the quantum efficiency (QE) is expected to be 0.9 for the 
-        VU and visible detectors and 0.6 for the infrared detector. The UV channel provides a resolution (RP) of 7, visible channel a maximum 
-        of 140 and the infrared 40.
-        """
-        config['GENERATOR-RANGE1'] = 0.975
-        config['GENERATOR-RANGE2'] = 1.80
-        config['GENERATOR-RESOLUTION'] = 40
-        config['GENERATOR-TELESCOPE3'] = '7e-11@-0.000e+00,7e-11@-1.995e-02,7e-11@-3.830e-02,3.544e-03@-5.439e-02,1.949e-02@-6.791e-02,\
-            3.367e-02@-7.434e-02,6.734e-02@-7.982e-02,1.241e-01@-8.561e-02,2.091e-01@-9.108e-02,2.818e-01@-9.526e-02,3.332e-01@-9.752e-02,\
-                3.987e-01@-1.014e-01,4.661e-01@-1.052e-01,5.352e-01@-1.075e-01,6.008e-01@-1.110e-01,6.344e-01@-1.130e-01,6.699e-01@-1.155e-01,\
-                    6.911e-01@-1.184e-01,7.000e-01@-1.278e-01,7.000e-01@-1.561e-01,7.000e-01@-1.950e-01,7.000e-01@-2.224e-01,7.000e-01@-2.349e-01'
-        config['GENERATOR-NOISEFRAMES'] = 1
-        config['GENERATOR-NOISETIME'] = 1000
+        config["GENERATOR-INSTRUMENT"] = """HabEx_SS-NIR: The HabEx StarShade (SS) will provide extraordinary high-contrast capabilities from the UV (0.2 to 0.45 um), to the\
+visible (0.45 to 1um), and to the infrared (0.975 to 1.8 um). By limiting the number of optical surfaces, this configuration provides\
+high optical throughput (0.2 to 0.4) across this broad of wavelengths, while the quantum efficiency (QE) is expected to be 0.9 for the\
+VU and visible detectors and 0.6 for the infrared detector. The UV channel provides a resolution (RP) of 7, visible channel a maximum\
+of 140 and the infrared 40."""
+        config["GENERATOR-RANGE1"] = 0.975
+        config["GENERATOR-RANGE2"] = 1.80
+        config["GENERATOR-RESOLUTION"] = 40
+        config["GENERATOR-TELESCOPE3"] = """7e-11@-0.000e+00,7e-11@-1.995e-02,7e-11@-3.830e-02,3.544e-03@-5.439e-02,1.949e-02@-6.791e-02,\
+3.367e-02@-7.434e-02,6.734e-02@-7.982e-02,1.241e-01@-8.561e-02,2.091e-01@-9.108e-02,2.818e-01@-9.526e-02,3.332e-01@-9.752e-02,\
+3.987e-01@-1.014e-01,4.661e-01@-1.052e-01,5.352e-01@-1.075e-01,6.008e-01@-1.110e-01,6.344e-01@-1.130e-01,6.699e-01@-1.155e-01,\
+6.911e-01@-1.184e-01,7.000e-01@-1.278e-01,7.000e-01@-1.561e-01,7.000e-01@-1.950e-01,7.000e-01@-2.224e-01,7.000e-01@-2.349e-01"""
+        config["GENERATOR-NOISEFRAMES"] = 1
+        config["GENERATOR-NOISETIME"] = 1000
 
     elif instrument == "SS-UV":
-        config['GENERATOR-INSTRUMENT'] = """
-        HabEx_SS-UV: The HabEx StarShade (SS) will provide extraordinary high-contrast capabilities from the UV (0.2 to 0.45 um), to the visible 
-        (0.45 to 1um), and to the infrared (0.975 to 1.8 um). By limiting the number of optical surfaces, this configuration provides high optical 
-        throughput (0.2 to 0.4) across this broad of wavelengths, while the quantum efficiency (QE) is expected to be 0.9 for the VU and visible 
-        detectors and 0.6 for the infrared detector. The UV channel provides a resolution (RP) of 7, visible channel a maximum of 140 and 
-        the infrared 40.
-        """
-        config['GENERATOR-RANGE1'] = 0.2
-        config['GENERATOR-RANGE2'] = 0.45
-        config['GENERATOR-RESOLUTION'] = 7
-        config['GENERATOR-TELESCOPE3'] = '7e-11@-0.000e+00,7e-11@-7.483e-03,7e-11@-1.436e-02,3.544e-03@-2.040e-02,1.949e-02@-2.547e-02,\
-            3.367e-02@-2.788e-02,6.734e-02@-2.993e-02,1.241e-01@-3.210e-02,2.091e-01@-3.416e-02,2.818e-01@-3.572e-02,3.332e-01@-3.657e-02,\
-                3.987e-01@-3.802e-02,4.661e-01@-3.947e-02,5.352e-01@-4.031e-02,6.008e-01@-4.164e-02,6.344e-01@-4.236e-02,6.699e-01@-4.333e-02,\
-                    6.911e-01@-4.441e-02,7.000e-01@-4.791e-02,7.000e-01@-5.853e-02,7.000e-01@-7.314e-02,7.000e-01@-8.340e-02,7.000e-01@-8.810e-02'
-        config['GENERATOR-NOISEFRAMES'] = 1
-        config['GENERATOR-NOISETIME'] = 1000
+        config["GENERATOR-INSTRUMENT"] = """HabEx_SS-UV: The HabEx StarShade (SS) will provide extraordinary high-contrast capabilities from the UV (0.2 to 0.45 um), to the visible\
+(0.45 to 1um), and to the infrared (0.975 to 1.8 um). By limiting the number of optical surfaces, this configuration provides high optical\
+throughput (0.2 to 0.4) across this broad of wavelengths, while the quantum efficiency (QE) is expected to be 0.9 for the VU and visible\
+detectors and 0.6 for the infrared detector. The UV channel provides a resolution (RP) of 7, visible channel a maximum of 140 and\
+the infrared 40."""
+        config["GENERATOR-RANGE1"] = 0.2
+        config["GENERATOR-RANGE2"] = 0.45
+        config["GENERATOR-RESOLUTION"] = 7
+        config["GENERATOR-TELESCOPE3"] = """7e-11@-0.000e+00,7e-11@-7.483e-03,7e-11@-1.436e-02,3.544e-03@-2.040e-02,1.949e-02@-2.547e-02,\
+3.367e-02@-2.788e-02,6.734e-02@-2.993e-02,1.241e-01@-3.210e-02,2.091e-01@-3.416e-02,2.818e-01@-3.572e-02,3.332e-01@-3.657e-02,\
+3.987e-01@-3.802e-02,4.661e-01@-3.947e-02,5.352e-01@-4.031e-02,6.008e-01@-4.164e-02,6.344e-01@-4.236e-02,6.699e-01@-4.333e-02,\
+6.911e-01@-4.441e-02,7.000e-01@-4.791e-02,7.000e-01@-5.853e-02,7.000e-01@-7.314e-02,7.000e-01@-8.340e-02,7.000e-01@-8.810e-02"""
+        config["GENERATOR-NOISEFRAMES"] = 1
+        config["GENERATOR-NOISETIME"] = 1000
+    
+    elif instrument == "B-NIR":
+        config["GENERATOR-INSTRUMENT"] = """LUVOIR_B-NIR: The Extreme Coronagraph for Living Planetary Systems (ECLIPS) delivers continuous spectral coverage from 200 nm to 2.5 um\ 
+via three channels, UV (200 to 525 nm), VIS (515 nm to 1030 nm), and NIR (1 to 2 microns). The UV channel is effectively an imager and\
+provides a maximum resolution of RP=7, while the VIS channel RP=140, and NIR=70. The core coronagraph throughput is practically twice\
+for LUVOIR-B than A."""
+        config["GENERATOR-RANGE1"] = 1.01
+        config["GENERATOR-RANGE2"] = 2.0
+        config["GENERATOR-RESOLUTION"] = 70
+        config["GENERATOR-DIAMTELE"] = 8.0
+        config["GENERATOR-TELESCOPE3"] = """4.578000e-11@0.000,4.578000e-11@0.216,4.578000e-11@0.649,2.110e-03@0.973,1.266e-02@1.459,\
+8.228e-02@2.108,1.709e-01@2.973,2.658e-01@4.486,3.418e-01@6.757,3.945e-01@10.216,4.219e-01@14.108,4.409e-01@19.459,4.536e-01@23.622,\
+4.578e-01@27.784,4.578e-01@29.459"""
+        config["GENERATOR-NOISE1"] = "0@0.2,0@1,2.5@1.01,2.5@2.0"
+        config["GENERATOR-NOISE2"] = "3e-5@0.2,3e-5@1,2e-3@1.01,2e-3@2.0"
+        config["GENERATOR-NOISEOEFF"] = """0.0317@0.2000,0.0437@0.2261,0.0589@0.2580,0.0742@0.2986,0.0851@0.3377,0.0917@0.3667,0.0971@0.4029,\
+0.1015@0.4493,0.1004@0.4971,0.1004@0.5140,0.1670@0.5150,0.1659@0.5377,0.1506@0.6304,0.1255@0.7087,0.0939@0.7986,0.0884@0.8435,0.1146@0.9058,\
+0.1419@0.9594,0.1594@0.9942,0.1821@1.2200,0.1958@1.4100,0.2049@1.6200,0.2094@1.8700,0.2140@2.0000"""
+        config["GENERATOR-NOISEFRAMES"] = 1
+        config["GENERATOR-NOISETIME"] = 1000
+        config["GENERATOR-TRANS"] = "03-01"
+        config["GENERATOR-CONT-STELLAR"] = "Y"
+
+    elif instrument == "B-Vis":
+        config["GENERATOR-INSTRUMENT"] = """LUVOIR_B-VIS: The Extreme Coronagraph for Living Planetary Systems (ECLIPS) delivers continuous spectral\
+coverage from 200 nm to 2.5 um via three channels, UV (200 to 525 nm), VIS (515 nm to 1030 nm), and NIR (1 to 2 microns). The UV channel is effectively\
+an imager and provides a maximum resolution of RP=7, while the VIS channel RP=140, and NIR=70. The core coronagraph throughput is practically twice for\
+LUVOIR-B than A."""
+        config["GENERATOR-RANGE1"] = 0.515
+        config["GENERATOR-RANGE2"] = 1.0
+        config["GENERATOR-RESOLUTION"] = 140
+        config["GENERATOR-DIAMTELE"] = 8.0
+        config["GENERATOR-TELESCOPE3"] = """4.578000e-11@0.000,4.578000e-11@0.216,4.578000e-11@0.649,2.110e-03@0.973,1.266e-02@1.459,8.228e-02@2.108,\
+1.709e-01@2.973,2.658e-01@4.486,3.418e-01@6.757,3.945e-01@10.216,4.219e-01@14.108,4.409e-01@19.459,4.536e-01@23.622,4.578e-01@27.784,4.578e-01@29.459"""
+        config["GENERATOR-NOISE1"] = "0@0.2,0@1,2.5@1.01,2.5@2.0"
+        config["GENERATOR-NOISE2"] = "3e-5@0.2,3e-5@1,2e-3@1.01,2e-3@2.0"
+        config["GENERATOR-NOISEOEFF"] = """0.0317@0.2000,0.0437@0.2261,0.0589@0.2580,0.0742@0.2986,0.0851@0.3377,0.0917@0.3667,0.0971@0.4029,\
+0.1015@0.4493,0.1004@0.4971,0.1004@0.5140,0.1670@0.5150,0.1659@0.5377,0.1506@0.6304,0.1255@0.7087,0.0939@0.7986,0.0884@0.8435,0.1146@0.9058,\
+0.1419@0.9594,0.1594@0.9942,0.1821@1.2200,0.1958@1.4100,0.2049@1.6200,0.2094@1.8700,0.2140@2.0000"""
+        config["GENERATOR-NOISEFRAMES"] = 1
+        config["GENERATOR-NOISETIME"] = 1000
+        config["GENERATOR-TRANS"] = "03-01"
+        config["GENERATOR-CONT-STELLAR"] = "Y"
+
+    elif instrument == "B-UV":
+        config["GENERATOR-INSTRUMENT"] = """LUVOIR_B-UV: The Extreme Coronagraph for Living Planetary Systems (ECLIPS) delivers continuous spectral\
+coverage from 200 nm to 2.5 um via three channels, UV (200 to 525 nm), VIS (515 nm to 1030 nm), and NIR (1 to 2 microns). The UV channel is effectively\
+an imager and provides a maximum resolution of RP=7, while the VIS channel RP=140, and NIR=70. The core coronagraph throughput is practically twice for\
+LUVOIR-B than A."""
+        config["GENERATOR-RANGE1"] = 0.2
+        config["GENERATOR-RANGE2"] = 0.515
+        config["GENERATOR-RESOLUTION"] = 7
+        config["GENERATOR-DIAMTELE"] = 8.0
+        config["GENERATOR-TELESCOPE3"] = """4.578000e-11@0.000,4.578000e-11@0.216,4.578000e-11@0.649,2.110e-03@0.973,1.266e-02@1.459,8.228e-02@2.108,\
+1.709e-01@2.973,2.658e-01@4.486,3.418e-01@6.757,3.945e-01@10.216,4.219e-01@14.108,4.409e-01@19.459,4.536e-01@23.622,4.578e-01@27.784,4.578e-01@29.459"""
+        config["GENERATOR-NOISE1"] = "0@0.2,0@1,2.5@1.01,2.5@2.0"
+        config["GENERATOR-NOISE2"] = "3e-5@0.2,3e-5@1,2e-3@1.01,2e-3@2.0"
+        config["GENERATOR-NOISEOEFF"] = """0.0317@0.2000,0.0437@0.2261,0.0589@0.2580,0.0742@0.2986,0.0851@0.3377,0.0917@0.3667,0.0971@0.4029,\
+0.1015@0.4493,0.1004@0.4971,0.1004@0.5140,0.1670@0.5150,0.1659@0.5377,0.1506@0.6304,0.1255@0.7087,0.0939@0.7986,0.0884@0.8435,0.1146@0.9058,\
+0.1419@0.9594,0.1594@0.9942,0.1821@1.2200,0.1958@1.4100,0.2049@1.6200,0.2094@1.8700,0.2140@2.0000"""
+        config["GENERATOR-NOISEFRAMES"] = 1
+        config["GENERATOR-NOISETIME"] = 1000
+        config["GENERATOR-TRANS"] = "03-01"
+        config["GENERATOR-CONT-STELLAR"] = "Y"
 
 def random_planet(config: dict, molweight: list, layers: int = 60) -> None:
     """

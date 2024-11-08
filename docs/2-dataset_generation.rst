@@ -49,10 +49,10 @@ Parameters for ``dg.generator``
 - ``verbose``: When ``True``, enables detailed output during the data generation process.
 - ``output_file``: The output file name, which stores the generated dataset.
 - ``instruments``: Specifies the instrument(s) to generate data for. Options are:
-    - ``"all"``: Processes all instruments (default behavior).
-    - ``"SS"``: Processes all "SS" instruments ("SS-NIR", "SS-UV", "SS-Vis").
-    - Specific instrument name as a string (e.g., ``"HWC"``, ``"SS-NIR"``).
-    - List of instrument names (e.g., [``"SS-NIR"``, ``"SS-Vis"``]).
+        - ``"all"``: All instruments (default)
+        - ``"SS"``: All "SS" instruments (``"SS-NIR"``, ``"SS-UV"``, ``"SS-Vis"``)
+        - ``"LUVOIR"``: All LUVOIR B instruments (``"B-NIR"``, ``"B-UV"``, ``"B-Vis"``)
+        - Specific instrument name(s) as a string or list (e.g., ``"B-NIR", ["SS-NIR", "SS-Vis"]``)
 
 In a multi-threaded or parallel, you can split this range ``(start,end)`` among different threads to speed up the generation process.
 
@@ -94,9 +94,9 @@ To generate planets with an isothermal profile:
 
 .. code-block:: python
 
-    dg.generator(           # It doesn't matter the stage here
+    dg.generator(                  # It doesn't matter the stage here
         start=0, end=8,
-        random_atm=True,    # Random atmosphere generation enabled
+        random_atm=True,           # Random atmosphere generation enabled
         verbose=True,
         output_file="random_0-8"   # Output file
     )
@@ -125,7 +125,7 @@ The `datavis.plot_spectrum`` function has been enhanced to allow plotting spectr
     * ``df``: The DataFrame containing the spectrum data.
     * ``label``: Optional label for the plot legend. If not provided, the instrument names are used.
     * ``index``: The index of the planet in the DataFrame. If None, assumes the DataFrame contains data for a single planet.
-    * ``instruments``: A string or list of instrument names to plot. Valid instruments are "HWC", "SS-UV", "SS-Vis", and "SS-NIR". If None, the function plots HWC data on one plot and combines SS instruments on a separate plot.
+    * ``instruments``: A string or list of instrument names to plot. Valid instruments are "B-UV", "B-Vis", "B-NIR", "SS-UV", "SS-Vis", and "SS-NIR". If None, the function plots LUVOIR data on one plot and SS on a separate plot.
     * ``ax``: An Axes object or list of Axes to plot on. If None, new figures and axes are created.
     * ``noise``: If True, plots the noisy data with error bars.
     * ``**kwargs``: Additional keyword arguments passed to the plotting functions for further customization.
@@ -133,13 +133,10 @@ The `datavis.plot_spectrum`` function has been enhanced to allow plotting spectr
 .. code-block:: python
 
     # Assume 'data' is your DataFrame containing the spectra data
-    # Plot HWC data for the planet at index 1
-    datavis.plot_spectrum(data, label="Planet X", index=1, instruments="HWC");
-
     # Plot SS instruments data for the planet at index 1
     datavis.plot_spectrum(data, label="Planet X", index=1, noise=True, instruments=["SS-UV", "SS-Vis", "SS-NIR"]);
 
-    # Plot HWC and combined SS instruments on separate plots
+    # Plot LUVOIR and SS instruments on separate plots
     datavis.plot_spectrum(data, index=1);
 
 Or, if you want visualize the noise data, use ``noise=True`` parameter:
