@@ -1,5 +1,5 @@
 
-Random Dataset Generation Guide
+How to use geeXHP
 ==============================
 
 Introduction
