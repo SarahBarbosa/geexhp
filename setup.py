@@ -3,7 +3,7 @@ from setuptools import setup
 setup(name="geexhp", 
       version="1.0.0", 
       description="Generator of synthetic reflection spectra of Earth-like exoplanets observed \
-                        by the Habitable Worlds Observatory using the Planetary Spectrum Generator",
+                        by the Habitable Worlds Observatory (HaBex and LUVOIR B) using the Planetary Spectrum Generator",
       long_description="ReadMe.md",
       author="Sarah G. A. Barbosa",
       author_email="sarahg.aroucha@gmail.com",
@@ -18,4 +18,7 @@ setup(name="geexhp",
                         "PyQt5", 
                         "tensorflow", 
                         "scikit-learn"],
+      include_package_data=True,
+      package_data={'geexhp.resources': ['default_habex.config'], 
+                        'geexhp.resources.atmos_layers': ['*.csv']},
       zip_safe = False)
