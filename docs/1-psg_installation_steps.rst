@@ -47,8 +47,8 @@ Steps to Install Docker, PSG, and Specific Packages on Ubuntu
 .. code-block:: bash
 
     curl http://localhost:3000/index.php?update=programsamd
-    curl http://localhost:3000/index.php?install=corrkmedmain
-    curl http://localhost:3000/index.php?install=corrkmedtrace
+    curl http://localhost:3000/index.php?install=corrklowmain
+    curl http://localhost:3000/index.php?install=corrklowtrace
 
 For more information, see the official documentation: https://psg.gsfc.nasa.gov/helpapi.php#installation
 
@@ -56,4 +56,4 @@ Disk Usage:
 -----------
 
 - The images take up **2.406 GB**.
-- The active container is using **74.97 GB**, which includes PSG and installed packages.
+- The active container is using **19.53 GB**, which includes PSG and installed packages.
