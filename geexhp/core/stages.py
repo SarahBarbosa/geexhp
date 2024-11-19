@@ -58,7 +58,7 @@ def _process_atmosphere(config: dict, csv_filename: str, molecules: List[str], h
         raise
 
     abundances = atmos_df.columns[2:]
-    atmos_df[abundances] = atmos_df[abundances].div(atmos_df[abundances].sum(axis=1), axis=0)
+    #atmos_df[abundances] = atmos_df[abundances].div(atmos_df[abundances].sum(axis=1), axis=0)
 
     molecular_weights = molweightlist(era)
     mmw = atmos_df[abundances].apply(

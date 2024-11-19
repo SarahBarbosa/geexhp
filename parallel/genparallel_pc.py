@@ -6,7 +6,7 @@ import concurrent.futures
 # Global variable to control the mode of data generation
 # Possible values: 'modern', 'proterozoic', 'archean', 'random'
 # Instruments: "SS-NIR", "SS-UV", "SS-Vis", "B-NIR", "B-UV", "B-Vis"
-MODE = "modern"
+MODE = "proterozoic"
 INSTR = "all"
 
 def generate_data(start, final, dg_instance):
@@ -43,8 +43,7 @@ if __name__ == "__main__":
             sys.exit(1)
 
     script_dir = os.path.dirname(os.path.realpath(__file__))
-    #config_path = os.path.abspath(os.path.join(script_dir, "..", "..", "geexhp", "config", "default_habex.config"))
-    config_path = os.path.abspath(os.path.join(script_dir, "..", "geexhp", "config", "default_habex.config"))
+    config_path = os.path.abspath(os.path.join(script_dir, "..", "geexhp", "resources", "default_habex.config"))
     url = "http://127.0.0.1:3000/api.php"  # URL of the PSG server
     
     stage = "modern" if MODE == "random" else MODE
