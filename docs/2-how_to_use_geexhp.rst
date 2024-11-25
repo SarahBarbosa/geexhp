@@ -8,18 +8,21 @@ This guide explains how to generate random planetary datasets based on different
 
 Loading the Dataset Generator
 =============================
-To generate random planetary datasets, you need to create a ``DataGen`` object using a configuration file and specifying a URL for the PSG API. This URL can point to either a local or a remote API, depending on how you run the PSG.
+To generate random planetary datasets, you need to create a ``DataGen`` object using a URL for the PSG API. This URL can point to either a local or a remote API, depending on how you run the PSG.
 
-If you're running PSG locally inside a Docker container, the API URL will usually be something like `http://127.0.0.1:3000/api.php`.
+If you're running PSG locally inside a Docker container, the API URL will usually be something like `http://127.0.0.1:3000/api.php`. However, before proceeding, ensure you are connected by starting the container:
 
-Once the Docker container is running, you can configure the URL and dynamically set the configuration file path in your Python script as follows:
+.. code-block:: bash
+    docker start psg  
+
+Once the container is running, you can initialize the ``DataGen`` object as follows:
 
 .. code-block:: python
 
     import os
     from geexhp import datagen
 
-    dg = datagen.DataGen(url="http://127.0.0.1:3000/api.php")
+    dg = datagen.DataGen()
 
 Era-Specific Customization
 ==========================
@@ -32,10 +35,10 @@ To generate datasets for different eras, you must specify the ``stage`` paramete
 .. code-block:: python
     
     # Proterozoic Era
-    dg_proterozoic = datagen.DataGen(url="http://127.0.0.1:3000/api.php", stage="proterozoic")
+    dg_proterozoic = datagen.DataGen(stage="proterozoic")
 
     # Archean Era
-    dg_archean = datagen.DataGen(url="http://127.0.0.1:3000/api.php", stage="archean")
+    dg_archean = datagen.DataGen(stage="archean")
 
 Generating Random Data for Different Geological Eras
 =====================================================
@@ -46,7 +49,6 @@ Parameters for ``dg.generator``
 - ``start``: The starting index for the range of planets to generate data for.
 - ``end``: The ending index for the range of planets to generate data for.
 - ``random_atm``: Set to ``True`` to generate random atmospheres, or ``False`` to use a fixed configuration.
-- ``verbose``: When ``True``, enables detailed output during the data generation process.
 - ``output_file``: The output file name, which stores the generated dataset.
 - ``instruments``: Specifies the instrument(s) to generate data for. Options are:
         - ``"all"``: All instruments (default)
@@ -65,7 +67,6 @@ Example
     dg.generator(           # Or dg_proterozoic or dg_archean
         start=0, end=8,     # A dataset with 8 planets  
         random_atm=False,
-        verbose=True,
         output_file="modern_0-8",  # Just a example
         instruments="all"   # Processes all instruments (default)
     )
@@ -97,7 +98,6 @@ To generate planets with an isothermal profile:
     dg.generator(                  # It doesn't matter the stage here
         start=0, end=8,
         random_atm=True,           # Random atmosphere generation enabled
-        verbose=True,
         output_file="random_0-8"   # Output file
     )
 
