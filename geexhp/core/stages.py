@@ -200,16 +200,17 @@ def random_atmosphere(config: dict) -> None:
     # Atmospheric parameters setup
     # 1e-11 = Earth’s upper atmosphere (Fuller-Rowell, 2014) in bar
     # Fuller-Rowell, T. (2014). Physical Characteristics and Modeling of Earth’s Thermosphere. 
-    pressure_top = 1e-11  # in bar
-    pressure_base = config["ATMOSPHERE-PRESSURE"] / 1000  # Convert to bar
-    pressure = np.logspace(np.log10(pressure_base), np.log10(pressure_top), num=layers)
-    temperature = np.full(layers, config["ATMOSPHERE-TEMPERATURE"])
+    # pressure_top = 1e-11  # in bar
+    # pressure_base = config["ATMOSPHERE-PRESSURE"] / 1000  # Convert to bar
+    # pressure = np.logspace(np.log10(pressure_base), np.log10(pressure_top), num=layers)
+    # temperature = np.full(layers, config["ATMOSPHERE-TEMPERATURE"])
 
     # Populate atmospheric layers
     for i in range(layers):
-        layer_data = [f'{pressure[i]}', f'{temperature[i]}']
-        layer_data += [f'{layer_concentrations[molecule][i]}' for molecule in layer_concentrations]
-        config[f'ATMOSPHERE-LAYER-{i + 1}'] = ','.join(layer_data)
+        PT = config[f"ATMOSPHERE-LAYER-{i + 1}"].split(",")[:2]
+        # layer_data = [f'{pressure[i]}', f'{temperature[i]}']
+        layer_data = [f'{layer_concentrations[molecule][i]}' for molecule in layer_concentrations]
+        config[f'ATMOSPHERE-LAYER-{i + 1}'] = ','.join(PT + layer_data)
 
     # Additional atmosphere configurations
     average_molecular_weight = sum(normalized_sample[molecule] * molecular_weights[molecule] for molecule in normalized_sample)

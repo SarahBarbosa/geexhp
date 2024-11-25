@@ -1,6 +1,6 @@
 import numpy as np
 import astropy.units as u
-from astropy.constants import R_sun, L_sun, sigma_sb, G, M_earth, R_earth
+from astropy.constants import R_sun, L_sun, sigma_sb, G, M_earth, R_earth, R
 
 def mixing_ratio_constant(config: dict, layers: int) -> None:
     """
@@ -256,6 +256,7 @@ def maintain_planetary_atmosphere(config: dict, attempts: int = 5) -> None:
     # In this case, we proceed to store the planet's properties in the config dictionary.
     if real_insolation < cosmic_shoreline:
         # According to McIntyre et al. (2023), Equation (3) in mbar
+        # For equilibrium atmospheres, this field defines the surface pressure
         config["ATMOSPHERE-PRESSURE"] = 1013.25 * (planet_radius ** (3.168 + np.random.uniform(-0.232, 0.232)))
         config['OBJECT-DIAMETER'] = 2 * planet_radius * R_earth.to(u.km).value
         config['OBJECT-GRAVITY'] = gravity
@@ -265,6 +266,18 @@ def maintain_planetary_atmosphere(config: dict, attempts: int = 5) -> None:
         temperature_analogue = 41.9 * (real_insolation * 1361.0) ** (1 / 4) + 33.85
         config["ATMOSPHERE-TEMPERATURE"] = temperature_analogue
         config["SURFACE-TEMPERATURE"] = temperature_analogue
+
+        z = np.linspace(0, 5000, 60) # Altitude in meters (0 to 50 km, 60 layers)
+        surface_pressure_pa = config["ATMOSPHERE-PRESSURE"] * 100  # Convert mbar to Pa (1 mbar = 100 Pa)
+        # pressure (P) decreases with altitude (z) following the scale-height: P = Psurf exp(-zg/RT), where g is 
+        # the gravity and R is the gas constant (8.3144598 [J / K / mol]).
+        pressureall = surface_pressure_pa * np.exp((- z * gravity) / (R.value * temperature_analogue))
+        pressureall_bar = pressureall / 1e5
+        temperatureall = np.full(60, config["ATMOSPHERE-TEMPERATURE"]) # Default constant temperature
+        for i in range(60):
+            PT = [f'{pressureall_bar[i]}', f'{temperatureall[i]}']
+            abudances = config[f"ATMOSPHERE-LAYER-{i + 1}"].split(",")[2:]
+            config[f'ATMOSPHERE-LAYER-{i + 1}'] = ','.join(PT + abudances)
 
         # HABEX FINAL REPORT: https://www.jpl.nasa.gov/habex/pdf/HabEx-Final-Report-Public-Release-LINKED-0924.pdf
         # The albedo can reasonably be assumed to be between 0.06 and 0.96. Earth-size HZ planets with a lower albedo, 
