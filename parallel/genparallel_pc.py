@@ -1,4 +1,4 @@
-from geexhp import datagen, stages
+from geexhp import datagen
 import os
 import sys
 import concurrent.futures
@@ -22,7 +22,6 @@ def generate_data(start, final, dg_instance):
         start=start,
         end=final,
         random_atm=random_atm,
-        verbose=True,
         output_file=file_name,
         instruments=INSTR
     )
@@ -41,13 +40,9 @@ if __name__ == "__main__":
         except ValueError:
             print(f"Invalid range argument: {arg}")
             sys.exit(1)
-
-    script_dir = os.path.dirname(os.path.realpath(__file__))
-    config_path = os.path.abspath(os.path.join(script_dir, "..", "geexhp", "resources", "default_habex.config"))
-    url = "http://127.0.0.1:3000/api.php"  # URL of the PSG server
     
     stage = "modern" if MODE == "random" else MODE
-    dg = datagen.DataGen(url=url, config=config_path, stage=stage)
+    dg = datagen.DataGen(stage=stage)
 
     # Execute planet data generation in parallel using threads
     with concurrent.futures.ThreadPoolExecutor() as executor:

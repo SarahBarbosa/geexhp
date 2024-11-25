@@ -261,7 +261,8 @@ def maintain_planetary_atmosphere(config: dict, attempts: int = 5) -> None:
         config['OBJECT-GRAVITY'] = gravity
 
         # See equation (25) by McIntyre et al. (2023) for surface temperature
-        temperature_analogue = 41.9 * real_insolation ** (1 / 4) + 33.85
+        # Earth insolation = 1361.0 Wm⁻²
+        temperature_analogue = 41.9 * (real_insolation * 1361.0) ** (1 / 4) + 33.85
         config["ATMOSPHERE-TEMPERATURE"] = temperature_analogue
         config["SURFACE-TEMPERATURE"] = temperature_analogue
 
