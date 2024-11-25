@@ -45,6 +45,7 @@ examples/hyperparam_search
 
 # Ignorar playground e outros arquivos temporários
 playground.ipynb
+examples/new_model.ipynb
 *.jar
 
 # Arquivos de backup e temporários de editores
