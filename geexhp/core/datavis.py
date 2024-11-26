@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 #from matplotlib_inline import backend_inline
 from matplotlib import lines as mlines
 
-from typing import List, Optional, Union
+from typing import Literal, List, Optional, Union
 
 def configure_matplotlib(oldschool: bool = False) -> None:
     """
@@ -33,9 +33,18 @@ def configure_matplotlib(oldschool: bool = False) -> None:
             "ytick.minor.visible": True  
         })
 
-def plot_spectrum(df: pd.DataFrame, label: Optional[str] = None, index: Optional[int] = None,
-                instruments: Optional[Union[str, List[str]]] = None, ax: Optional[plt.Axes] = None,
-                noise: bool = False, **kwargs) -> List[plt.Axes]:
+def plot_spectrum(
+    df: pd.DataFrame,
+    label: Optional[str] = None,
+    index: Optional[int] = None,
+    instruments: Optional[Union[
+        Literal["B-NIR", "B-UV", "B-Vis", "SS-NIR", "SS-UV", "SS-Vis"],
+        List[Literal["B-NIR", "B-UV", "B-Vis", "SS-NIR", "SS-UV", "SS-Vis"]]
+    ]] = None,
+    ax: Optional[Union[plt.Axes, List[plt.Axes]]] = None,
+    noise: bool = False,
+    **kwargs
+) -> List[plt.Axes]:
     """
     Plots the albedo spectrum of an exoplanet for specified instruments.
 

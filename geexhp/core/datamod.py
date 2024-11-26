@@ -64,15 +64,20 @@ def random_atmospheric_layers(config: dict, layers: int) -> None:
         strings concatenated to the initial unmodified parts.
     """
 
-    # Generate random factors for each type of gas with 25% chance of being zero
+    # Generate random factors for each type of gas with 20% chance of being zero
     num_gases = len(config[f"ATMOSPHERE-LAYER-1"].split(",")) - 2
-    random_factors = [0 if np.random.random() < 0.20 else np.random.uniform(0, 10) for _ in range(num_gases)]
+    # random_factors = [0 if np.random.random() < 0.20 else np.random.uniform(0, 10) for _ in range(num_gases)]
+    random_factors = [0 if np.random.random() < 0.20 else np.exp(np.random.uniform(0, 10)) for _ in range(num_gases)]
 
     # Iterate over each key in the dictionary and modify the values accordingly
     for i in range(layers):
         PT = config[f"ATMOSPHERE-LAYER-{i + 1}"].split(",")[:2]
         original_values = config[f"ATMOSPHERE-LAYER-{i + 1}"].split(",")[2:]
         modified_values = [str(float(value) * random_factors[index]) for index, value in enumerate(original_values)]
+        # modified_values = [
+        #     str(float(value) * random_factors[index] + np.random.uniform(0, 0.5))
+        #     for index, value in enumerate(original_values)
+        # ]
         config[f"ATMOSPHERE-LAYER-{i + 1}"] = ",".join(PT + modified_values)
 
 def normalize_layer(config: dict, layers: int, molweight: list) -> None:

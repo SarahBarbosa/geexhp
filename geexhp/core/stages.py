@@ -3,13 +3,13 @@ import importlib.resources
 import numpy as np
 import pandas as pd
 
-from typing import List
+from typing import Literal, List
 
 from geexhp.core import datamod as dm
 
 LAYERS = 60
 
-def molweightlist(era: str) -> np.ndarray:
+def molweightlist(era: Literal["modern", "proterozoic", "archean"]) -> np.ndarray:
     """
     Returns the molecular weights of main molecules based on the given era.
 
