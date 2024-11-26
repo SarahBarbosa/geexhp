@@ -14,7 +14,7 @@ import requests
 import urllib.parse
 
 from collections import OrderedDict
-from typing import Optional, Union, List
+from typing import Literal, Optional, Union, List
 
 from geexhp.core import stages as st
 from geexhp.core import datamod as dm
@@ -45,7 +45,8 @@ class DataGen:
     >>> data_gen = DataGen()
     >>> data_gen.generator(start=0, end=10, random_atm=True, verbose=True, output_file='psg_data')
     """
-    def __init__(self, url: str = 'http://localhost:3000/api.php', stage: str = "modern") -> None:
+    def __init__(self, url: str = 'http://localhost:3000/api.php', 
+                 stage: Literal['modern', 'proterozoic', 'archean'] = 'modern') -> None:
         """
         Initializes the DataGen class.
 
@@ -266,8 +267,17 @@ class DataGen:
 
         return instruments_list
 
-    def generator(self, start: int, end: int, random_atm: bool = False, output_file: str = "data", 
-                instruments: Optional[Union[str, List[str]]] = "all") -> None:
+    def generator(
+        self,
+        start: int,
+        end: int,
+        random_atm: bool = False,
+        output_file: str = "data",
+        instruments: Optional[Union[
+            Literal["all", "SS", "LUVOIR", "B-NIR", "B-UV", "B-Vis", "SS-NIR", "SS-UV", "SS-Vis"],
+            List[Literal["B-NIR", "B-UV", "B-Vis", "SS-NIR", "SS-UV", "SS-Vis"]]
+        ]] = "all"
+    ) -> None:
         """
         Generates a dataset using the PSG for a specified number of planets 
         and saves it to a Parquet file.
@@ -324,7 +334,7 @@ class DataGen:
 
         instruments_list = self._validate_and_get_instruments(instruments)
 
-        data_dir = "data"
+        data_dir = "../data"
         os.makedirs(data_dir, exist_ok=True)
         output_path = os.path.join(data_dir, f"{output_file}.parquet")
 
