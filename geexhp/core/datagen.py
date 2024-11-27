@@ -334,7 +334,7 @@ class DataGen:
 
         instruments_list = self._validate_and_get_instruments(instruments)
 
-        data_dir = "../data"
+        data_dir = "data"
         os.makedirs(data_dir, exist_ok=True)
         output_path = os.path.join(data_dir, f"{output_file}.parquet")
 
