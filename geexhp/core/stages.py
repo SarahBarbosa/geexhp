@@ -192,7 +192,8 @@ def random_atmosphere(config: dict) -> None:
 
     molecules = list(molecular_weights.keys())
 
-    sample = {molecule: np.random.lognormal(mean=-13, sigma=1) for molecule in molecules}
+    # Generate a random number uniformly distributed in the logarithmic scale.
+    sample = {molecule: 10 ** np.random.uniform(-9, -4) for molecule in molecules}
     total_concentration = sum(sample.values())
     normalized_sample = {molecule: value / total_concentration for molecule, value in sample.items()}
     layer_concentrations = {molecule: np.full(layers, concentration) for molecule, concentration in normalized_sample.items()}
