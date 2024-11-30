@@ -4,7 +4,7 @@
 modes=('modern' 'proterozoic' 'archean' 'random')
 
 # Number of planets and threads
-NPLANETS=20000
+NPLANETS=31000
 
 # Number of threads (number of CPU cores)
 NUM_THREADS=$(nproc)
