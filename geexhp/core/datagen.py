@@ -164,8 +164,6 @@ class DataGen:
         if finite_noise.size > 0:
             max_finite_noise = np.max(finite_noise)
             noise[~np.isfinite(noise)] = max_finite_noise
-        else:
-            noise = np.full_like(albedo, 1e-10)
 
         noisy_albedo = np.random.normal(
             loc=albedo,

@@ -43,6 +43,9 @@ def plot_spectrum(
     ]] = None,
     ax: Optional[Union[plt.Axes, List[plt.Axes]]] = None,
     noise: bool = False,
+    show_legend: bool = True,
+    line_color: Optional[str] = None,
+    error_color: Optional[str] = None,
     **kwargs
 ) -> List[plt.Axes]:
     """
@@ -63,6 +66,12 @@ def plot_spectrum(
         Axes object(s) to plot on. If None, new figures and axes will be created.
     noise : bool, optional
         If True, will also plot the noisy data with error bars. Default is False.
+    show_legend : bool, optional
+        If True, displays the legend. Default is True.
+    line_color : str, optional
+        Color for the fit line. If None, uses default colors.
+    error_color : str, optional
+        Color for the error bars. If None, uses default 'tab:gray'.
     **kwargs : dict
         Additional keyword arguments passed to the plot function.
 
@@ -104,12 +113,14 @@ def plot_spectrum(
 
         plot_idx = 0
         if available_instruments_b:
-            _plot_instruments(df, label, index, available_instruments_b, axes[plot_idx], noise, **kwargs)
+            _plot_instruments(df, label, index, available_instruments_b, axes[plot_idx], noise,
+                              show_legend, line_color, error_color, **kwargs)
             axes[plot_idx].set_title("Combined LUVOIR B Instruments")
             plot_idx += 1
 
         if available_instruments_ss:
-            _plot_instruments(df, label, index, available_instruments_ss, axes[plot_idx], noise, **kwargs)
+            _plot_instruments(df, label, index, available_instruments_ss, axes[plot_idx], noise,
+                              show_legend, line_color, error_color, **kwargs)
             axes[plot_idx].set_title("Combined The HabEx StarShade (SS)")
             plot_idx += 1
 
@@ -128,10 +139,12 @@ def plot_spectrum(
         if ax is None:
             _, ax = plt.subplots()
 
-        _plot_instruments(df, label, index, available_instruments, ax, noise, **kwargs)
+        _plot_instruments(df, label, index, available_instruments, ax, noise,
+                          show_legend, line_color, error_color, **kwargs)
         return [ax]
 
-def _plot_instruments(df, label, index, instruments, ax, noise, **kwargs):
+def _plot_instruments(df, label, index, instruments, ax, noise,
+                      show_legend, line_color, error_color, **kwargs):
     """
     Helper function to plot spectra for specified instruments on a given Axes.
     """
@@ -146,7 +159,9 @@ def _plot_instruments(df, label, index, instruments, ax, noise, **kwargs):
     noisy_label_added = False
     noisy_label = "Noisy Data"
 
-    custom_color = kwargs.get('color', None)
+    # Use provided colors or defaults
+    custom_color = line_color if line_color else kwargs.get('color', None)
+    noisy_color = error_color if error_color else 'tab:gray'
 
     for instrument in instruments:
         wavelength_col = f"WAVELENGTH_{instrument}"
@@ -161,7 +176,6 @@ def _plot_instruments(df, label, index, instruments, ax, noise, **kwargs):
             instr_label = f"{label} ({instrument})" if label else f"{instrument}"
 
             plot_color = custom_color if custom_color else color_map[instrument]
-            noisy_color = 'tab:gray'
 
             if noise and noisy_albedo_col in df_row and noise_col in df_row:
                 noisy_albedo = np.array(df_row[noisy_albedo_col])
@@ -189,7 +203,9 @@ def _plot_instruments(df, label, index, instruments, ax, noise, **kwargs):
 
     ax.set_xlabel("Wavelength [$\\mu$m]")
     ax.set_ylabel("Apparent Albedo")
-    ax.legend()
+    if show_legend:
+        ax.legend()
+
 
 def label_line(line: mlines.Line2D, x: float, label: str = None, align: bool = True, **kwargs) -> None:
     """
