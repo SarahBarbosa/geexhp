@@ -260,6 +260,12 @@ def maintain_planetary_atmosphere(config: dict, attempts: int = 5) -> None:
     # the Cosmic Shoreline, it means the planet has enough gravitational pull to retain its atmosphere.
     # In this case, we proceed to store the planet's properties in the config dictionary.
     if real_insolation < cosmic_shoreline:
+        # HABEX FINAL REPORT: https://www.jpl.nasa.gov/habex/pdf/HabEx-Final-Report-Public-Release-LINKED-0924.pdf
+        # The albedo can reasonably be assumed to be between 0.06 and 0.96. Earth-size HZ planets with a lower albedo, 
+        # if they exist, would actually be impossible to detect in the first place.
+        config["SURFACE-ALBEDO"] = np.random.uniform(0.06, 0.96)
+        config["SURFACE-EMISSIVITY"] = 1 - config["SURFACE-ALBEDO"]
+
         # According to McIntyre et al. (2023), Equation (3) in mbar
         # For equilibrium atmospheres, this field defines the surface pressure
         config["ATMOSPHERE-PRESSURE"] = 1013.25 * (planet_radius ** (3.168 + np.random.uniform(-0.232, 0.232)))
@@ -268,7 +274,10 @@ def maintain_planetary_atmosphere(config: dict, attempts: int = 5) -> None:
 
         # See equation (25) by McIntyre et al. (2023) for surface temperature
         # Earth insolation = 1361.0 Wm⁻²
-        temperature_analogue = 41.9 * (real_insolation * 1361.0) ** (1 / 4) + 33.85
+        albedo = config["SURFACE-ALBEDO"]
+        teq = ((1 - albedo) *  (real_insolation * 1361.0)/ (4 * sigma_sb.value)) ** (1 / 4)
+        # temperature_analogue = teq + 33.85
+        temperature_analogue = teq
         config["ATMOSPHERE-TEMPERATURE"] = temperature_analogue
         config["SURFACE-TEMPERATURE"] = temperature_analogue
 
@@ -283,12 +292,6 @@ def maintain_planetary_atmosphere(config: dict, attempts: int = 5) -> None:
             PT = [f'{pressureall_bar[i]}', f'{temperatureall[i]}']
             abudances = config[f"ATMOSPHERE-LAYER-{i + 1}"].split(",")[2:]
             config[f'ATMOSPHERE-LAYER-{i + 1}'] = ','.join(PT + abudances)
-
-        # HABEX FINAL REPORT: https://www.jpl.nasa.gov/habex/pdf/HabEx-Final-Report-Public-Release-LINKED-0924.pdf
-        # The albedo can reasonably be assumed to be between 0.06 and 0.96. Earth-size HZ planets with a lower albedo, 
-        # if they exist, would actually be impossible to detect in the first place.
-        config["SURFACE-ALBEDO"] = np.random.uniform(0.06, 0.96)
-        config["SURFACE-EMISSIVITY"] = 1 - config["SURFACE-ALBEDO"]
     else:
         # If the real insolation is greater than or equal to the critical insolation,
         # the planet is above the Cosmic Shoreline and cannot retain a significant atmosphere.
