@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # Modes to process
-modes=('modern' 'proterozoic' 'archean' 'random')
+modes=('modern' 'proterozoic' 'archean')
 
 # Number of planets and threads
-NPLANETS=31000
+NPLANETS=20000
 
 # Number of threads (number of CPU cores)
 NUM_THREADS=$(nproc)

@@ -45,10 +45,8 @@ def mixing_ratio_constant(config: dict, layers: int) -> None:
 def random_atmospheric_layers(config: dict, layers: int) -> None:
     """
     Modify the atmospheric layers configuration by multiplying each column (starting 
-    from the third element in each entry) with a random factor. Each column has a 
-    20% chance to get a random factor of zero, otherwise a random factor between 0 
-    and 10.
-
+    from the third element in each entry) with a random factor. 
+    
     Parameters
     ----------
     config : dict
@@ -64,10 +62,13 @@ def random_atmospheric_layers(config: dict, layers: int) -> None:
         strings concatenated to the initial unmodified parts.
     """
 
-    # Generate random factors for each type of gas with 20% chance of being zero
     num_gases = len(config[f"ATMOSPHERE-LAYER-1"].split(",")) - 2
+
+    # Generate random factors for each type of gas with 20% chance of being zero
     # random_factors = [0 if np.random.random() < 0.20 else np.random.uniform(0, 10) for _ in range(num_gases)]
-    random_factors = [0 if np.random.random() < 0.20 else np.exp(np.random.uniform(0, 10)) for _ in range(num_gases)]
+    # random_factors = [0 if np.random.random() < 0.20 else np.exp(np.random.uniform(0, 10)) for _ in range(num_gases)]
+
+    random_factors = [np.exp(np.random.uniform(0, 5)) for _ in range(num_gases)]
 
     # Iterate over each key in the dictionary and modify the values accordingly
     for i in range(layers):
@@ -126,7 +127,8 @@ def set_spectral_type(config: dict) -> None:
     Sets the spectral type of the star and updates the dictionary with star and 
     occultation class.
     """
-    spectral_type = ['F', 'G', 'K', 'M']
+    # spectral_type = ['F', 'G', 'K', 'M']
+    spectral_type = ['F', 'G', 'K']
     class_star = np.random.choice(spectral_type)
     config['OBJECT-STAR-TYPE'] = class_star
     config['GEOMETRY-STELLAR-TYPE'] = class_star
@@ -138,12 +140,13 @@ def set_stellar_parameters(config: dict) -> None:
     dictionary with randomized values for these parameters, within the ranges 
     associated with the spectral type provided. 
     """
+    # https://www.pas.rochester.edu/~emamajek/EEM_dwarf_UBVIJHK_colors_Teff.dat
     class_star = config['OBJECT-STAR-TYPE']
     params = {
         'F': {'temp_range': (6000, 7220), 'radius_range': (1.18, 1.79), 'mag_range': (2.50, 4.22)},
         'G': {'temp_range': (5340, 5920), 'radius_range': (0.876, 1.12), 'mag_range': (4.40, 5.34)},
         'K': {'temp_range': (3940, 5280), 'radius_range': (0.552, 0.817), 'mag_range': (5.54, 7.59)},
-        'M': {'temp_range': (2320, 3870), 'radius_range': (0.104, 0.559), 'mag_range': (7.75,  13.62)}
+        #'M': {'temp_range': (2320, 3870), 'radius_range': (0.104, 0.559), 'mag_range': (7.75,  13.62)}
     }
 
     star_temperature = round(np.random.uniform(*params[class_star]['temp_range']), 3)
@@ -155,8 +158,15 @@ def set_stellar_parameters(config: dict) -> None:
     config['GEOMETRY-STELLAR-TEMPERATURE'] = star_temperature
     config["GEOMETRY-STELLAR-MAGNITUDE"] = star_mag
 
-    # Set the planet's distance from the observer to 3 parsecs (fixed value)
-    config["GEOMETRY-OBS-ALTITUDE"] = 3
+    ## SORRY FOR THIS, I WAS TOO LAZY TO CREATE A SEPARATE FUNCTION JUST FOR THIS.
+    # Set the planet's distance from the observer to 5 to 10 parsecs
+    config["GEOMETRY-OBS-ALTITUDE"] = np.random.uniform(5,10)
+    
+    # Orbital inclination [degree]
+    config["OBJECT-INCLINATION"] = np.random.uniform(0,50)
+
+    # Angular parameter (season/phase) that defines the position of the planet moving along its Keplerian orbit. 
+    config["OBJECT-SEASON"] = np.random.uniform(0,360)
 
     # (REMOVED) Motivation and source: High metallicity and non-equilibrium chemistry... 
     # (Madhusudhan1 and Seager 2011)
@@ -208,17 +218,16 @@ def set_habitable_zone_distance(config: dict) -> None:
     upper_dist = np.sqrt((luminosity_star / L_sun.value) / S_eff_upper)
     config['OBJECT-STAR-DISTANCE'] = np.random.uniform(lower_dist, upper_dist)
 
-def maintain_planetary_atmosphere(config: dict, attempts: int = 5) -> None:
+
+def maintain_planetary_atmosphere(config: dict, attempts: int = 10) -> None:
     """
     Simulates to find a planet size that can maintain an atmosphere. 
     References are included for each scientific principle used.
 
     The number of attempts to try generating a planet with atmosphere. 
-    Recommended between 3 to 5 attempts for balancing efficiency and success rate.
-    More attempts may slow execution without significantly improving success.
     """
     if attempts == 0:
-        raise ValueError("Failed to find a suitable planet configuration to maintain an atmosphere.")
+        raise ValueError("Exhausted all attempts to find a planet configuration that can retain a stable atmosphere with liquid water.")
 
     semi_major_axis = config['OBJECT-STAR-DISTANCE']
     star_luminosity = calculate_luminosity(config)
@@ -277,17 +286,31 @@ def maintain_planetary_atmosphere(config: dict, attempts: int = 5) -> None:
         albedo = config["SURFACE-ALBEDO"]
         teq = ((1 - albedo) *  (real_insolation * 1361.0)/ (4 * sigma_sb.value)) ** (1 / 4)
         # temperature_analogue = teq + 33.85
-        temperature_analogue = teq
+        # temperature_analogue = teq
+
+        # See equation (9.22) by Sara Seager book (Exoplanet Atmospheres Physical Processes)
+        # Or https://en.wikipedia.org/wiki/Idealized_greenhouse_model#The_energy_balance_solution
+        temperature_analogue = teq * (2 / (2 - config["SURFACE-EMISSIVITY"])) ** (1/4)
         config["ATMOSPHERE-TEMPERATURE"] = temperature_analogue
         config["SURFACE-TEMPERATURE"] = temperature_analogue
 
+        # https://iopscience.iop.org/article/10.1088/2041-8205/736/2/L25/pdf
+        # potentially habitable (175 K < Teq < 270 K)
+        if 175 < temperature_analogue < 270:
+            pass
+        else:
+            return maintain_planetary_atmosphere(config, attempts - 1)
+
+        # If liquid water is present, proceed with altitude layering
         z = np.linspace(0, 5000, 60) # Altitude in meters (0 to 50 km, 60 layers)
         surface_pressure_pa = config["ATMOSPHERE-PRESSURE"] * 100  # Convert mbar to Pa (1 mbar = 100 Pa)
+        
         # pressure (P) decreases with altitude (z) following the scale-height: P = Psurf exp(-zg/RT), where g is 
         # the gravity and R is the gas constant (8.3144598 [J / K / mol]).
         pressureall = surface_pressure_pa * np.exp((- z * gravity) / (R.value * temperature_analogue))
         pressureall_bar = pressureall / 1e5
         temperatureall = np.full(60, config["ATMOSPHERE-TEMPERATURE"]) # Default constant temperature
+        
         for i in range(60):
             PT = [f'{pressureall_bar[i]}', f'{temperatureall[i]}']
             abudances = config[f"ATMOSPHERE-LAYER-{i + 1}"].split(",")[2:]
@@ -339,7 +362,7 @@ of 140 and the infrared 40."""
 3.367e-02@-7.434e-02,6.734e-02@-7.982e-02,1.241e-01@-8.561e-02,2.091e-01@-9.108e-02,2.818e-01@-9.526e-02,3.332e-01@-9.752e-02,\
 3.987e-01@-1.014e-01,4.661e-01@-1.052e-01,5.352e-01@-1.075e-01,6.008e-01@-1.110e-01,6.344e-01@-1.130e-01,6.699e-01@-1.155e-01,\
 6.911e-01@-1.184e-01,7.000e-01@-1.278e-01,7.000e-01@-1.561e-01,7.000e-01@-1.950e-01,7.000e-01@-2.224e-01,7.000e-01@-2.349e-01"""
-        config["GENERATOR-NOISEFRAMES"] = 1
+        config["GENERATOR-NOISEFRAMES"] = 3600
         config["GENERATOR-NOISETIME"] = 1000
 
     elif instrument == "SS-UV":
@@ -355,7 +378,7 @@ the infrared 40."""
 3.367e-02@-2.788e-02,6.734e-02@-2.993e-02,1.241e-01@-3.210e-02,2.091e-01@-3.416e-02,2.818e-01@-3.572e-02,3.332e-01@-3.657e-02,\
 3.987e-01@-3.802e-02,4.661e-01@-3.947e-02,5.352e-01@-4.031e-02,6.008e-01@-4.164e-02,6.344e-01@-4.236e-02,6.699e-01@-4.333e-02,\
 6.911e-01@-4.441e-02,7.000e-01@-4.791e-02,7.000e-01@-5.853e-02,7.000e-01@-7.314e-02,7.000e-01@-8.340e-02,7.000e-01@-8.810e-02"""
-        config["GENERATOR-NOISEFRAMES"] = 1
+        config["GENERATOR-NOISEFRAMES"] = 3600
         config["GENERATOR-NOISETIME"] = 1000
     
     elif instrument == "B-NIR":
@@ -375,7 +398,7 @@ for LUVOIR-B than A."""
         config["GENERATOR-NOISEOEFF"] = """0.0317@0.2000,0.0437@0.2261,0.0589@0.2580,0.0742@0.2986,0.0851@0.3377,0.0917@0.3667,0.0971@0.4029,\
 0.1015@0.4493,0.1004@0.4971,0.1004@0.5140,0.1670@0.5150,0.1659@0.5377,0.1506@0.6304,0.1255@0.7087,0.0939@0.7986,0.0884@0.8435,0.1146@0.9058,\
 0.1419@0.9594,0.1594@0.9942,0.1821@1.2200,0.1958@1.4100,0.2049@1.6200,0.2094@1.8700,0.2140@2.0000"""
-        config["GENERATOR-NOISEFRAMES"] = 1
+        config["GENERATOR-NOISEFRAMES"] = 3600
         config["GENERATOR-NOISETIME"] = 1000
         config["GENERATOR-TRANS"] = "03-01"
         config["GENERATOR-CONT-STELLAR"] = "Y"
@@ -396,7 +419,7 @@ LUVOIR-B than A."""
         config["GENERATOR-NOISEOEFF"] = """0.0317@0.2000,0.0437@0.2261,0.0589@0.2580,0.0742@0.2986,0.0851@0.3377,0.0917@0.3667,0.0971@0.4029,\
 0.1015@0.4493,0.1004@0.4971,0.1004@0.5140,0.1670@0.5150,0.1659@0.5377,0.1506@0.6304,0.1255@0.7087,0.0939@0.7986,0.0884@0.8435,0.1146@0.9058,\
 0.1419@0.9594,0.1594@0.9942,0.1821@1.2200,0.1958@1.4100,0.2049@1.6200,0.2094@1.8700,0.2140@2.0000"""
-        config["GENERATOR-NOISEFRAMES"] = 1
+        config["GENERATOR-NOISEFRAMES"] = 3600
         config["GENERATOR-NOISETIME"] = 1000
         config["GENERATOR-TRANS"] = "03-01"
         config["GENERATOR-CONT-STELLAR"] = "Y"
@@ -417,7 +440,7 @@ LUVOIR-B than A."""
         config["GENERATOR-NOISEOEFF"] = """0.0317@0.2000,0.0437@0.2261,0.0589@0.2580,0.0742@0.2986,0.0851@0.3377,0.0917@0.3667,0.0971@0.4029,\
 0.1015@0.4493,0.1004@0.4971,0.1004@0.5140,0.1670@0.5150,0.1659@0.5377,0.1506@0.6304,0.1255@0.7087,0.0939@0.7986,0.0884@0.8435,0.1146@0.9058,\
 0.1419@0.9594,0.1594@0.9942,0.1821@1.2200,0.1958@1.4100,0.2049@1.6200,0.2094@1.8700,0.2140@2.0000"""
-        config["GENERATOR-NOISEFRAMES"] = 1
+        config["GENERATOR-NOISEFRAMES"] = 3600
         config["GENERATOR-NOISETIME"] = 1000
         config["GENERATOR-TRANS"] = "03-01"
         config["GENERATOR-CONT-STELLAR"] = "Y"
