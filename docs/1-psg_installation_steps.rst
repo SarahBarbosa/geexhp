@@ -28,6 +28,7 @@ Steps to Install Docker, PSG, and Specific Packages on Ubuntu
 When adding the GPS key, you might need to use the command below instead:
 
 .. code-block:: bash
+
     # Add GPG key
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/docker-archive-keyring.gpg
 
