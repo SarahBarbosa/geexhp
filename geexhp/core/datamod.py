@@ -219,7 +219,7 @@ def set_habitable_zone_distance(config: dict) -> None:
     config['OBJECT-STAR-DISTANCE'] = np.random.uniform(lower_dist, upper_dist)
 
 
-def maintain_planetary_atmosphere(config: dict, attempts: int = 10) -> None:
+def maintain_planetary_atmosphere(config: dict, attempts: int = 200) -> None:
     """
     Simulates to find a planet size that can maintain an atmosphere. 
     References are included for each scientific principle used.
@@ -296,14 +296,37 @@ def maintain_planetary_atmosphere(config: dict, attempts: int = 10) -> None:
 
         # https://iopscience.iop.org/article/10.1088/2041-8205/736/2/L25/pdf
         # potentially habitable (175 K < Teq < 270 K)
-        if 175 < temperature_analogue < 270:
+        # if 175 < temperature_analogue < 270:
+        #     pass
+        # else:
+        #     return maintain_planetary_atmosphere(config, attempts - 1)
+
+        P0 = 1013.25        # Reference pressure (1 atm in mbar)
+        T0 = 373.15         # Boiling point of water at 1 atm (in K)
+        Hv = 40.65*1e3      # Latent heat of vaporization (in J/mol)
+        pressure_mbar = config["ATMOSPHERE-PRESSURE"]
+        surface_pressure_pa = config["ATMOSPHERE-PRESSURE"] * 100  # Convert mbar to Pa (1 mbar = 100 Pa)
+
+        # Calculate the boiling point of water at the given atmospheric pressure using the Clausius-Clapeyron equation
+        boiling_point = 1 / ((1 / T0) - (R.value / Hv) * np.log(pressure_mbar / P0))
+
+        # Determine the freezing point:
+        # - If the atmospheric pressure is above the triple point of water (611.657 Pa),
+        #   the freezing point is 273.15 K (0°C).
+        # - Below this pressure, liquid water cannot exist, and water transitions directly
+        #   between solid and vapor states (sublimation).
+        freezing_point = 273.15 if surface_pressure_pa > 611.657 else None
+
+        # Check if the temperature allows water to exist as a liquid:
+        # - The temperature must be between the freezing point and the boiling point for water to be liquid.
+        # - If this condition is not met, attempt to adjust the atmospheric parameters recursively.
+        if freezing_point and freezing_point <= temperature_analogue <= boiling_point:
             pass
-        else:
-            return maintain_planetary_atmosphere(config, attempts - 1)
+        else: 
+            maintain_planetary_atmosphere(config, attempts - 1)
 
         # If liquid water is present, proceed with altitude layering
         z = np.linspace(0, 5000, 60) # Altitude in meters (0 to 50 km, 60 layers)
-        surface_pressure_pa = config["ATMOSPHERE-PRESSURE"] * 100  # Convert mbar to Pa (1 mbar = 100 Pa)
         
         # pressure (P) decreases with altitude (z) following the scale-height: P = Psurf exp(-zg/RT), where g is 
         # the gravity and R is the gas constant (8.3144598 [J / K / mol]).
