@@ -272,27 +272,23 @@ def maintain_planetary_atmosphere(config: dict, attempts: int = 200) -> None:
         # HABEX FINAL REPORT: https://www.jpl.nasa.gov/habex/pdf/HabEx-Final-Report-Public-Release-LINKED-0924.pdf
         # The albedo can reasonably be assumed to be between 0.06 and 0.96. Earth-size HZ planets with a lower albedo, 
         # if they exist, would actually be impossible to detect in the first place.
-        config["SURFACE-ALBEDO"] = np.random.uniform(0.06, 0.96)
-        config["SURFACE-EMISSIVITY"] = 1 - config["SURFACE-ALBEDO"]
+        albedo = np.random.uniform(0.06, 0.96)
+        emissivity = 1 - albedo
 
         # According to McIntyre et al. (2023), Equation (3) in mbar
         # For equilibrium atmospheres, this field defines the surface pressure
-        config["ATMOSPHERE-PRESSURE"] = 1013.25 * (planet_radius ** (3.168 + np.random.uniform(-0.232, 0.232)))
-        config['OBJECT-DIAMETER'] = 2 * planet_radius * R_earth.to(u.km).value
-        config['OBJECT-GRAVITY'] = gravity
+        pressure_mbar = 1013.25 * (planet_radius ** (3.168 + np.random.uniform(-0.232, 0.232)))
+        planet_diameter = 2 * planet_radius * R_earth.to(u.km).value
 
         # See equation (25) by McIntyre et al. (2023) for surface temperature
         # Earth insolation = 1361.0 Wm⁻²
-        albedo = config["SURFACE-ALBEDO"]
         teq = ((1 - albedo) *  (real_insolation * 1361.0)/ (4 * sigma_sb.value)) ** (1 / 4)
         # temperature_analogue = teq + 33.85
         # temperature_analogue = teq
 
         # See equation (9.22) by Sara Seager book (Exoplanet Atmospheres Physical Processes)
         # Or https://en.wikipedia.org/wiki/Idealized_greenhouse_model#The_energy_balance_solution
-        temperature_analogue = teq * (2 / (2 - config["SURFACE-EMISSIVITY"])) ** (1/4)
-        config["ATMOSPHERE-TEMPERATURE"] = temperature_analogue
-        config["SURFACE-TEMPERATURE"] = temperature_analogue
+        temperature_analogue = teq * (2 / (2 - emissivity)) ** (1/4)
 
         # https://iopscience.iop.org/article/10.1088/2041-8205/736/2/L25/pdf
         # potentially habitable (175 K < Teq < 270 K)
@@ -304,8 +300,8 @@ def maintain_planetary_atmosphere(config: dict, attempts: int = 200) -> None:
         P0 = 1013.25        # Reference pressure (1 atm in mbar)
         T0 = 373.15         # Boiling point of water at 1 atm (in K)
         Hv = 40.65*1e3      # Latent heat of vaporization (in J/mol)
-        pressure_mbar = config["ATMOSPHERE-PRESSURE"]
-        surface_pressure_pa = config["ATMOSPHERE-PRESSURE"] * 100  # Convert mbar to Pa (1 mbar = 100 Pa)
+
+        surface_pressure_pa = pressure_mbar * 100  # Convert mbar to Pa (1 mbar = 100 Pa)
 
         # Calculate the boiling point of water at the given atmospheric pressure using the Clausius-Clapeyron equation
         boiling_point = 1 / ((1 / T0) - (R.value / Hv) * np.log(pressure_mbar / P0))
@@ -321,23 +317,31 @@ def maintain_planetary_atmosphere(config: dict, attempts: int = 200) -> None:
         # - The temperature must be between the freezing point and the boiling point for water to be liquid.
         # - If this condition is not met, attempt to adjust the atmospheric parameters recursively.
         if freezing_point and freezing_point <= temperature_analogue <= boiling_point:
-            pass
+            config["SURFACE-ALBEDO"] = albedo
+            config["SURFACE-EMISSIVITY"] = emissivity
+            config["ATMOSPHERE-PRESSURE"] = pressure_mbar
+            config['OBJECT-DIAMETER'] = planet_diameter
+            config['OBJECT-GRAVITY'] = gravity
+
+            config["ATMOSPHERE-TEMPERATURE"] = temperature_analogue
+            config["SURFACE-TEMPERATURE"] = temperature_analogue
+            
+            # If liquid water is present, proceed with altitude layering
+            z = np.linspace(0, 5000, 60) # Altitude in meters (0 to 50 km, 60 layers)
+            
+            # pressure (P, in Pa) decreases with altitude (z) following the scale-height: P = Psurf exp(-zg/RT), where g is 
+            # the gravity and R is the gas constant (8.3144598 [J / K / mol]).
+            pressureall = surface_pressure_pa * np.exp((- z * gravity) / (R.value * temperature_analogue))
+            pressureall_bar = pressureall / 1e5 # Pa in bar
+            temperatureall = np.full(60, temperature_analogue) # Default constant temperature    
+
+            for i in range(60):
+                PT = [f'{pressureall_bar[i]}', f'{temperatureall[i]}']
+                abudances = config[f"ATMOSPHERE-LAYER-{i + 1}"].split(",")[2:]
+                config[f'ATMOSPHERE-LAYER-{i + 1}'] = ','.join(PT + abudances)
         else: 
             maintain_planetary_atmosphere(config, attempts - 1)
 
-        # If liquid water is present, proceed with altitude layering
-        z = np.linspace(0, 5000, 60) # Altitude in meters (0 to 50 km, 60 layers)
-        
-        # pressure (P) decreases with altitude (z) following the scale-height: P = Psurf exp(-zg/RT), where g is 
-        # the gravity and R is the gas constant (8.3144598 [J / K / mol]).
-        pressureall = surface_pressure_pa * np.exp((- z * gravity) / (R.value * temperature_analogue))
-        pressureall_bar = pressureall / 1e5
-        temperatureall = np.full(60, config["ATMOSPHERE-TEMPERATURE"]) # Default constant temperature
-        
-        for i in range(60):
-            PT = [f'{pressureall_bar[i]}', f'{temperatureall[i]}']
-            abudances = config[f"ATMOSPHERE-LAYER-{i + 1}"].split(",")[2:]
-            config[f'ATMOSPHERE-LAYER-{i + 1}'] = ','.join(PT + abudances)
     else:
         # If the real insolation is greater than or equal to the critical insolation,
         # the planet is above the Cosmic Shoreline and cannot retain a significant atmosphere.
