@@ -331,7 +331,14 @@ def maintain_planetary_atmosphere(config: dict, attempts: int = 200) -> None:
             
             # pressure (P, in Pa) decreases with altitude (z) following the scale-height: P = Psurf exp(-zg/RT), where g is 
             # the gravity and R is the gas constant (8.3144598 [J / K / mol]).
-            pressureall = surface_pressure_pa * np.exp((- z * gravity) / (R.value * temperature_analogue))
+
+            # Convert molar mass from g/mol to kg/mol
+            M_kg_per_mol = config["ATMOSPHERE-WEIGHT"] / 1000  # kg/mol
+            # Compute the specific gas constant
+            R_specific = R.value / M_kg_per_mol  # J/(kg·K)
+
+            # Calculate pressure at each altitude layer
+            pressureall = surface_pressure_pa * np.exp((- z * gravity) / (R_specific * temperature_analogue))
             pressureall_bar = pressureall / 1e5 # Pa in bar
             temperatureall = np.full(60, temperature_analogue) # Default constant temperature    
 
