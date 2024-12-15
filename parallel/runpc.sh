@@ -7,6 +7,9 @@ BLUE='\033[34m'
 CYAN='\033[36m'
 RESET='\033[0m'
 
+# Trap Ctrl+C to clean up
+trap "echo -e '\n\nScript interrupted. Cleaning up...'; pkill -P $$; exit" SIGINT
+
 # Check for pv installation
 if ! command -v pv &> /dev/null; then
     echo -e "${YELLOW}Error: 'pv' is not installed. Please install it with:${RESET}"
