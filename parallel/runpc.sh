@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Define colors
+# Colors
 GREEN='\033[32m'
 YELLOW='\033[33m'
 BLUE='\033[34m'
@@ -8,7 +8,7 @@ CYAN='\033[36m'
 RESET='\033[0m'
 
 # Trap Ctrl+C to clean up
-trap "echo -e '\n\nScript interrupted. Cleaning up...'; pkill -P $$; exit" SIGINT
+trap "echo -e '\n\nScript interrupted. Cleaning up...'; pkill -P $$; rm -f progress_*.tmp; exit" SIGINT
 
 # Check for pv installation
 if ! command -v pv &> /dev/null; then
@@ -55,6 +55,15 @@ progress_bar() {
     printf "] %d%%" $((completed * 100 / total))
 }
 
+# Sum progress from all progress files
+get_total_progress() {
+    local total=0
+    for file in progress_*.tmp; do
+        [[ -f "$file" ]] && total=$((total + $(wc -l < "$file")))
+    done
+    echo "$total"
+}
+
 # Function to format time as hours, minutes, and seconds
 format_time() {
     local total_seconds=$1
@@ -73,58 +82,43 @@ script_start_time=$(date +%s)
 for mode in "${modes[@]}"; do
     echo ""
     echo -e "${CYAN}>> Processing mode: $mode${RESET}"
-    args=()
-    completed_tasks=0
-    total_tasks=$NUM_THREADS
-
-    # Temporary log file for this mode
     log_file=$(mktemp)
     pids=()
 
     # Track start time for this mode
     mode_start_time=$(date +%s)
 
-    # Track each thread's process
+    # Launch processes
     for (( i=0; i<NUM_THREADS; i++ )); do
         start=$((planets_per_thread * i))
-        if [ $i -eq $((NUM_THREADS - 1)) ]; then
-            end=$NPLANETS
-        else
-            end=$((planets_per_thread * (i + 1)))
-        fi
-        args+=("$start" "$end")
-        
-        # Run the Python script in the background, redirecting output
+        end=$((i == NUM_THREADS-1 ? NPLANETS : start + planets_per_thread))
         python genparallel_pc.py "$mode" "$start" "$end" >> "$log_file" 2>&1 &
         pids+=($!)
     done
 
     # Monitor progress
     while :; do
-        completed_tasks=0
-        for pid in "${pids[@]}"; do
-            if ! kill -0 "$pid" 2>/dev/null; then
-                ((completed_tasks++))
-            fi
-        done
-        progress_bar "$completed_tasks" "$total_tasks"
-        if [ "$completed_tasks" -eq "$total_tasks" ]; then
-            break
-        fi
-        sleep 0.1  # Short delay to reduce CPU usage while checking
+        total_progress=$(get_total_progress)
+        progress_bar "$total_progress" "$NPLANETS"
+        [[ "$total_progress" -ge "$NPLANETS" ]] && break
+        sleep 0.2
     done
-    echo ""
 
-    # Track end time and calculate duration for this mode
+    # Wait for all processes and check for errors
+    for pid in "${pids[@]}"; do
+        wait "$pid" || echo -e "${YELLOW}Warning: A thread exited with an error.${RESET}"
+    done
+
+    # Calculate mode duration
     mode_end_time=$(date +%s)
     mode_duration=$((mode_end_time - mode_start_time))
 
-    # Parse the log file for errors and completions
-    skipped=$(grep -c "Skipping..." "$log_file")
+    # Parse skipped planets
+    skipped=$(grep -c "Skipping..." "$log_file" || echo 0)
     successful=$((NPLANETS - skipped))
 
-    # Display results for the mode
-    echo -e "Mode '${CYAN}$mode${RESET}':"
+    # Display results for this mode
+    echo -e "\nMode '${CYAN}$mode${RESET}':"
     printf "    ${GREEN}✅ %-5d planets processed${RESET}\n" "$successful"
     printf "    ${YELLOW}⚠️  %-5d planets skipped${RESET}\n" "$skipped"
     printf "    ${BLUE}⏱️  Duration: %s${RESET}\n" "$(format_time $mode_duration)"
@@ -133,8 +127,8 @@ for mode in "${modes[@]}"; do
     total_skipped=$((total_skipped + skipped))
     total_done=$((total_done + successful))
 
-    # Clean up log file
-    rm "$log_file"
+    # Clean up
+    rm -f progress_*.tmp "$log_file"
 done
 
 # Final summary
@@ -150,5 +144,5 @@ printf "    ${YELLOW}⚠️  Total planets skipped:   %-5d${RESET}\n" "$total_sk
 printf "    ${BLUE}⏱️  Total Duration:          %s${RESET}\n" "$(format_time $total_duration)"
 echo ""
 echo -e "${YELLOW}Note:${RESET} The planets were skipped because:"
-echo -e "${YELLOW}      ${RESET}Exhausted all attempts to find a planet configuration that can retain a stable atmosphere with liquid water."
+echo -e "         Exhausted all attempts to find a planet configuration that can retain a stable atmosphere with liquid water."
 
