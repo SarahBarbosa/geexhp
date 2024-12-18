@@ -10,6 +10,14 @@ RESET='\033[0m'
 # Trap Ctrl+C to clean up
 trap "echo -e '\n\nScript interrupted. Cleaning up...'; pkill -P $$; exit" SIGINT
 
+# Check if Docker container 'psg' is running
+if ! docker ps --filter "name=psg" --filter "status=running" | grep -q 'psg'; then
+    echo -e "${YELLOW}Error: Docker container 'psg' is not running.${RESET}"
+    echo -e "${YELLOW}Please start the container with:${RESET}"
+    echo -e "${CYAN}    docker start psg${RESET}"
+    exit 1
+fi
+
 # Check for pv installation
 if ! command -v pv &> /dev/null; then
     echo -e "${YELLOW}Error: 'pv' is not installed. Please install it with:${RESET}"
