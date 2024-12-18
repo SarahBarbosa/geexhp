@@ -159,8 +159,8 @@ def set_stellar_parameters(config: dict) -> None:
     config["GEOMETRY-STELLAR-MAGNITUDE"] = star_mag
 
     ## SORRY FOR THIS, I WAS TOO LAZY TO CREATE A SEPARATE FUNCTION JUST FOR THIS.
-    # Set the planet's distance from the observer to 5 to 10 parsecs
-    config["GEOMETRY-OBS-ALTITUDE"] = np.random.uniform(5,10)
+    # Set the planet's distance from the observer to 5 to 20 parsecs
+    config["GEOMETRY-OBS-ALTITUDE"] = np.random.uniform(5,20)
     
     # Orbital inclination [degree]
     config["OBJECT-INCLINATION"] = np.random.uniform(0,50)
