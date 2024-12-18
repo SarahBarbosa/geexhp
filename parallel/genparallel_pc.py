@@ -1,34 +1,23 @@
 import sys
 import concurrent.futures
 from geexhp import datagen
-import os
 
 INSTR = "all"
 
 def generate_data(start, final, dg_instance, mode):
     """
     Generates data for planets in the specified range using the provided atmospheric model.
-    Writes progress to a temporary file.
     """
     file_name = f"{mode}_{start}-{final}"
-    progress_file = f"progress_{mode}_{start}-{final}.tmp"
     random_atm = True if mode == "random" else False
 
-    total = final - start
-
-    # Open progress file for writing
-    with open(progress_file, "w") as pf:
-        for i in range(start, final):
-            dg_instance.generator(
-                start=i,
-                end=i+1,
-                random_atm=random_atm,
-                output_file=file_name,
-                instruments=INSTR
-            )
-            # Write a single line for each completed planet
-            pf.write("1\n")
-            pf.flush()  # Ensure the progress is written immediately
+    dg_instance.generator(
+        start=start,
+        end=final,
+        random_atm=random_atm,
+        output_file=file_name,
+        instruments=INSTR
+    )
 
 if __name__ == "__main__":
     if len(sys.argv) < 4 or (len(sys.argv) - 2) % 2 != 0:
