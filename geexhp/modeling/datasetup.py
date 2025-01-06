@@ -58,6 +58,9 @@ def extract_abundances(df: pd.DataFrame) -> pd.DataFrame:
     molecules = set()
     df["ATMOSPHERE-LAYERS-MOLECULES"].apply(lambda x: molecules.update(x.split(',')))
     sorted_molecules = sorted(molecules)
+
+    # Row-wise expand
     abun_df = df.apply(lambda row: _extract(row, sorted_molecules), axis=1, result_type="expand")
     abun_df.columns = [f"{molecule}" for molecule in sorted_molecules]
+    
     return pd.concat([df, abun_df], axis=1)
