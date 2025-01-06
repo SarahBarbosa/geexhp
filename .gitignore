@@ -38,7 +38,7 @@ models/*.pkl
 models/*.npy
 models/*.joblib
 models/*.h5
-parallel/data/
+parallel/data*/
 examples/kawashima_data/
 examples/arney_data/
 ecospeclib-all/
