@@ -156,33 +156,26 @@ class HyperTuningBayCNN:
 
     def evaluate(self, test_dataset, feature_names, y_scalers, plot=True, additional_metrics=True):
         if self.best_model is None:
-            raise ValueError("Nenhum modelo foi treinado ainda. Por favor, execute 'fit_best_model' primeiro.")
+            raise ValueError("No model has been trained yet. Please run 'fit_best_model' first.")
 
-        # Inicializar listas para coletar valores verdadeiros e predições
         y_true_dict = {name: [] for name in self.outputs_list}
         y_pred_dict = {name: [] for name in self.outputs_list}
 
-        # Iterar sobre o test_dataset para coletar predições e valores verdadeiros
         for X_batch, y_batch in test_dataset:
-            # Fazer predições
             y_pred_batch = self.best_model.predict(X_batch, verbose=0)
-            
-            # Append to lists
+
             for name in self.outputs_list:
                 y_true_dict[name].extend(y_batch[name].numpy())
                 y_pred_dict[name].extend(y_pred_batch[name])
 
-        # Converter listas em arrays numpy
         y_true = np.column_stack([y_true_dict[name] for name in self.outputs_list])
         y_pred = np.column_stack([y_pred_dict[name] for name in self.outputs_list])
 
-        # Inverter a transformação dos outputs (individualmente para cada scaler)
         y_true_inv = np.column_stack([y_scalers[idx].inverse_transform(y_true[:, idx].reshape(-1, 1)).ravel()
                                     for idx in range(len(self.outputs_list))])
         y_pred_inv = np.column_stack([y_scalers[idx].inverse_transform(y_pred[:, idx].reshape(-1, 1)).ravel()
                                     for idx in range(len(self.outputs_list))])
 
-        # Avaliar outputs
         results = self._evaluate_outputs(
             y_true_inv, y_pred_inv, feature_names, plot, additional_metrics)
 
@@ -285,7 +278,7 @@ class HyperTuningBayCNN:
     
     def predict_with_uncertainty(self, X, n_iter=100):
         if self.best_model is None:
-            raise ValueError("Nenhum modelo foi treinado ainda. Por favor, execute 'fit_best_model' primeiro.")
+            raise ValueError("No model has been trained yet. Please run 'fit_best_model' first.")
 
         predictions_list = {name: [] for name in self.outputs_list}
         for _ in range(n_iter):

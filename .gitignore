@@ -32,7 +32,8 @@ pip-delete-this-directory.txt
 
 # Arquivos de dados e modelos
 data/*.parquet
-data/*.tfrecords
+data/*.tfrecord
+data/TFRecord_data
 data/old/
 models/*.pkl
 models/*.npy

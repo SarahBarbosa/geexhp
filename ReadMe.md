@@ -14,8 +14,8 @@ pip install -e .
 
 # To-Do List
 
-- [ ] Create ~4 million data points with noise (~1 million per type) using APOLO.
-- [ ] Add clouds/haze to the data.
+- [x] Create ~2 million data points with noise.
 - [x] Use low-resolution data.
-- [ ] New models
-- [ ] Imaging spectra
+
+- [ ] Add clouds/haze to the data (NEW PAPER?).
+- [ ] Imaging spectra (NEW PAPER? ExoImage).
