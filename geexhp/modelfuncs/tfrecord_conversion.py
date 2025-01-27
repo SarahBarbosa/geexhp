@@ -13,12 +13,31 @@ from geexhp.modelfuncs import datasetup as dset
 # -----------------------------------------------------------------------------
 
 COLUMNS_OF_INTEREST = [
+
+    "ALBEDO_B-NIR",
+    "ALBEDO_B-UV",
+    "ALBEDO_B-Vis",
+
+    "ALBEDO_SS-NIR",
+    "ALBEDO_SS-UV",
+    "ALBEDO_SS-Vis",
+
     "NOISY_ALBEDO_B-NIR",
     "NOISY_ALBEDO_B-UV",
     "NOISY_ALBEDO_B-Vis",
+
     "NOISY_ALBEDO_SS-NIR",
     "NOISY_ALBEDO_SS-UV",
     "NOISY_ALBEDO_SS-Vis",
+
+    "NOISE_B-NIR",
+    "NOISE_B-UV",
+    "NOISE_B-Vis",
+
+    "NOISE_SS-NIR",
+    "NOISE_SS-UV",
+    "NOISE_SS-Vis",
+
     "OBJECT-DIAMETER",
     "OBJECT-GRAVITY",
     "ATMOSPHERE-TEMPERATURE",
@@ -42,6 +61,7 @@ SPECTRA = [
     "NOISY_ALBEDO_B-NIR",
     "NOISY_ALBEDO_B-UV",
     "NOISY_ALBEDO_B-Vis",
+
     "NOISY_ALBEDO_SS-NIR",
     "NOISY_ALBEDO_SS-UV",
     "NOISY_ALBEDO_SS-Vis",
@@ -69,6 +89,14 @@ def _serialize_sample(row: Dict[str, Union[str, float, List[float]]]) -> bytes:
     """
     feature = {
         # SPECTRA
+        "ALBEDO_B-NIR": _float_feature_list(row["ALBEDO_B-NIR"]),
+        "ALBEDO_B-UV": _float_feature_list(row["ALBEDO_B-UV"]),
+        "ALBEDO_B-Vis": _float_feature_list(row["ALBEDO_B-Vis"]),
+
+        "ALBEDO_SS-NIR": _float_feature_list(row["ALBEDO_SS-NIR"]),
+        "ALBEDO_SS-UV": _float_feature_list(row["ALBEDO_SS-UV"]),
+        "ALBEDO_SS-Vis": _float_feature_list(row["ALBEDO_SS-Vis"]),
+
         "NOISY_ALBEDO_B-NIR": _float_feature_list(row["NOISY_ALBEDO_B-NIR"]),
         "NOISY_ALBEDO_B-UV": _float_feature_list(row["NOISY_ALBEDO_B-UV"]),
         "NOISY_ALBEDO_B-Vis": _float_feature_list(row["NOISY_ALBEDO_B-Vis"]),
@@ -77,19 +105,27 @@ def _serialize_sample(row: Dict[str, Union[str, float, List[float]]]) -> bytes:
         "NOISY_ALBEDO_SS-UV": _float_feature_list(row["NOISY_ALBEDO_SS-UV"]),
         "NOISY_ALBEDO_SS-Vis": _float_feature_list(row["NOISY_ALBEDO_SS-Vis"]),
 
-        "NOISY_ALBEDO_B-NIR_norm": _float_feature_list(row["NOISY_ALBEDO_B-NIR_norm"]),
-        "NOISY_ALBEDO_B-UV_norm": _float_feature_list(row["NOISY_ALBEDO_B-UV_norm"]),
-        "NOISY_ALBEDO_B-Vis_norm": _float_feature_list(row["NOISY_ALBEDO_B-Vis_norm"]),
+        # "NOISY_ALBEDO_B-NIR_norm": _float_feature_list(row["NOISY_ALBEDO_B-NIR_norm"]),
+        # "NOISY_ALBEDO_B-UV_norm": _float_feature_list(row["NOISY_ALBEDO_B-UV_norm"]),
+        # "NOISY_ALBEDO_B-Vis_norm": _float_feature_list(row["NOISY_ALBEDO_B-Vis_norm"]),
 
-        "NOISY_ALBEDO_SS-NIR_norm": _float_feature_list(row["NOISY_ALBEDO_SS-NIR_norm"]),
-        "NOISY_ALBEDO_SS-UV_norm": _float_feature_list(row["NOISY_ALBEDO_SS-UV_norm"]),
-        "NOISY_ALBEDO_SS-Vis_norm": _float_feature_list(row["NOISY_ALBEDO_SS-Vis_norm"]),
+        # "NOISY_ALBEDO_SS-NIR_norm": _float_feature_list(row["NOISY_ALBEDO_SS-NIR_norm"]),
+        # "NOISY_ALBEDO_SS-UV_norm": _float_feature_list(row["NOISY_ALBEDO_SS-UV_norm"]),
+        # "NOISY_ALBEDO_SS-Vis_norm": _float_feature_list(row["NOISY_ALBEDO_SS-Vis_norm"]),
+
+        "NOISE_B-NIR": _float_feature_list(row["NOISE_B-NIR"]),
+        "NOISE_B-UV": _float_feature_list(row["NOISE_B-UV"]),
+        "NOISE_B-Vis": _float_feature_list(row["NOISE_B-Vis"]),
+
+        "NOISE_SS-NIR": _float_feature_list(row["NOISE_SS-NIR"]),
+        "NOISE_SS-UV": _float_feature_list(row["NOISE_SS-UV"]),
+        "NOISE_SS-Vis": _float_feature_list(row["NOISE_SS-Vis"]),
 
         # Main Features
         "OBJECT-RADIUS-REL-EARTH": _float_feature(row["OBJECT-RADIUS-REL-EARTH"]),
-        "LOG-OBJECT-GRAVITY": _float_feature(row["LOG-OBJECT-GRAVITY"]),
-        "LOG-ATMOSPHERE-TEMPERATURE": _float_feature(row["LOG-ATMOSPHERE-TEMPERATURE"]),
-        "BAR-ATMOSPHERE-PRESSURE": _float_feature(row["BAR-ATMOSPHERE-PRESSURE"]),
+        # "LOG-OBJECT-GRAVITY": _float_feature(row["LOG-OBJECT-GRAVITY"]),
+        # "LOG-ATMOSPHERE-TEMPERATURE": _float_feature(row["LOG-ATMOSPHERE-TEMPERATURE"]),
+        # "BAR-ATMOSPHERE-PRESSURE": _float_feature(row["BAR-ATMOSPHERE-PRESSURE"]),
 
         "OBJECT-DIAMETER": _float_feature(row["OBJECT-DIAMETER"]),
         "OBJECT-GRAVITY": _float_feature(row["OBJECT-GRAVITY"]),
@@ -119,19 +155,20 @@ def _serialize_sample(row: Dict[str, Union[str, float, List[float]]]) -> bytes:
         "log_O2": _float_feature(row["log_O2"]),
         "log_O3": _float_feature(row["log_O3"]),
     }
+
     example_proto = tf.train.Example(features=tf.train.Features(feature=feature))
     return example_proto.SerializeToString()
 
-def _minmax_scaler(data: np.ndarray) -> np.ndarray:
-    """
-    Scale data to range [0, 1] using min-max normalization.
-    """
-    return (data - np.min(data)) / (np.max(data) - np.min(data))
+# def _zscore_scaler(data: np.ndarray) -> np.ndarray:
+#     """
+#     Standard Scaling.
+#     """
+#     return (data - np.mean(data)) / np.std(data)
 
 
 def _convert_to_earth_radius(data: float) -> float:
     """
-    Convert diameter (in km) to Earth's radii (relative).
+    Convert diameter (in km) to Earth"s radii (relative).
     """
     return data / (2 * R_earth.to("km").value)
 
@@ -199,7 +236,7 @@ def create_tfrecords(root_folder: str, save_root: str) -> None:
 
                 # Filter out rows with noise > 5
                 noise_columns = [col for col in df.columns if "NOISE_" in col]
-                mask = ~df[noise_columns].applymap(lambda x: any(value > 5 for value in x)).any(axis=1)
+                mask = ~df[noise_columns].applymap(lambda x: any(value > 3 for value in x)).any(axis=1)
                 df = df[mask]
 
                 # Keep only columns of interest
@@ -211,13 +248,13 @@ def create_tfrecords(root_folder: str, save_root: str) -> None:
 
                 # Additional derived features
                 filtered_df["OBJECT-RADIUS-REL-EARTH"] = df["OBJECT-DIAMETER"].apply(_convert_to_earth_radius)
-                filtered_df["LOG-OBJECT-GRAVITY"] = df["OBJECT-GRAVITY"].apply(_log_data)
-                filtered_df["LOG-ATMOSPHERE-TEMPERATURE"] = df["ATMOSPHERE-TEMPERATURE"].apply(_log_data)
-                filtered_df["BAR-ATMOSPHERE-PRESSURE"] = df["ATMOSPHERE-PRESSURE"].apply(lambda x: x / 1000)
+                # filtered_df["LOG-OBJECT-GRAVITY"] = df["OBJECT-GRAVITY"].apply(_log_data)
+                # filtered_df["LOG-ATMOSPHERE-TEMPERATURE"] = df["ATMOSPHERE-TEMPERATURE"].apply(_log_data)
+                # filtered_df["BAR-ATMOSPHERE-PRESSURE"] = df["ATMOSPHERE-PRESSURE"].apply(lambda x: x / 1000)
 
                 # Normalize spectra columns
-                for spectrum in SPECTRA:
-                    filtered_df[f"{spectrum}_norm"] = filtered_df[spectrum].apply(_minmax_scaler)
+                # for spectrum in SPECTRA:
+                #     filtered_df[f"{spectrum}_norm"] = filtered_df[spectrum].apply(_zscore_scaler)
 
                 # Create log abundance columns for each molecule
                 for molecule in MOLECULES:
