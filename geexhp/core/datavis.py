@@ -5,8 +5,12 @@ from math import atan2, degrees
 import matplotlib.pyplot as plt
 #from matplotlib_inline import backend_inline
 from matplotlib import lines as mlines
+import matplotlib.font_manager as fm
 
 from typing import Literal, List, Optional, Union
+
+def has_lato_font() -> bool:
+    return any("Lato" in f.name for f in fm.fontManager.ttflist)
 
 def configure_matplotlib(oldschool: bool = False) -> None:
     """
@@ -17,13 +21,19 @@ def configure_matplotlib(oldschool: bool = False) -> None:
     if oldschool:
         import smplotlib
     else:
+
+        if has_lato_font():
+            font_family = "Lato"
+        else:
+            font_family = "sans-serif"
+
         plt.rcParams.update({
             "xtick.top": True,          
             "ytick.right": True,        
             "xtick.direction": "in",    
             "ytick.direction": "in",    
             "font.size": 12,            
-            "font.family": "Lato",      
+            "font.family": font_family,      
             "axes.labelsize": 12,  
             "axes.titlesize": 12,  
             "legend.fontsize": 10,  
