@@ -44,6 +44,7 @@ examples/kawashima_data/
 examples/arney_data/
 ecospeclib-all/
 examples/hyperparam_search
+examples/opt
 
 # Ignorar playground e outros arquivos temporários
 playground.ipynb
