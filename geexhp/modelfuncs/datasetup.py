@@ -61,7 +61,6 @@ def combine_parquet(folder: str, keyword: str, output_file: bool = False) -> pd.
 
     combineddf = pd.concat(dataframes, ignore_index=True)
 
-    # Optionally, save the combined DataFrame as a new .parquet file
     if output_file:
         output_dir = "../data"
         os.makedirs(output_dir, exist_ok=True)
@@ -195,18 +194,16 @@ def _split_era(root_folder: str, train_split: float, val_split: float) -> Dict[s
     """
     tf_data = _load_dataset_paths(root_folder)
 
-    split_indexes = {
-        'train': False,
-        'val': False,
-    }
-
-    # We do it for each era so that the dataset can be stratified by era.
+    # Process each era separately.
     for era in list(tf_data.keys()):
         total_number_of_samples = sum(tf_data[era]['file_numbers_of_samples'])
-
         count = 0
+        
+        # Initialize a new split_indexes dict for this era.
+        split_indexes = {'train': None, 'val': None}
+
         for index, num_samples in enumerate(tf_data[era]['file_numbers_of_samples']):
-            if (count >= total_number_of_samples * train_split) and (split_indexes['train'] is False):
+            if split_indexes['train'] is None and count >= total_number_of_samples * train_split:
                 split_indexes['train'] = index
 
             if count >= total_number_of_samples * (train_split + val_split):
@@ -238,7 +235,6 @@ def train_val_test_split(root_folder: str, train_split: float = 0.8, val_split: 
     tf_data = _split_era(root_folder, train_split, val_split)
 
     # All splits must be the same for all eras.
-    train_split = tf_data['modern']['split_indexes']['train']
     train_split = tf_data['modern']['split_indexes']['train']
     val_split = tf_data['modern']['split_indexes']['val']
 
