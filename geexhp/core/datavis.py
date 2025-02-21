@@ -28,10 +28,10 @@ def configure_matplotlib(oldschool: bool = False) -> None:
             font_family = "sans-serif"
 
         plt.rcParams.update({
-            "xtick.top": True,          
-            "ytick.right": True,        
-            "xtick.direction": "in",    
-            "ytick.direction": "in",    
+            "xtick.top": False,          
+            "ytick.right": False,        
+            "xtick.direction": "out",    
+            "ytick.direction": "out",    
             "font.size": 12,            
             "font.family": font_family,      
             "axes.labelsize": 12,  
@@ -40,7 +40,14 @@ def configure_matplotlib(oldschool: bool = False) -> None:
             "xtick.labelsize": 10,  
             "ytick.labelsize": 10,  
             "xtick.minor.visible": True,  
-            "ytick.minor.visible": True  
+            "ytick.minor.visible": True,
+            "axes.spines.top": False,  
+            "axes.spines.right": False,  
+            "axes.grid" : True,
+            "grid.color": "gray", 
+            "grid.linestyle": "--", 
+            "grid.linewidth": 0.5,
+            "grid.alpha": 0.3, 
         })
 
 def plot_spectrum(
