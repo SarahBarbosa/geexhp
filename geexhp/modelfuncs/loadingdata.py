@@ -115,11 +115,6 @@ def parse_example(
         processed = tf.math.pow(float(val), float(1 / best_n))
         other_chemical_outputs.append(processed)
 
-    # Stack the lists into tensors.
-    physical_tensor = tf.stack(physical_outputs, axis=-1)           # shape (4,)
-    main_chem_tensor = tf.stack(main_chemical_outputs, axis=-1)         # shape (2,)
-    other_chem_tensor = tf.stack(other_chemical_outputs, axis=-1)       # shape (6,)
-
     grouped_outputs = {
         'physical_output': physical_outputs,              # shape (4,)
         'main_chemical_output': main_chemical_outputs,    # shape (2,)
