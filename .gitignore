@@ -45,8 +45,7 @@ examples/kawashima_data/
 examples/arney_data/
 ecospeclib-all/
 examples/hyperparam_search_SAB
-examples/opt
-examples/NN_22-tuner.keras
+examples/*.keras
 
 # Ignorar playground e outros arquivos temporários
 playground.ipynb
