@@ -22,18 +22,18 @@ def configure_matplotlib(oldschool: bool = False) -> None:
         import smplotlib
     else:
 
-        if has_lato_font():
-            font_family = "Lato"
-        else:
-            font_family = "sans-serif"
+        #if has_lato_font():
+        #    font_family = "Lato"
+        #else:
+        #    font_family = "sans-serif"
 
         plt.rcParams.update({
-            "xtick.top": False,          
-            "ytick.right": False,        
-            "xtick.direction": "out",    
-            "ytick.direction": "out",    
+            "xtick.top": True,          
+            "ytick.right": True,        
+            "xtick.direction": "in",    
+            "ytick.direction": "in",    
             "font.size": 12,            
-            "font.family": font_family,      
+            "font.family": "sans-serif",        
             "axes.labelsize": 12,  
             "axes.titlesize": 12,  
             "legend.fontsize": 10,  
@@ -41,13 +41,18 @@ def configure_matplotlib(oldschool: bool = False) -> None:
             "ytick.labelsize": 10,  
             "xtick.minor.visible": True,  
             "ytick.minor.visible": True,
-            "axes.spines.top": False,  
-            "axes.spines.right": False,  
-            "axes.grid" : True,
-            "grid.color": "gray", 
-            "grid.linestyle": "--", 
-            "grid.linewidth": 0.5,
-            "grid.alpha": 0.3, 
+            "xtick.major.size": 4,
+            "ytick.major.size": 4,
+            "xtick.minor.size": 2,
+            "ytick.minor.size": 2,
+            #"axes.spines.top": False,  
+            #"axes.spines.right": False, 
+            "legend.frameon": False 
+            #"axes.grid" : True,
+            #"grid.color": "gray", 
+            #"grid.linestyle": "--", 
+            #"grid.linewidth": 0.5,
+            #"grid.alpha": 0.3, 
         })
 
 def plot_spectrum(

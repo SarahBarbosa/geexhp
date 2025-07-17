@@ -192,9 +192,9 @@ def create_tfrecords(root_folder: str, save_root: str) -> None:
                 df = pd.read_parquet(file_path)
                 df["Earth_type"] = earth_type
 
-                # Filter out rows with noise > 5
+                # Filter out rows with noise > 3
                 noise_columns = [col for col in df.columns if "NOISE_" in col]
-                mask = ~df[noise_columns].applymap(lambda x: any(value > 3 for value in x)).any(axis=1)
+                mask = ~df[noise_columns].map(lambda x: any(value > 3 for value in x)).any(axis=1)
                 df = df[mask]
 
                 # Keep only columns of interest

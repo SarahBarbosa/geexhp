@@ -416,10 +416,10 @@ the infrared 40."""
         config["GENERATOR-NOISETIME"] = 1000
     
     elif instrument == "B-NIR":
-        config["GENERATOR-INSTRUMENT"] = """LUVOIR_B-NIR: The Extreme Coronagraph for Living Planetary Systems (ECLIPS) delivers continuous spectral coverage from 200 nm to 2.5 um\ 
-via three channels, UV (200 to 525 nm), VIS (515 nm to 1030 nm), and NIR (1 to 2 microns). The UV channel is effectively an imager and\
-provides a maximum resolution of RP=7, while the VIS channel RP=140, and NIR=70. The core coronagraph throughput is practically twice\
-for LUVOIR-B than A."""
+        config["GENERATOR-INSTRUMENT"] = """LUVOIR_B-NIR: The Extreme Coronagraph for Living Planetary Systems (ECLIPS) delivers continuous spectral\
+coverage from 200 nm to 2.5 um via three channels, UV (200 to 525 nm), VIS (515 nm to 1030 nm), and NIR (1 to 2 microns). The UV channel is effectively\
+an imager and provides a maximum resolution of RP=7, while the VIS channel RP=140, and NIR=70. The core coronagraph throughput is practically twice for\
+LUVOIR-B than A."""
         config["GENERATOR-RANGE1"] = 1.01
         config["GENERATOR-RANGE2"] = 2.0
         config["GENERATOR-RESOLUTION"] = 70

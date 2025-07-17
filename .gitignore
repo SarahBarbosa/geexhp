@@ -32,6 +32,7 @@ pip-delete-this-directory.txt
 
 # Arquivos de dados e modelos
 data/*.parquet
+data/distances/
 data/tests/
 data/*.tfrecord
 data/TFRecord_data
@@ -46,6 +47,10 @@ examples/arney_data/
 ecospeclib-all/
 examples/hyperparam_search_SAB
 examples/*.keras
+parallel_test/
+examples/teste/
+examples/TRASH_MODELS
+models/
 
 # Ignorar playground e outros arquivos temporários
 playground.ipynb
