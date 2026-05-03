@@ -1,5 +1,5 @@
-Steps to Install Docker, PSG, and Specific Packages on Ubuntu
-=============================================================
+Steps to Install Docker, PSG, and Required PSG Packages on Ubuntu
+=================================================================
 
 1. Install Docker
 ------------------
@@ -25,7 +25,7 @@ Steps to Install Docker, PSG, and Specific Packages on Ubuntu
     sudo systemctl start docker
     sudo usermod -aG docker ${USER}
 
-When adding the GPS key, you might need to use the command below instead:
+When adding the GPG key, you might need to use the command below instead:
 
 .. code-block:: bash
 
@@ -33,8 +33,8 @@ When adding the GPS key, you might need to use the command below instead:
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/docker-archive-keyring.gpg
 
 2. Pull the PSG Image
-----------------------
-You might need run these commands as sudo.
+---------------------
+You might need to run these commands with ``sudo``.
 
 .. code-block:: bash
 
@@ -49,8 +49,8 @@ You might need run these commands as sudo.
 
     docker run -d --name psg -p 127.0.0.1:3000:80 psg
 
-4. Update the PROGRAMSAMD Package and install Specific Packages Inside the Container
---------------------------------------------------
+4. Update ``programsamd`` and Install Required Packages Inside the Container
+-----------------------------------------------------------------------------
 
 .. code-block:: bash
 

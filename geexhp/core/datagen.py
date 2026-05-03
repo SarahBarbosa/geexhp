@@ -306,9 +306,7 @@ class DataGen:
             - CO2 (Carbon dioxide)
             - CH4 (Methane)
             - O2 (Oxygen)
-            - NH3 (Ammonia)
-            - HCN (Hydrogen cyanide)
-            - PH3 (Phosphine)
+            - O3 (Ozone)
             - H2 (Hydrogen molecule)
         - To run this function in parallel, consider dividing the start and end range across 
         multiple threads or processes. For example, if generating data for planets 0 to 1000, 
