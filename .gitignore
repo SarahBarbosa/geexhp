@@ -1,63 +1,78 @@
-# Diretório do ambiente virtual Python
+# Virtual environments
 psg-venv/
 .venv/
 venv/
 env/
 
-# Configurações do Visual Studio Code
+# Editors and IDEs
 .vscode/
+.idea/
 
-# Bytecode Python
+# Python cache and build artifacts
 __pycache__/
-*.pyc
-*.pyo
+*.py[cod]
 *.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+build/
+dist/
+*.egg-info/
+*.egg
+pip-wheel-metadata/
 
-# Variáveis de ambiente
+# Environment and local settings
 .env
+.python-version
 
-# Informações do pacote egg
-geexhp.egg-info/
-
-# Ignorar logs e arquivos temporários
+# Logs and temp files
 *.log
 *.tmp
 *.bak
+*.orig
 *.swp
 *.swo
-
-# Cache pip
+*~
 pip-log.txt
 pip-delete-this-directory.txt
 
-# Arquivos de dados e modelos
+# Notebook artifacts
+.ipynb_checkpoints/
+playground.ipynb
+examples/new_model.ipynb
+examples/* copy.ipynb
+examples/15-snr_distribution_and_detection.ipynb
+
+# Data and model artifacts
 data/*.parquet
+data/*.tfrecord
+data/tfrecords/
 data/distances/
 data/tests/
-data/*.tfrecord
-data/TFRecord_data
+data/TFRecord_data/
 data/old/
+models/
 models/*.pkl
 models/*.npy
 models/*.joblib
 models/*.h5
 parallel/data*/
+parallel_test/
+docs/*.pdf
+
+# Local example outputs and experimental dirs
+examples/*.keras
+examples/hyperparam_search_SAB/
+examples/teste/
+examples/TRASH_MODELS/
+
+# Large external data folders
 examples/kawashima_data/
 examples/arney_data/
 ecospeclib-all/
-examples/hyperparam_search_SAB
-examples/*.keras
-parallel_test/
-examples/teste/
-examples/TRASH_MODELS
-models/
 
-# Ignorar playground e outros arquivos temporários
-playground.ipynb
-examples/new_model.ipynb
+# Miscellaneous binaries
 *.jar
-
-# Arquivos de backup e temporários de editores
-*.bak
-*.orig
-*~
+.DS_Store

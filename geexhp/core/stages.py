@@ -29,7 +29,7 @@ def molweightlist(era: Literal["modern", "proterozoic", "archean"]) -> np.ndarra
     Molecules included per era:
 
     - `"modern"` or `"proterozoic"`:
-        CO2, O2, H2O, CO, O3, CH4, N2O, N2
+        CO2, O2, H2O, CO, O3, CH4, N2
     - `"archean"`:
         CH4, CO, H2O, C2H6, CO2, N2
 

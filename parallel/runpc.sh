@@ -133,9 +133,9 @@ for mode in "${modes[@]}"; do
 
     # Display results for the mode
     echo -e "Mode '${CYAN}$mode${RESET}':"
-    printf "    ${GREEN}✅ %-5d planets processed${RESET}\n" "$successful"
-    printf "    ${YELLOW}⚠️  %-5d planets skipped${RESET}\n" "$skipped"
-    printf "    ${BLUE}⏱️  Duration: %s${RESET}\n" "$(format_time $mode_duration)"
+    printf "    ${GREEN} %-5d planets processed${RESET}\n" "$successful"
+    printf "    ${YELLOW} %-5d planets skipped${RESET}\n" "$skipped"
+    printf "    ${BLUE} Duration: %s${RESET}\n" "$(format_time $mode_duration)"
 
     # Accumulate totals
     total_skipped=$((total_skipped + skipped))
@@ -153,9 +153,9 @@ echo ""
 echo -e "${CYAN}-----------------------------------------${RESET}"
 echo -e "${CYAN}   PROCESSING COMPLETED FOR ALL MODES${RESET}"
 echo -e "${CYAN}-----------------------------------------${RESET}"
-printf "    ${GREEN}✅ Total planets processed: %-5d${RESET}\n" "$total_done"
-printf "    ${YELLOW}⚠️  Total planets skipped:   %-5d${RESET}\n" "$total_skipped"
-printf "    ${BLUE}⏱️  Total Duration:          %s${RESET}\n" "$(format_time $total_duration)"
+printf "    ${GREEN}Total planets processed: %-5d${RESET}\n" "$total_done"
+printf "    ${YELLOW}Total planets skipped:   %-5d${RESET}\n" "$total_skipped"
+printf "    ${BLUE}Total Duration:          %s${RESET}\n" "$(format_time $total_duration)"
 echo ""
 echo -e "${YELLOW}Note:${RESET} The planets were skipped because:"
 echo -e "${YELLOW}      ${RESET}Exhausted all attempts to find a planet configuration that can retain a stable atmosphere with liquid water."
