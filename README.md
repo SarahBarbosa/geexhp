@@ -32,8 +32,12 @@ Clone the repository and install it in editable mode:
 ```bash
 git clone https://github.com/SarahBarbosa/geexhp.git
 cd geexhp
+git lfs pull
 pip install -e .
 ```
+
+This repository uses Git LFS for large data/model artifacts used by the desktop app and examples, including the test TFRecord and trained Keras
+models. If `git lfs pull` is not available, install Git LFS first and run  `git lfs install`.
 
 For development tools:
 
@@ -75,6 +79,12 @@ Instrument options include:
 - `"LUVOIR"`: LUVOIR-B channels.
 - `"SS"`: HabEx/SS channels.
 - Specific channels such as `"B-UV"`, `"B-Vis"`, `"B-NIR"`, `"SS-UV"`, `"SS-Vis"`, and `"SS-NIR"`.
+
+## Desktop App
+
+This repository includes an offline PySide6 desktop app for exploring the trained LUVOIR-B and HabEx/SS retrieval models, inspecting reflected-light spectra, visualizing Integrated-Gradients sensitivity maps, comparing retrievals, and running custom pasted spectra through the models.
+
+The app lives in `desktop_app/`. For installation, double-click launcher, environment setup, Git LFS requirements, and usage details, see [`desktop_app/README.md`](desktop_app/README.md).
 
 ## Documentation
 

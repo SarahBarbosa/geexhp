@@ -1,0 +1,677 @@
+from typing import Optional
+
+import matplotlib
+
+matplotlib.use("QtAgg")
+
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
+from matplotlib.backends.backend_qtagg import NavigationToolbar2QT as NavToolbar
+from matplotlib.figure import Figure
+from PySide6.QtWidgets import QVBoxLayout, QWidget
+
+from geexhp import datavis
+
+from desktop_app.app.constants import (
+    ALL_PARAMS,
+    BANDS,
+    MAIN_CHEM,
+    OTHER_CHEM,
+    PARAM_LABELS,
+    PHYS_PARAMS,
+    TELESCOPE_CONFIG,
+)
+from desktop_app.app.data import Spectrum
+from desktop_app.app import theme
+
+datavis.configure_matplotlib()
+
+TEL_COLORS = {"LUVOIR": theme.TEL_LUVOIR, "HABEX": theme.TEL_HABEX}
+
+CORNER_LABELS_FULL = [
+    r"$R_\oplus$",
+    r"$g$ [m s$^{-2}$]",
+    r"$T_{\rm surf}$ [K]",
+    r"$P_{\rm surf}$ [mbar]",
+    r"$\log_{10}$(O$_2$)",
+    r"$\log_{10}$(O$_3$)",
+    r"$\log_{10}$(CH$_4$)",
+    r"$\log_{10}$(CO$_2$)",
+    r"$\log_{10}$(H$_2$O)",
+    r"$\log_{10}$(N$_2$)",
+]
+
+plt.rcParams.update(
+    {
+        "axes.edgecolor": "#cbd2dd",
+        "axes.labelcolor": theme.INK,
+        "axes.titlecolor": theme.NAVY_700,
+        "axes.titlepad": 10,
+        "axes.titlesize": 11.5,
+        "axes.titleweight": "bold",
+        "axes.labelsize": 11,
+        "xtick.color": theme.INK_DIM,
+        "ytick.color": theme.INK_DIM,
+        "xtick.labelsize": 9.5,
+        "ytick.labelsize": 9.5,
+        "axes.spines.top": False,
+        "axes.spines.right": False,
+        "legend.framealpha": 0.0,
+        "savefig.facecolor": theme.SURFACE,
+        "figure.facecolor": theme.SURFACE,
+        "axes.facecolor": theme.SURFACE,
+    }
+)
+
+
+class _CanvasBase(QWidget):
+    def __init__(self, figsize=(9, 4), parent=None, show_toolbar: bool = False):
+        super().__init__(parent)
+        self.fig = Figure(figsize=figsize, layout="tight", facecolor=theme.SURFACE)
+        self.canvas = FigureCanvasQTAgg(self.fig)
+        self.canvas.setStyleSheet(f"background:{theme.SURFACE};")
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+        if show_toolbar:
+            self.toolbar = NavToolbar(self.canvas, self)
+            self.toolbar.setStyleSheet(f"background:{theme.SURFACE}; border:none;")
+            layout.addWidget(self.toolbar)
+        layout.addWidget(self.canvas)
+
+    def clear(self) -> None:
+        self.fig.clear()
+        self.canvas.draw_idle()
+
+
+BAND_TINTS = {
+    "UV": ("#7e6dbf", 0.045),
+    "Vis": ("#3fbfb0", 0.045),
+    "NIR": ("#e8b657", 0.055),
+}
+
+
+class SpectrumCanvas(_CanvasBase):
+    def __init__(self, parent=None):
+        super().__init__(figsize=(11, 4.2), parent=parent)
+
+    def show_spectrum(self, spec: Spectrum, title_suffix: str = "") -> None:
+        self.fig.clear()
+        ax = self.fig.add_subplot(1, 1, 1)
+        color = TEL_COLORS.get(spec.telescope, theme.TEL_LUVOIR)
+        tel_label = TELESCOPE_CONFIG[spec.telescope]["label"]
+
+        for band in BANDS:
+            wl = spec.wavelengths[band]
+            tint, alpha = BAND_TINTS[band]
+            ax.axvspan(wl.min(), wl.max(), color=tint, alpha=alpha, zorder=0)
+
+        wave = spec.wave_full
+        noisy = spec.noisy_full
+        err = spec.noise_full
+        _, caps, bars = ax.errorbar(
+            wave,
+            noisy,
+            yerr=err,
+            fmt=".",
+            capsize=0,
+            lw=0.8,
+            color="#9aa4b6",
+            alpha=0.45,
+            markersize=2.6,
+            zorder=2,
+            label="noisy",
+        )
+        for b in bars:
+            b.set_alpha(0.25)
+        for c in caps:
+            c.set_alpha(0.25)
+
+        if spec.clean_full is not None:
+            ax.plot(
+                wave,
+                spec.clean_full,
+                color=color,
+                lw=1.6,
+                zorder=3,
+                label="true albedo",
+            )
+
+        self.fig.canvas.draw_idle()
+        ymin, ymax = ax.get_ylim()
+        ax.set_ylim(ymin, ymax * 1.08)
+        for band in BANDS:
+            wl = spec.wavelengths[band]
+            ax.text(
+                0.5 * (wl.min() + wl.max()),
+                ymax * 1.05,
+                band,
+                ha="center",
+                va="top",
+                fontsize=9.5,
+                color=BAND_TINTS[band][0],
+                weight="bold",
+                alpha=0.95,
+            )
+
+        ax.set_xlabel(r"Wavelength  [$\mu$m]")
+        ax.set_ylabel("Apparent albedo")
+        ax.set_xlim(wave.min(), wave.max())
+        leg = ax.legend(loc="upper right", fontsize=10)
+        for t in leg.get_texts():
+            t.set_color(theme.INK_DIM)
+        title = f"{tel_label}  reflected-light spectrum"
+        if title_suffix:
+            title += f"   ·   {title_suffix}"
+        ax.set_title(title, loc="left")
+        self.canvas.draw_idle()
+
+
+class RetrievalCanvas(_CanvasBase):
+    def __init__(self, parent=None):
+        super().__init__(figsize=(11, 6), parent=parent)
+
+    def show_retrieval(
+        self,
+        telescope: str,
+        predicted: dict[str, float],
+        sigma_phys: dict[str, float],
+        truth: Optional[dict[str, float]] = None,
+        hide: tuple[str, ...] = (),
+    ) -> None:
+        self.fig.clear()
+        chem_names_full = list(MAIN_CHEM) + list(OTHER_CHEM)
+        chem_names = [n for n in chem_names_full if n not in hide]
+        n_chem = len(chem_names)
+        n_cols = max(n_chem, 6)
+
+        gs = self.fig.add_gridspec(
+            2,
+            n_cols,
+            hspace=0.65,
+            wspace=0.55,
+            left=0.07,
+            right=0.98,
+            top=0.88,
+            bottom=0.08,
+        )
+        color = TEL_COLORS.get(telescope, theme.TEL_LUVOIR)
+        truth_color = theme.NAVY_700
+        tel_label = TELESCOPE_CONFIG[telescope]["label"]
+
+        phys_offset = max((n_cols - len(PHYS_PARAMS)) // 2, 0)
+        for j, name in enumerate(PHYS_PARAMS):
+            ax = self.fig.add_subplot(gs[0, phys_offset + j])
+            mu = predicted[name]
+            sd = sigma_phys.get(name, np.nan)
+            ax.errorbar(
+                [0.5],
+                [mu],
+                yerr=[sd],
+                fmt="o",
+                color=color,
+                capsize=4,
+                lw=1.6,
+                markersize=8,
+                label="predicted",
+                markeredgecolor="white",
+                markeredgewidth=1.0,
+            )
+            if truth is not None and name in truth:
+                ax.scatter(
+                    [0.5],
+                    [truth[name]],
+                    marker="D",
+                    s=46,
+                    color=truth_color,
+                    zorder=4,
+                    label="truth",
+                    edgecolor="white",
+                    linewidths=1.0,
+                )
+            ax.set_xlim(0, 1)
+            ax.set_xticks([])
+            ax.set_title(PARAM_LABELS[j])
+            ax.grid(axis="y", color=theme.BORDER, lw=0.6, alpha=0.7)
+            ax.set_axisbelow(True)
+            if j == 0:
+                leg = ax.legend(
+                    loc="lower center",
+                    bbox_to_anchor=(2.2, 1.16),
+                    fontsize=10,
+                    ncol=2,
+                    frameon=False,
+                )
+                for t in leg.get_texts():
+                    t.set_color(theme.INK_DIM)
+
+        chem_offset = max((n_cols - n_chem) // 2, 0)
+        for j, name in enumerate(chem_names):
+            ax = self.fig.add_subplot(gs[1, chem_offset + j])
+            mu = max(predicted[name], 1e-30)
+            sd = sigma_phys.get(name, 0.0)
+            mu_log = np.log10(mu)
+            lo = max(mu - sd, 1e-30)
+            hi = mu + sd
+            err_low = mu_log - np.log10(lo)
+            err_high = np.log10(hi) - mu_log
+            ax.errorbar(
+                [0.5],
+                [mu_log],
+                yerr=[[err_low], [err_high]],
+                fmt="o",
+                color=color,
+                capsize=4,
+                lw=1.6,
+                markersize=8,
+                markeredgecolor="white",
+                markeredgewidth=1.0,
+            )
+            if truth is not None and name in truth and truth[name] > 0:
+                ax.scatter(
+                    [0.5],
+                    [np.log10(truth[name])],
+                    marker="D",
+                    s=46,
+                    color=truth_color,
+                    zorder=4,
+                    edgecolor="white",
+                    linewidths=1.0,
+                )
+
+            full_idx = chem_names_full.index(name)
+            ax.set_xlim(0, 1)
+            ax.set_xticks([])
+            ax.set_title(PARAM_LABELS[4 + full_idx])
+            ax.grid(axis="y", color=theme.BORDER, lw=0.6, alpha=0.7, which="major")
+            ax.set_axisbelow(True)
+            ax.set_ylim(-12, 0.5)
+            ax.set_yticks([-12, -9, -6, -3, 0])
+
+        self.fig.text(
+            0.015,
+            0.70,
+            "PHYSICAL",
+            rotation=90,
+            va="center",
+            fontsize=9,
+            color=theme.NAVY_700,
+            weight="bold",
+        )
+        self.fig.text(
+            0.015,
+            0.27,
+            "log₁₀  vmr",
+            rotation=90,
+            va="center",
+            fontsize=9,
+            color=theme.NAVY_700,
+            weight="bold",
+        )
+        self.fig.suptitle(
+            f"Retrieval  ·  {tel_label}",
+            x=0.07,
+            y=0.96,
+            ha="left",
+            fontsize=12.5,
+            color=theme.NAVY_700,
+            weight="bold",
+        )
+        self.canvas.draw_idle()
+
+
+class IGCanvas(_CanvasBase):
+    CHEMS = ("O2", "O3", "CH4", "CO2", "H2O", "N2")
+
+    def __init__(self, parent=None):
+        super().__init__(figsize=(11, 6.5), parent=parent)
+
+    def show_heatmap(
+        self,
+        wave: np.ndarray,
+        heatmap: np.ndarray,
+        telescope: str,
+        era: str,
+        spectrum: Optional[Spectrum] = None,
+    ) -> None:
+        self.fig.clear()
+        gs = self.fig.add_gridspec(
+            2,
+            2,
+            height_ratios=[3, 1],
+            width_ratios=[40, 1],
+            hspace=0.10,
+            wspace=0.04,
+            left=0.09,
+            right=0.95,
+            top=0.90,
+            bottom=0.12,
+        )
+        ax = self.fig.add_subplot(gs[0, 0])
+        cax = self.fig.add_subplot(gs[0, 1])
+        ax_s = self.fig.add_subplot(gs[1, 0], sharex=ax)
+
+        vmax = float(np.nanpercentile(np.abs(heatmap), 99))
+        vmax = vmax if vmax > 0 else 1e-3
+        im = ax.pcolormesh(
+            wave,
+            np.arange(len(self.CHEMS)),
+            heatmap,
+            cmap="RdBu_r",
+            vmin=-vmax,
+            vmax=vmax,
+            shading="nearest",
+        )
+        chem_labels = [r"O$_2$", r"O$_3$", r"CH$_4$", r"CO$_2$", r"H$_2$O", r"N$_2$"]
+        ax.set_yticks(np.arange(len(self.CHEMS)))
+        ax.set_yticklabels(chem_labels, fontsize=11)
+        ax.invert_yaxis()
+        ax.set_ylabel("Chemical species")
+        ax.tick_params(axis="x", labelbottom=False)
+        ax.spines[:].set_visible(False)
+        cbar = self.fig.colorbar(im, cax=cax)
+        cbar.set_label("Integrated gradient", fontsize=10, color=theme.INK_DIM)
+        cbar.ax.tick_params(labelsize=9, colors=theme.INK_DIM)
+        cbar.outline.set_visible(False)
+
+        tel_label = TELESCOPE_CONFIG[telescope]["label"]
+        ax.set_title(
+            f"Wavelength sensitivity  ·  {tel_label}   ·   {era.capitalize()} Earth",
+            loc="left",
+            fontsize=12,
+            color=theme.NAVY_700,
+            weight="bold",
+        )
+
+        if spectrum is not None and spectrum.clean_full is not None:
+            ax_s.fill_between(
+                spectrum.wave_full,
+                0,
+                spectrum.clean_full,
+                color=TEL_COLORS[telescope],
+                alpha=0.18,
+            )
+            ax_s.plot(
+                spectrum.wave_full,
+                spectrum.clean_full,
+                color=TEL_COLORS[telescope],
+                lw=1.4,
+            )
+        ax_s.set_xlabel(r"Wavelength  [$\mu$m]")
+        ax_s.set_ylabel("Albedo", fontsize=10)
+        ax_s.set_xlim(wave.min(), wave.max())
+        ax_s.tick_params(labelsize=9)
+        ax_s.grid(axis="y", color=theme.BORDER, lw=0.5, alpha=0.6)
+        ax_s.set_axisbelow(True)
+
+        self.canvas.draw_idle()
+
+
+class CompareCanvas(_CanvasBase):
+    def __init__(self, parent=None):
+        super().__init__(figsize=(11, 4.5), parent=parent)
+
+    def show_compare(
+        self,
+        results: dict[str, tuple[dict[str, float], dict[str, float]]],
+        truth: Optional[dict[str, float]] = None,
+        hide: tuple[str, ...] = (),
+    ) -> None:
+        self.fig.clear()
+        ax = self.fig.add_subplot(1, 1, 1)
+        keep_params = [p for p in ALL_PARAMS if p not in hide]
+        keep_labels = [
+            PARAM_LABELS[i] for i, p in enumerate(ALL_PARAMS) if p not in hide
+        ]
+        n = len(keep_params)
+        x = np.arange(n)
+        width = 0.32
+
+        ax.axhspan(0.9, 1.1, color=theme.LIME, alpha=0.10, zorder=0)
+        ax.axhline(
+            1.0, color=theme.INK_DIM, ls="--", lw=1.0, alpha=0.7, label="perfect"
+        )
+
+        offsets = {"LUVOIR": -0.5 * width, "HABEX": 0.5 * width}
+        for tel, (pred, sigma) in results.items():
+            mu = np.array([pred[k] for k in keep_params], dtype=float)
+            sd = np.array([sigma.get(k, 0.0) for k in keep_params], dtype=float)
+
+            denom = np.where(mu > 0, np.abs(mu), 1.0)
+            mu_n = mu / denom
+            sd_n = sd / denom
+
+            ax.errorbar(
+                x + offsets[tel],
+                mu_n,
+                yerr=sd_n,
+                fmt="o",
+                capsize=3,
+                lw=1.6,
+                markersize=7,
+                color=TEL_COLORS[tel],
+                label=TELESCOPE_CONFIG[tel]["label"],
+                markeredgecolor="white",
+                markeredgewidth=1.0,
+            )
+
+        if truth is not None:
+            t = np.array([truth.get(k, np.nan) for k in keep_params], dtype=float)
+            denom = np.where(t > 0, np.abs(t), 1.0)
+            ax.scatter(
+                x,
+                t / denom,
+                marker="D",
+                s=46,
+                color=theme.NAVY_700,
+                zorder=5,
+                label="truth",
+                edgecolor="white",
+                linewidths=1.0,
+            )
+
+        ax.set_xticks(x)
+        ax.set_xticklabels(keep_labels, fontsize=11)
+        ax.set_ylabel("predicted / truth")
+        ax.set_title(
+            "LUVOIR  vs  HabEx  ·  relative retrieval",
+            loc="left",
+            fontsize=12,
+            color=theme.NAVY_700,
+            weight="bold",
+        )
+        leg = ax.legend(loc="best", fontsize=10)
+        for t in leg.get_texts():
+            t.set_color(theme.INK_DIM)
+        ax.grid(axis="y", color=theme.BORDER, lw=0.6, alpha=0.6)
+        ax.set_axisbelow(True)
+        self.canvas.draw_idle()
+
+
+class CornerCanvas(_CanvasBase):
+    def __init__(self, parent=None):
+        super().__init__(figsize=(11, 8.2), parent=parent)
+
+    def show_placeholder(self) -> None:
+        self.fig.clear()
+        ax = self.fig.add_subplot(1, 1, 1)
+        ax.axis("off")
+        ax.text(
+            0.5,
+            0.55,
+            "Paste a custom spectrum and run retrieval to generate a corner plot.",
+            ha="center",
+            va="center",
+            color=theme.INK_DIM,
+            fontsize=13,
+        )
+        self.canvas.draw_idle()
+
+    def show_corner(
+        self,
+        bootstrap: np.ndarray,
+        mc_dropout: np.ndarray,
+        spec: Spectrum,
+        hide: tuple[str, ...] = (),
+    ) -> None:
+        self.fig.clear()
+        keep = [i for i, name in enumerate(ALL_PARAMS) if name not in hide]
+        labels = [CORNER_LABELS_FULL[i] for i in keep]
+        bs = self._finite_rows(bootstrap[:, keep])
+        mc = self._finite_rows(mc_dropout[:, keep])
+
+        if bs.size == 0 or mc.size == 0:
+            self.show_placeholder()
+            return
+
+        k = len(keep)
+        gs = self.fig.add_gridspec(
+            k,
+            k,
+            left=0.08,
+            right=0.97,
+            bottom=0.08,
+            top=0.92,
+            wspace=0.06,
+            hspace=0.06,
+        )
+        axes = np.empty((k, k), dtype=object)
+        c_bs = TEL_COLORS.get(spec.telescope, theme.TEL_LUVOIR)
+        c_mc = "#5f6672"
+
+        ranges = []
+        for j in range(k):
+            col = np.concatenate([bs[:, j], mc[:, j]])
+            lo, hi = np.nanpercentile(col, [0.5, 99.5])
+            if not np.isfinite(lo) or not np.isfinite(hi) or lo == hi:
+                lo, hi = np.nanmin(col), np.nanmax(col)
+            pad = 0.08 * (hi - lo if hi > lo else 1.0)
+            ranges.append((lo - pad, hi + pad))
+
+        for row in range(k):
+            for col in range(k):
+                ax = self.fig.add_subplot(gs[row, col])
+                axes[row, col] = ax
+                if row < col:
+                    ax.axis("off")
+                    continue
+
+                if row == col:
+                    ax.hist(
+                        bs[:, col],
+                        bins=28,
+                        density=True,
+                        color=c_bs,
+                        alpha=0.34,
+                        histtype="stepfilled",
+                        linewidth=1.0,
+                    )
+                    ax.hist(
+                        mc[:, col],
+                        bins=28,
+                        density=True,
+                        color=c_mc,
+                        histtype="step",
+                        linestyle="--",
+                        linewidth=1.2,
+                    )
+                    q16, q50, q84 = np.nanpercentile(bs[:, col], [16, 50, 84])
+                    ax.set_title(
+                        f"{q50:.3g} (+{q84 - q50:.2g}/-{q50 - q16:.2g})",
+                        fontsize=7.5,
+                        color=theme.NAVY_700,
+                        loc="left",
+                        pad=2,
+                    )
+                else:
+                    ax.scatter(
+                        bs[:, col],
+                        bs[:, row],
+                        s=4,
+                        color=c_bs,
+                        alpha=0.18,
+                        linewidths=0,
+                    )
+                    ax.scatter(
+                        mc[:, col],
+                        mc[:, row],
+                        s=4,
+                        color=c_mc,
+                        alpha=0.10,
+                        linewidths=0,
+                    )
+
+                ax.set_xlim(ranges[col])
+                if row != col:
+                    ax.set_ylim(ranges[row])
+                ax.grid(color=theme.BORDER, lw=0.4, alpha=0.5)
+                ax.tick_params(axis="both", labelsize=6, pad=1)
+
+                if row == k - 1:
+                    ax.set_xlabel(labels[col], fontsize=7.5)
+                else:
+                    ax.set_xticklabels([])
+                if col == 0 and row > 0:
+                    ax.set_ylabel(labels[row], fontsize=7.5)
+                else:
+                    ax.set_yticklabels([])
+
+        tel_label = TELESCOPE_CONFIG[spec.telescope]["label"]
+        self.fig.suptitle(
+            f"Corner plot  ·  {tel_label} custom spectrum",
+            x=0.08,
+            y=0.985,
+            ha="left",
+            fontsize=12.5,
+            color=theme.NAVY_700,
+            weight="bold",
+        )
+
+        ax_in = self.fig.add_axes([0.68, 0.70, 0.27, 0.20])
+        rng = np.random.default_rng(222)
+        for _ in range(18):
+            eps = rng.standard_normal(len(spec.wave_full)).astype(np.float32)
+            ax_in.plot(
+                spec.wave_full,
+                spec.noisy_full + eps * spec.noise_full,
+                color=c_bs,
+                alpha=0.15,
+                lw=0.7,
+            )
+        ax_in.plot(spec.wave_full, spec.noisy_full, color=c_bs, lw=1.7)
+        ax_in.set_xlabel(r"Wavelength [$\mu$m]", fontsize=7)
+        ax_in.set_ylabel("Apparent albedo", fontsize=7)
+        ax_in.tick_params(axis="both", labelsize=6, pad=1)
+        ax_in.grid(color=theme.BORDER, lw=0.4, alpha=0.5)
+
+        from matplotlib.lines import Line2D
+        from matplotlib.patches import Patch
+
+        handles = [
+            Patch(facecolor=c_bs, edgecolor=c_bs, alpha=0.45, label="Bootstrap"),
+            Line2D([0], [0], color=c_mc, lw=1.4, ls="--", label="MC Dropout"),
+        ]
+        self.fig.legend(
+            handles=handles,
+            loc="upper right",
+            bbox_to_anchor=(0.965, 0.985),
+            frameon=False,
+            fontsize=9,
+        )
+        self.canvas.draw_idle()
+
+    @staticmethod
+    def _finite_rows(samples: np.ndarray) -> np.ndarray:
+        samples = np.asarray(samples, dtype=float)
+        if samples.size == 0:
+            return samples
+        out = samples.copy()
+        for col in range(out.shape[1]):
+            vals = out[:, col]
+            finite = np.isfinite(vals)
+            if not np.any(finite):
+                out[:, col] = 0.0
+            elif not np.all(finite):
+                out[~finite, col] = np.nanmedian(vals[finite])
+        return out
