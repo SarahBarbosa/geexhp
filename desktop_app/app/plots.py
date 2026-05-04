@@ -55,8 +55,8 @@ plt.rcParams.update(
         "ytick.color": theme.INK_DIM,
         "xtick.labelsize": 9.5,
         "ytick.labelsize": 9.5,
-        "axes.spines.top": False,
-        "axes.spines.right": False,
+        "axes.spines.top": True,
+        "axes.spines.right": True,
         "legend.framealpha": 0.0,
         "savefig.facecolor": theme.SURFACE,
         "figure.facecolor": theme.SURFACE,
@@ -83,6 +83,14 @@ class _CanvasBase(QWidget):
     def clear(self) -> None:
         self.fig.clear()
         self.canvas.draw_idle()
+
+
+def _clean_axes(ax) -> None:
+    ax.spines["top"].set_visible(True)
+    ax.spines["right"].set_visible(True)
+    ax.spines["top"].set_color(theme.BORDER)
+    ax.spines["right"].set_color(theme.BORDER)
+    ax.tick_params(top=False, right=False)
 
 
 BAND_TINTS = {
@@ -580,6 +588,7 @@ class NetworkCanvas(_CanvasBase):
             ax.set_xlim(wave.min(), wave.max())
             ax.grid(axis="y", color=theme.BORDER, lw=0.6, alpha=0.7)
             ax.set_axisbelow(True)
+            _clean_axes(ax)
             return
 
         if kind == "activation":
@@ -603,11 +612,28 @@ class NetworkCanvas(_CanvasBase):
             cbar.ax.tick_params(labelsize=8, colors=theme.INK_DIM)
             cbar.outline.set_visible(False)
             mean_abs = np.mean(np.abs(values), axis=1)
-            ax2 = ax.twinx()
-            ax2.plot(mean_abs, color=theme.GOLD_DARK, lw=1.2, alpha=0.95)
-            ax2.set_ylabel("Mean |activation|", fontsize=9, color=theme.GOLD_DARK)
-            ax2.tick_params(axis="y", labelsize=8, colors=theme.GOLD_DARK)
-            ax2.spines["right"].set_color(theme.GOLD_DARK)
+            if np.nanmax(mean_abs) > 0:
+                y_line = (mean_abs / np.nanmax(mean_abs)) * (data.shape[0] - 1)
+                ax.plot(
+                    np.arange(len(y_line)),
+                    y_line,
+                    color=theme.GOLD_DARK,
+                    lw=1.45,
+                    alpha=0.95,
+                )
+                ax.text(
+                    0.985,
+                    1.045,
+                    "mean |activation|",
+                    transform=ax.transAxes,
+                    ha="right",
+                    va="bottom",
+                    fontsize=8.5,
+                    color=theme.GOLD_DARK,
+                    weight="bold",
+                    clip_on=False,
+                )
+            _clean_axes(ax)
             return
 
         if kind == "vector":
@@ -621,6 +647,7 @@ class NetworkCanvas(_CanvasBase):
             ax.set_axisbelow(True)
             if values.size > 24:
                 ax.set_xticks(np.arange(0, values.size, 4))
+            _clean_axes(ax)
             return
 
         keep = [i for i, name in enumerate(ALL_PARAMS) if name not in hide]
@@ -642,6 +669,7 @@ class NetworkCanvas(_CanvasBase):
         ax.set_ylim(0.0, max(1.05, float(np.nanmax(shown)) * 1.18))
         ax.grid(axis="y", color=theme.BORDER, lw=0.6, alpha=0.7)
         ax.set_axisbelow(True)
+        _clean_axes(ax)
 
 
 class CompareCanvas(_CanvasBase):
@@ -655,33 +683,90 @@ class CompareCanvas(_CanvasBase):
         hide: tuple[str, ...] = (),
     ) -> None:
         self.fig.clear()
-        ax = self.fig.add_subplot(1, 1, 1)
-        keep_params = [p for p in ALL_PARAMS if p not in hide]
-        keep_labels = [
-            PARAM_LABELS[i] for i, p in enumerate(ALL_PARAMS) if p not in hide
-        ]
-        n = len(keep_params)
-        x = np.arange(n)
-        width = 0.32
-
-        ax.axhspan(0.9, 1.1, color=theme.LIME, alpha=0.10, zorder=0)
-        ax.axhline(
-            1.0, color=theme.INK_DIM, ls="--", lw=1.0, alpha=0.7, label="perfect"
+        gs = self.fig.add_gridspec(
+            2,
+            4,
+            height_ratios=[1.0, 1.25],
+            hspace=0.58,
+            wspace=0.36,
+            left=0.06,
+            right=0.98,
+            top=0.86,
+            bottom=0.12,
         )
+        phys_axes = [self.fig.add_subplot(gs[0, i]) for i in range(4)]
+        ax_chem = self.fig.add_subplot(gs[1, :])
+        offsets = {"LUVOIR": -0.12, "HABEX": 0.12}
 
-        offsets = {"LUVOIR": -0.5 * width, "HABEX": 0.5 * width}
+        phys = list(PHYS_PARAMS)
+        chem_all = list(MAIN_CHEM) + list(OTHER_CHEM)
+        chem = [name for name in chem_all if name not in hide]
+        chem_labels = [
+            PARAM_LABELS[len(PHYS_PARAMS) + chem_all.index(name)] for name in chem
+        ]
+
+        x_chem = np.arange(len(chem))
+
+        for j, name in enumerate(phys):
+            ax = phys_axes[j]
+            vals_for_range = []
+            for tel, (pred, sigma) in results.items():
+                mu = float(pred[name])
+                sd = float(sigma.get(name, 0.0))
+                vals_for_range.extend([mu - sd, mu + sd])
+                ax.errorbar(
+                    [0.5 + offsets[tel]],
+                    [mu],
+                    yerr=[sd],
+                    fmt="o",
+                    capsize=3,
+                    lw=1.5,
+                    markersize=7,
+                    color=TEL_COLORS[tel],
+                    label=TELESCOPE_CONFIG[tel]["label"],
+                    markeredgecolor="white",
+                    markeredgewidth=1.0,
+                )
+            if truth is not None and name in truth:
+                vals_for_range.append(float(truth[name]))
+                ax.scatter(
+                    [0.5],
+                    [truth[name]],
+                    marker="D",
+                    s=44,
+                    color=theme.NAVY_700,
+                    zorder=5,
+                    label="truth",
+                    edgecolor="white",
+                    linewidths=1.0,
+                )
+            if vals_for_range:
+                lo, hi = np.nanmin(vals_for_range), np.nanmax(vals_for_range)
+                pad = 0.14 * (hi - lo if hi > lo else max(abs(hi), 1.0))
+                ax.set_ylim(lo - pad, hi + pad)
+            ax.set_xlim(0.14, 0.86)
+            ax.set_xticks([])
+            ax.set_title(PARAM_LABELS[j], fontsize=11, color=theme.NAVY_700, weight="bold")
+            ax.grid(axis="y", color=theme.BORDER, lw=0.6, alpha=0.6)
+            ax.set_axisbelow(True)
+            _clean_axes(ax)
+
         for tel, (pred, sigma) in results.items():
-            mu = np.array([pred[k] for k in keep_params], dtype=float)
-            sd = np.array([sigma.get(k, 0.0) for k in keep_params], dtype=float)
-
-            denom = np.where(mu > 0, np.abs(mu), 1.0)
-            mu_n = mu / denom
-            sd_n = sd / denom
-
-            ax.errorbar(
-                x + offsets[tel],
-                mu_n,
-                yerr=sd_n,
+            c_mu = np.array([pred[k] for k in chem], dtype=float)
+            c_sd = np.array([sigma.get(k, 0.0) for k in chem], dtype=float)
+            c_log = np.full_like(c_mu, np.nan, dtype=float)
+            c_err_low = np.zeros_like(c_mu, dtype=float)
+            c_err_high = np.zeros_like(c_mu, dtype=float)
+            ok = c_mu > 0
+            c_log[ok] = np.log10(c_mu[ok])
+            lo = np.maximum(c_mu - c_sd, 1e-30)
+            hi = np.maximum(c_mu + c_sd, 1e-30)
+            c_err_low[ok] = c_log[ok] - np.log10(lo[ok])
+            c_err_high[ok] = np.log10(hi[ok]) - c_log[ok]
+            ax_chem.errorbar(
+                x_chem + offsets[tel],
+                c_log,
+                yerr=[c_err_low, c_err_high],
                 fmt="o",
                 capsize=3,
                 lw=1.6,
@@ -693,11 +778,13 @@ class CompareCanvas(_CanvasBase):
             )
 
         if truth is not None:
-            t = np.array([truth.get(k, np.nan) for k in keep_params], dtype=float)
-            denom = np.where(t > 0, np.abs(t), 1.0)
-            ax.scatter(
-                x,
-                t / denom,
+            t_chem = np.array([truth.get(k, np.nan) for k in chem], dtype=float)
+            t_chem_log = np.full_like(t_chem, np.nan, dtype=float)
+            ok_truth = t_chem > 0
+            t_chem_log[ok_truth] = np.log10(t_chem[ok_truth])
+            ax_chem.scatter(
+                x_chem,
+                t_chem_log,
                 marker="D",
                 s=46,
                 color=theme.NAVY_700,
@@ -707,21 +794,29 @@ class CompareCanvas(_CanvasBase):
                 linewidths=1.0,
             )
 
-        ax.set_xticks(x)
-        ax.set_xticklabels(keep_labels, fontsize=11)
-        ax.set_ylabel("predicted / truth")
-        ax.set_title(
-            "LUVOIR  vs  HabEx  ·  relative retrieval",
-            loc="left",
-            fontsize=12,
+        ax_chem.set_xticks(x_chem)
+        ax_chem.set_xticklabels(chem_labels, fontsize=11)
+        ax_chem.set_ylabel(r"$\log_{10}$ volume mixing ratio")
+        ax_chem.set_title("Chemical abundances", loc="left", fontsize=12, color=theme.NAVY_700, weight="bold")
+        ax_chem.grid(axis="y", color=theme.BORDER, lw=0.6, alpha=0.6)
+        ax_chem.set_ylim(-12.5, 0.5)
+        ax_chem.set_yticks([-12, -9, -6, -3, 0])
+
+        ax_chem.set_axisbelow(True)
+        _clean_axes(ax_chem)
+
+        self.fig.suptitle(
+            "LUVOIR  vs  HabEx  ·  physical scales separated, chemistry in log-space",
+            x=0.055,
+            y=0.98,
+            ha="left",
+            fontsize=12.5,
             color=theme.NAVY_700,
             weight="bold",
         )
-        leg = ax.legend(loc="best", fontsize=10)
+        leg = ax_chem.legend(loc="best", fontsize=10)
         for t in leg.get_texts():
             t.set_color(theme.INK_DIM)
-        ax.grid(axis="y", color=theme.BORDER, lw=0.6, alpha=0.6)
-        ax.set_axisbelow(True)
         self.canvas.draw_idle()
 
 
@@ -760,6 +855,12 @@ class CornerCanvas(_CanvasBase):
         if bs.size == 0 or mc.size == 0:
             self.show_placeholder()
             return
+
+        try:
+            self._show_corner_notebook_style(bs, mc, spec, labels)
+            return
+        except Exception:
+            self.fig.clear()
 
         k = len(keep)
         gs = self.fig.add_gridspec(
@@ -852,6 +953,7 @@ class CornerCanvas(_CanvasBase):
                     ax.set_ylabel(labels[row], fontsize=7.5)
                 else:
                     ax.set_yticklabels([])
+                _clean_axes(ax)
 
         tel_label = TELESCOPE_CONFIG[spec.telescope]["label"]
         self.fig.suptitle(
@@ -880,6 +982,7 @@ class CornerCanvas(_CanvasBase):
         ax_in.set_ylabel("Apparent albedo", fontsize=7)
         ax_in.tick_params(axis="both", labelsize=6, pad=1)
         ax_in.grid(color=theme.BORDER, lw=0.4, alpha=0.5)
+        _clean_axes(ax_in)
 
         from matplotlib.lines import Line2D
         from matplotlib.patches import Patch
@@ -894,6 +997,139 @@ class CornerCanvas(_CanvasBase):
             bbox_to_anchor=(0.965, 0.985),
             frameon=False,
             fontsize=9,
+        )
+        self.canvas.draw_idle()
+
+    def _show_corner_notebook_style(
+        self,
+        bootstrap: np.ndarray,
+        mc_dropout: np.ndarray,
+        spec: Spectrum,
+        labels: list[str],
+    ) -> None:
+        import corner
+        from matplotlib.lines import Line2D
+        from matplotlib.patches import Patch
+
+        self.fig.clear()
+        c_bs = "#B5D31F" if spec.telescope == "LUVOIR" else TEL_COLORS[spec.telescope]
+        c_mc = "#6B6B6B"
+        levels = (0.393, 0.865)
+        k = bootstrap.shape[1]
+
+        corner.corner(
+            bootstrap,
+            labels=labels,
+            color=c_bs,
+            fill_contours=True,
+            plot_density=False,
+            plot_datapoints=False,
+            quantiles=[0.16, 0.50, 0.84],
+            show_titles=True,
+            title_fmt=".3f",
+            title_kwargs={"fontsize": 8.5},
+            label_kwargs={"fontsize": 8.5},
+            labelpad=0.18,
+            max_n_ticks=2,
+            hist_kwargs={"linewidth": 1.3},
+            contourf_kwargs={"alpha": 0.30},
+            contour_kwargs={"linewidths": 1.1},
+            levels=levels,
+            fig=self.fig,
+        )
+        corner.corner(
+            mc_dropout,
+            fig=self.fig,
+            color=c_mc,
+            fill_contours=False,
+            plot_density=False,
+            plot_datapoints=False,
+            max_n_ticks=2,
+            hist_kwargs={"linewidth": 1.5, "linestyle": "--"},
+            contour_kwargs={"linewidths": 1.4, "linestyles": "--"},
+            levels=levels,
+        )
+
+        axes = np.array(self.fig.axes[: k * k]).reshape((k, k))
+        for row in range(k):
+            for col in range(k):
+                ax = axes[row, col]
+                if row < col:
+                    ax.axis("off")
+                    continue
+                ax.tick_params(axis="both", which="major", labelsize=6.5, pad=1)
+                _clean_axes(ax)
+                if row == col:
+                    ax.title.set_ha("left")
+                    ax.title.set_x(0.02)
+                    ax.title.set_color(theme.NAVY_700)
+
+        self.fig.subplots_adjust(
+            left=0.08,
+            right=0.97,
+            bottom=0.08,
+            top=0.92,
+            wspace=0.05,
+            hspace=0.05,
+        )
+
+        tel_label = TELESCOPE_CONFIG[spec.telescope]["label"]
+        self.fig.suptitle(
+            f"Corner plot  ·  {tel_label} custom spectrum",
+            x=0.08,
+            y=0.985,
+            ha="left",
+            fontsize=12.5,
+            color=theme.NAVY_700,
+            weight="bold",
+        )
+
+        ax_in = self.fig.add_axes([0.68, 0.73, 0.27, 0.18])
+        rng = np.random.default_rng(222)
+        for _ in range(24):
+            eps = rng.standard_normal(len(spec.wave_full)).astype(np.float32)
+            ax_in.plot(
+                spec.wave_full,
+                spec.noisy_full + eps * spec.noise_full,
+                color=c_bs,
+                alpha=0.18,
+                lw=0.75,
+            )
+        ax_in.plot(
+            spec.wave_full,
+            spec.noisy_full,
+            color=c_bs,
+            lw=1.9,
+            label=tel_label,
+        )
+        ax_in.set_xlabel(r"Wavelength [$\mu$m]", fontsize=7)
+        ax_in.set_ylabel("Apparent albedo", fontsize=7)
+        ax_in.tick_params(axis="both", which="major", labelsize=6, pad=1)
+        ax_in.grid(color=theme.BORDER, lw=0.4, alpha=0.5)
+        _clean_axes(ax_in)
+
+        handles = [
+            Patch(
+                facecolor=c_bs,
+                alpha=0.55,
+                edgecolor=c_bs,
+                label=r"Bootstrap  ($\sigma_{\rm data}$)",
+            ),
+            Line2D(
+                [0],
+                [0],
+                color=c_mc,
+                lw=1.5,
+                ls="--",
+                label=r"MC Dropout  ($\sigma_{\rm model}$)",
+            ),
+        ]
+        self.fig.legend(
+            handles=handles,
+            loc="upper right",
+            bbox_to_anchor=(0.965, 0.985),
+            frameon=False,
+            fontsize=8.5,
         )
         self.canvas.draw_idle()
 
