@@ -408,6 +408,242 @@ class IGCanvas(_CanvasBase):
         self.canvas.draw_idle()
 
 
+class NetworkCanvas(_CanvasBase):
+    FLOW_LABELS = (
+        "Spectrum",
+        "Norm",
+        "Conv",
+        "Downsample",
+        "Attention",
+        "Pool",
+        "Dense",
+        "Output",
+    )
+
+    OUTPUT_LABELS = (
+        r"$R_\oplus$",
+        r"$g$",
+        r"$T$",
+        r"$P$",
+        r"O$_2$",
+        r"O$_3$",
+        r"CH$_4$",
+        r"CO$_2$",
+        r"H$_2$O",
+        r"N$_2$",
+    )
+
+    def __init__(self, parent=None):
+        super().__init__(figsize=(11.5, 6.6), parent=parent)
+        self.show_placeholder()
+
+    def show_placeholder(self) -> None:
+        self.fig.clear()
+        ax = self.fig.add_subplot(1, 1, 1)
+        ax.axis("off")
+        ax.text(
+            0.5,
+            0.58,
+            "Run a network walkthrough to see the selected spectrum move through the CNN.",
+            ha="center",
+            va="center",
+            color=theme.INK_DIM,
+            fontsize=13,
+        )
+        ax.text(
+            0.5,
+            0.48,
+            "The walkthrough uses real intermediate tensors from the saved Keras model.",
+            ha="center",
+            va="center",
+            color=theme.INK_FAINT,
+            fontsize=10.5,
+        )
+        self.canvas.draw_idle()
+
+    def show_stage(
+        self,
+        stages: list[dict],
+        active_index: int,
+        hide: tuple[str, ...] = (),
+    ) -> None:
+        if not stages:
+            self.show_placeholder()
+            return
+
+        stage = stages[active_index]
+        tel = stage.get("telescope", "LUVOIR")
+        color = TEL_COLORS.get(tel, theme.TEL_LUVOIR)
+        tel_label = TELESCOPE_CONFIG[tel]["label"]
+
+        self.fig.clear()
+        ax_detail = self.fig.add_subplot(1, 1, 1)
+        self._draw_detail(ax_detail, stage, color, hide)
+
+        self.fig.suptitle(
+            f"Network walkthrough  ·  {tel_label}",
+            x=0.07,
+            y=0.985,
+            ha="left",
+            fontsize=12.5,
+            color=theme.NAVY_700,
+            weight="bold",
+        )
+        self.fig.text(
+            0.07,
+            0.905,
+            stage["subtitle"],
+            ha="left",
+            va="center",
+            fontsize=10,
+            color=theme.INK_DIM,
+        )
+        self.canvas.draw_idle()
+
+    def _draw_flow(self, ax, active_index: int, color: str) -> None:
+        ax.axis("off")
+        xs = np.linspace(0.05, 0.95, len(self.FLOW_LABELS))
+        y = 0.52
+        for i, label in enumerate(self.FLOW_LABELS):
+            active = i == active_index
+            done = i < active_index
+            face = color if active or done else theme.SURFACE_2
+            edge = color if active or done else theme.BORDER_2
+            txt = "white" if active else theme.NAVY_700
+            ax.scatter(
+                xs[i],
+                y,
+                s=760 if active else 570,
+                color=face,
+                alpha=0.24 if done and not active else 1.0,
+                edgecolor=edge,
+                linewidth=1.7,
+                zorder=3,
+                transform=ax.transAxes,
+            )
+            ax.text(
+                xs[i],
+                y,
+                str(i + 1),
+                ha="center",
+                va="center",
+                fontsize=10,
+                color=txt,
+                weight="bold",
+                transform=ax.transAxes,
+            )
+            ax.text(
+                xs[i],
+                0.13,
+                label,
+                ha="center",
+                va="center",
+                fontsize=8.5,
+                color=theme.INK_DIM,
+                transform=ax.transAxes,
+            )
+            if i < len(xs) - 1:
+                ax.annotate(
+                    "",
+                    xy=(xs[i + 1] - 0.035, y),
+                    xytext=(xs[i] + 0.035, y),
+                    xycoords=ax.transAxes,
+                    arrowprops=dict(
+                        arrowstyle="-|>",
+                        color=color if i < active_index else theme.BORDER_2,
+                        lw=1.25,
+                        shrinkA=0,
+                        shrinkB=0,
+                    ),
+                )
+
+    def _draw_detail(self, ax, stage: dict, color: str, hide: tuple[str, ...]) -> None:
+        kind = stage["kind"]
+        values = np.asarray(stage["values"], dtype=float)
+        ax.set_title(
+            stage["title"],
+            loc="left",
+            fontsize=12,
+            color=theme.NAVY_700,
+            weight="bold",
+        )
+        if kind in {"spectrum", "line"}:
+            wave = np.asarray(stage.get("wave"), dtype=float)
+            ax.plot(wave, values, color=color, lw=1.7)
+            if kind == "spectrum":
+                ax.fill_between(wave, 0, values, color=color, alpha=0.16)
+                ax.set_ylabel("Apparent albedo")
+            else:
+                ax.axhline(0.0, color=theme.INK_FAINT, lw=0.9, ls="--", alpha=0.75)
+                ax.set_ylabel("Standardized albedo")
+            ax.set_xlabel(r"Wavelength  [$\mu$m]")
+            ax.set_xlim(wave.min(), wave.max())
+            ax.grid(axis="y", color=theme.BORDER, lw=0.6, alpha=0.7)
+            ax.set_axisbelow(True)
+            return
+
+        if kind == "activation":
+            data = values.T
+            vmax = float(np.nanpercentile(np.abs(data), 99))
+            vmax = vmax if vmax > 0 else 1.0
+            im = ax.imshow(
+                data,
+                aspect="auto",
+                cmap="RdBu_r",
+                vmin=-vmax,
+                vmax=vmax,
+                origin="lower",
+                interpolation="nearest",
+            )
+            ax.set_xlabel("Compressed spectral position")
+            ax.set_ylabel("Feature channel")
+            ax.grid(False)
+            cbar = self.fig.colorbar(im, ax=ax, pad=0.012, fraction=0.032)
+            cbar.set_label("Activation", fontsize=9, color=theme.INK_DIM)
+            cbar.ax.tick_params(labelsize=8, colors=theme.INK_DIM)
+            cbar.outline.set_visible(False)
+            mean_abs = np.mean(np.abs(values), axis=1)
+            ax2 = ax.twinx()
+            ax2.plot(mean_abs, color=theme.GOLD_DARK, lw=1.2, alpha=0.95)
+            ax2.set_ylabel("Mean |activation|", fontsize=9, color=theme.GOLD_DARK)
+            ax2.tick_params(axis="y", labelsize=8, colors=theme.GOLD_DARK)
+            ax2.spines["right"].set_color(theme.GOLD_DARK)
+            return
+
+        if kind == "vector":
+            x = np.arange(values.size)
+            colors = [color if v >= 0 else theme.ROSE for v in values]
+            ax.bar(x, values, color=colors, alpha=0.86, width=0.82)
+            ax.axhline(0.0, color=theme.INK_FAINT, lw=0.9)
+            ax.set_xlabel("Latent unit")
+            ax.set_ylabel("Activation")
+            ax.grid(axis="y", color=theme.BORDER, lw=0.6, alpha=0.7)
+            ax.set_axisbelow(True)
+            if values.size > 24:
+                ax.set_xticks(np.arange(0, values.size, 4))
+            return
+
+        keep = [i for i, name in enumerate(ALL_PARAMS) if name not in hide]
+        labels = [self.OUTPUT_LABELS[i] for i in keep]
+        shown = values[keep]
+        x = np.arange(len(keep))
+        out_colors = []
+        for idx in keep:
+            if idx < len(PHYS_PARAMS):
+                out_colors.append(color)
+            elif idx < len(PHYS_PARAMS) + len(MAIN_CHEM):
+                out_colors.append(theme.GOLD_DARK)
+            else:
+                out_colors.append(theme.SKY)
+        ax.bar(x, shown, color=out_colors, alpha=0.88, width=0.72)
+        ax.set_xticks(x)
+        ax.set_xticklabels(labels, fontsize=11)
+        ax.set_ylabel("Normalized model output")
+        ax.set_ylim(0.0, max(1.05, float(np.nanmax(shown)) * 1.18))
+        ax.grid(axis="y", color=theme.BORDER, lw=0.6, alpha=0.7)
+        ax.set_axisbelow(True)
+
+
 class CompareCanvas(_CanvasBase):
     def __init__(self, parent=None):
         super().__init__(figsize=(11, 4.5), parent=parent)

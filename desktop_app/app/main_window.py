@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import Optional
 
 import numpy as np
-from PySide6.QtCore import Qt, QObject, QRect, QSize, QThread, Signal
+from PySide6.QtCore import Qt, QObject, QRect, QSize, QThread, QTimer, Signal
 from PySide6.QtGui import QColor, QFont, QPainter, QPainterPath, QPixmap
 from PySide6.QtWidgets import (
     QButtonGroup,
@@ -23,6 +23,7 @@ from PySide6.QtWidgets import (
     QRadioButton,
     QScrollArea,
     QSizePolicy,
+    QSlider,
     QSplitter,
     QStackedWidget,
     QStatusBar,
@@ -45,11 +46,13 @@ from desktop_app.app.constants import (
 )
 from desktop_app.app.data import DataStore, SampleMeta, Spectrum
 from desktop_app.app.inference import Retriever
+from desktop_app.app.network_view import NetworkDiagramView
 from desktop_app.app.param_editor import ParameterEditor
 from desktop_app.app.plots import (
     CompareCanvas,
     CornerCanvas,
     IGCanvas,
+    NetworkCanvas,
     RetrievalCanvas,
     SpectrumCanvas,
 )
@@ -89,6 +92,11 @@ class MainWindow(QMainWindow):
         self.last_results: dict[str, tuple[dict, dict]] = {}
         self.last_truth: Optional[dict] = None
         self.hide_o2o3 = False
+        self.network_stages: list[dict] = []
+        self.network_stage_index = 0
+        self.network_timer = QTimer(self)
+        self.network_timer.setInterval(950)
+        self.network_timer.timeout.connect(self._advance_network_stage)
 
         self._build_ui()
         if not defer_loading:
@@ -105,11 +113,13 @@ class MainWindow(QMainWindow):
 
         self.tabs = QTabWidget()
         self.tabs.addTab(self._build_target_tab(), "1.  Target")
-        self.tabs.addTab(self._build_retrieve_tab(), "2.  Retrieve")
-        self.tabs.addTab(self._build_sensitivity_tab(), "3.  Sensitivity")
-        self.tabs.addTab(self._build_compare_tab(), "4.  Compare")
-        self.tabs.addTab(self._build_corner_tab(), "5.  Corner")
-        self.tabs.addTab(self._build_about_tab(), "6.  About")
+        self.tabs.addTab(self._build_network_tab(), "2.  Network")
+        self.tabs.addTab(self._build_retrieve_tab(), "3.  Retrieve")
+        self.tabs.addTab(self._build_sensitivity_tab(), "4.  Sensitivity")
+        self.tabs.addTab(self._build_compare_tab(), "5.  Compare")
+        self.corner_tab = self._build_corner_tab()
+        self.tabs.addTab(self.corner_tab, "6.  Corner")
+        self.tabs.addTab(self._build_about_tab(), "7.  About")
         root.addWidget(self.tabs, 1)
 
         self.statusbar = QStatusBar()
@@ -344,6 +354,134 @@ class MainWindow(QMainWindow):
         l.setContentsMargins(10, 10, 10, 10)
         l.addWidget(canvas)
         return frame
+
+    def _build_network_tab(self) -> QWidget:
+        page = QWidget()
+        outer = QVBoxLayout(page)
+        outer.setContentsMargins(20, 18, 20, 18)
+        outer.setSpacing(14)
+
+        info_card = QFrame()
+        info_card.setObjectName("InfoCard")
+        ilay = QHBoxLayout(info_card)
+        ilay.setContentsMargins(18, 14, 18, 14)
+        info = QLabel(
+            "<b style='color:#1a2334;'>How the neural network works</b> "
+            "<span style='color:#5a6478;'>·  Select a spectrum on tab 1, then run "
+            "a walkthrough. Each step is computed from the saved Keras model: "
+            "normalization, convolutional feature maps, attention, latent vectors, "
+            "and final output heads.</span>"
+        )
+        info.setWordWrap(True)
+        ilay.addWidget(info, 1)
+        outer.addWidget(info_card)
+
+        body = QHBoxLayout()
+        body.setSpacing(14)
+
+        controls = QGroupBox("NETWORK WALKTHROUGH")
+        controls.setMaximumWidth(330)
+        controls.setMinimumWidth(310)
+        clay = QVBoxLayout(controls)
+        clay.setSpacing(11)
+
+        self.lbl_network_context = QLabel("Use the selected target and telescope.")
+        self.lbl_network_context.setObjectName("Hint")
+        self.lbl_network_context.setWordWrap(True)
+        clay.addWidget(self.lbl_network_context)
+
+        self.btn_network_run = QPushButton("▶   Run walkthrough")
+        self.btn_network_run.setProperty("primary", True)
+        self.btn_network_run.setMinimumHeight(38)
+        self.btn_network_run.clicked.connect(self._run_network_walkthrough)
+        clay.addWidget(self.btn_network_run)
+
+        row = QHBoxLayout()
+        row.setSpacing(8)
+        self.btn_network_prev = QPushButton("‹")
+        self.btn_network_prev.setToolTip("Previous network step")
+        self.btn_network_prev.clicked.connect(
+            lambda: self._show_network_stage(self.network_stage_index - 1)
+        )
+        self.btn_network_play = QPushButton("Play")
+        self.btn_network_play.clicked.connect(self._toggle_network_play)
+        self.btn_network_next = QPushButton("›")
+        self.btn_network_next.setToolTip("Next network step")
+        self.btn_network_next.clicked.connect(
+            lambda: self._show_network_stage(self.network_stage_index + 1)
+        )
+        for btn in (
+            self.btn_network_prev,
+            self.btn_network_play,
+            self.btn_network_next,
+        ):
+            btn.setEnabled(False)
+            btn.setMinimumHeight(34)
+            row.addWidget(btn)
+        clay.addLayout(row)
+
+        self.network_slider = QSlider(Qt.Horizontal)
+        self.network_slider.setRange(0, 0)
+        self.network_slider.valueChanged.connect(self._on_network_slider)
+        clay.addWidget(self.network_slider)
+
+        self.lbl_network_stage = QLabel("No walkthrough loaded.")
+        self.lbl_network_stage.setObjectName("MutedValue")
+        self.lbl_network_stage.setWordWrap(True)
+        clay.addWidget(self.lbl_network_stage)
+
+        inspector = QFrame()
+        inspector.setObjectName("NetworkInspector")
+        il = QVBoxLayout(inspector)
+        il.setContentsMargins(13, 12, 13, 12)
+        il.setSpacing(8)
+        self.lbl_network_inspector_title = QLabel("Layer inspector")
+        self.lbl_network_inspector_title.setObjectName("NetworkInspectorTitle")
+        self.lbl_network_inspector_body = QLabel(
+            "Run the walkthrough, then hover or click the architecture."
+        )
+        self.lbl_network_inspector_body.setObjectName("NetworkInspectorBody")
+        self.lbl_network_inspector_body.setWordWrap(True)
+        self.lbl_network_inspector_body.setTextFormat(Qt.RichText)
+        self.lbl_network_inspector_stats = QLabel("")
+        self.lbl_network_inspector_stats.setObjectName("NetworkInspectorStats")
+        self.lbl_network_inspector_stats.setWordWrap(True)
+        self.lbl_network_inspector_stats.setTextFormat(Qt.RichText)
+        il.addWidget(self.lbl_network_inspector_title)
+        il.addWidget(self.lbl_network_inspector_body)
+        il.addWidget(self.lbl_network_inspector_stats)
+        clay.addWidget(inspector)
+
+        note = QLabel(
+            "The top panel is the model architecture. The bottom panel is the live "
+            "tensor for the selected layer."
+        )
+        note.setObjectName("Hint")
+        note.setWordWrap(True)
+        clay.addWidget(note)
+        clay.addStretch(1)
+
+        self.network_diagram = NetworkDiagramView()
+        self.network_diagram.stageSelected.connect(self._show_network_stage)
+        self.network_canvas = NetworkCanvas()
+        detail_split = QSplitter(Qt.Vertical)
+        detail_split.setHandleWidth(8)
+
+        diagram_card = QFrame()
+        diagram_card.setObjectName("CanvasCard")
+        dlay = QVBoxLayout(diagram_card)
+        dlay.setContentsMargins(10, 10, 10, 10)
+        dlay.addWidget(self.network_diagram)
+
+        detail_split.addWidget(diagram_card)
+        detail_split.addWidget(self._wrap_canvas(self.network_canvas))
+        detail_split.setStretchFactor(0, 2)
+        detail_split.setStretchFactor(1, 3)
+
+        body.addWidget(controls)
+        body.addWidget(detail_split, 1)
+        outer.addLayout(body, 1)
+        return page
 
     def _build_retrieve_tab(self) -> QWidget:
         page = QWidget()
@@ -916,10 +1054,167 @@ class MainWindow(QMainWindow):
         QMessageBox.critical(self, "Failed to load TFRecord", msg)
         self.startupReady.emit()
 
+    def _current_network_spec(self) -> Optional[Spectrum]:
+        tel = self._selected_telescope()
+        if self.rb_custom.isChecked():
+            if (
+                self.current_custom_spec is None
+                or self.current_custom_spec.telescope != tel
+            ):
+                self._on_custom_spectrum(self.editor.text(), run_after=False)
+            if (
+                self.current_custom_spec is None
+                or self.current_custom_spec.telescope != tel
+            ):
+                return None
+            return self.current_custom_spec
+
+        if self.current_index is None:
+            QMessageBox.information(
+                self, "Pick a target", "Select a sample on tab 1 first."
+            )
+            return None
+        try:
+            return self.store.load_spectrum(self.current_index, tel)
+        except Exception as exc:
+            QMessageBox.critical(self, "Failed to read spectrum", repr(exc))
+            return None
+
+    def _run_network_walkthrough(self) -> None:
+        spec = self._current_network_spec()
+        if spec is None:
+            return
+        self.statusbar.showMessage(
+            f"Tracing {TELESCOPE_CONFIG[spec.telescope]['label']} network internals …"
+        )
+        QApplication.processEvents()
+        try:
+            self.network_stages = self.retriever.trace_network(spec)
+        except Exception as exc:
+            QMessageBox.critical(self, "Network walkthrough failed", repr(exc))
+            self.statusbar.clearMessage()
+            return
+
+        self.network_slider.blockSignals(True)
+        self.network_slider.setRange(0, max(len(self.network_stages) - 1, 0))
+        self.network_slider.blockSignals(False)
+        self.network_diagram.set_stages(self.network_stages, 0)
+        for btn in (
+            self.btn_network_prev,
+            self.btn_network_play,
+            self.btn_network_next,
+        ):
+            btn.setEnabled(True)
+        self._show_network_stage(0)
+        self.statusbar.showMessage(
+            f"{TELESCOPE_CONFIG[spec.telescope]['label']} walkthrough ready.", 5000
+        )
+
+    def _clear_network_trace(self) -> None:
+        self.network_timer.stop()
+        self.network_stages = []
+        self.network_stage_index = 0
+        if not hasattr(self, "network_canvas"):
+            return
+        self.network_canvas.show_placeholder()
+        if hasattr(self, "network_diagram"):
+            self.network_diagram.clear()
+        self.network_slider.blockSignals(True)
+        self.network_slider.setRange(0, 0)
+        self.network_slider.setValue(0)
+        self.network_slider.blockSignals(False)
+        self.lbl_network_stage.setText("No walkthrough loaded.")
+        self.lbl_network_inspector_title.setText("Layer inspector")
+        self.lbl_network_inspector_body.setText(
+            "Run the walkthrough, then hover or click the architecture."
+        )
+        self.lbl_network_inspector_stats.setText("")
+        self.btn_network_play.setText("Play")
+        for btn in (
+            self.btn_network_prev,
+            self.btn_network_play,
+            self.btn_network_next,
+        ):
+            btn.setEnabled(False)
+
+    def _show_network_stage(self, index: int) -> None:
+        if not self.network_stages:
+            return
+        index = max(0, min(index, len(self.network_stages) - 1))
+        self.network_stage_index = index
+        self.network_slider.blockSignals(True)
+        self.network_slider.setValue(index)
+        self.network_slider.blockSignals(False)
+        self.btn_network_prev.setEnabled(index > 0)
+        self.btn_network_next.setEnabled(index < len(self.network_stages) - 1)
+        self.btn_network_play.setEnabled(True)
+        self.lbl_network_stage.setText(
+            f"Step {index + 1} of {len(self.network_stages)}  ·  "
+            f"{self.network_stages[index]['title']}"
+        )
+        self._update_network_inspector(self.network_stages[index])
+        self.network_canvas.show_stage(
+            self.network_stages,
+            index,
+            hide=self._hidden_set(),
+        )
+        self.network_diagram.set_active_index(index)
+
+    def _update_network_inspector(self, stage: dict) -> None:
+        values = np.asarray(stage.get("values"), dtype=float)
+        shape = " × ".join(str(s) for s in values.shape) if values.size else "—"
+        finite = values[np.isfinite(values)] if values.size else np.asarray([])
+        if finite.size:
+            stats = (
+                f"<b>Tensor</b> {shape}<br>"
+                f"<b>Mean</b> {float(np.mean(finite)):.4g} &nbsp; "
+                f"<b>Min</b> {float(np.min(finite)):.4g} &nbsp; "
+                f"<b>Max</b> {float(np.max(finite)):.4g}"
+            )
+        else:
+            stats = f"<b>Tensor</b> {shape}"
+        self.lbl_network_inspector_title.setText(stage.get("title", "Layer"))
+        self.lbl_network_inspector_body.setText(
+            f"{stage.get('explain', stage.get('subtitle', ''))}"
+            f"<br><br><span style='color:#5a6478;'>"
+            f"{stage.get('reading', '')}</span>"
+        )
+        self.lbl_network_inspector_stats.setText(stats)
+
+    def _on_network_slider(self, value: int) -> None:
+        self.network_timer.stop()
+        self.btn_network_play.setText("Play")
+        self._show_network_stage(value)
+
+    def _advance_network_stage(self) -> None:
+        if not self.network_stages:
+            self.network_timer.stop()
+            return
+        if self.network_stage_index >= len(self.network_stages) - 1:
+            self.network_timer.stop()
+            self.btn_network_play.setText("Play")
+            return
+        self._show_network_stage(self.network_stage_index + 1)
+
+    def _toggle_network_play(self) -> None:
+        if not self.network_stages:
+            self._run_network_walkthrough()
+            if not self.network_stages:
+                return
+        if self.network_timer.isActive():
+            self.network_timer.stop()
+            self.btn_network_play.setText("Play")
+            return
+        if self.network_stage_index >= len(self.network_stages) - 1:
+            self._show_network_stage(0)
+        self.network_timer.start()
+        self.btn_network_play.setText("Pause")
+
     def _on_mode_change(self) -> None:
         self.target_stack.setCurrentIndex(0 if self.rb_filter.isChecked() else 1)
         if self.rb_custom.isChecked():
             self.editor.set_telescope(self._selected_telescope())
+        self._clear_network_trace()
 
     def _on_hide_toggle(self, checked: bool) -> None:
         self.hide_o2o3 = bool(checked)
@@ -936,6 +1231,8 @@ class MainWindow(QMainWindow):
                 self.compare_canvas.show_compare(
                     self.last_results, truth=self.last_truth, hide=self._hidden_set()
                 )
+        if self.network_stages:
+            self._show_network_stage(self.network_stage_index)
 
     def _hidden_set(self) -> tuple[str, ...]:
         return ("O2", "O3") if self.hide_o2o3 else ()
@@ -981,6 +1278,11 @@ class MainWindow(QMainWindow):
     def _on_target_change(self) -> None:
         if hasattr(self, "editor"):
             self.editor.set_telescope(self._selected_telescope())
+        if hasattr(self, "lbl_network_context"):
+            self.lbl_network_context.setText(
+                f"Using {TELESCOPE_CONFIG[self._selected_telescope()]['label']} "
+                "for the currently selected spectrum."
+            )
         if self.rb_filter.isChecked():
             if self.cmb_sample.count() == 0:
                 return
@@ -1043,6 +1345,7 @@ class MainWindow(QMainWindow):
         self.last_truth = None
         self.compare_canvas.clear()
         self.corner_canvas.show_placeholder()
+        self._clear_network_trace()
         self.spectrum_canvas.show_spectrum(spec, title_suffix=label)
         self.statusbar.showMessage(
             f"{TELESCOPE_CONFIG[spec.telescope]['label']} custom spectrum is ready.",
@@ -1076,6 +1379,7 @@ class MainWindow(QMainWindow):
         self.last_truth = meta.truth
         self.compare_canvas.clear()
         self.corner_canvas.show_placeholder()
+        self._clear_network_trace()
         self._refresh_ig()
 
     def _run_retrieval(self, telescope: str) -> None:
@@ -1147,7 +1451,7 @@ class MainWindow(QMainWindow):
                 bs = self.retriever.bootstrap_samples(spec, n_samples=5000)
                 mc = self.retriever.mc_dropout_samples(spec, n_samples=5000)
                 self.corner_canvas.show_corner(bs, mc, spec, hide=hide)
-                self.tabs.setCurrentIndex(4)
+                self.tabs.setCurrentWidget(self.corner_tab)
             except Exception as exc:
                 QMessageBox.warning(self, "Corner plot failed", repr(exc))
 
