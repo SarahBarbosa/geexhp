@@ -3,7 +3,15 @@ from typing import Optional
 
 import numpy as np
 from PySide6.QtCore import Qt, QObject, QRect, QSize, QThread, QTimer, Signal
-from PySide6.QtGui import QColor, QFont, QPainter, QPainterPath, QPixmap
+from PySide6.QtGui import (
+    QColor,
+    QFont,
+    QImageReader,
+    QMovie,
+    QPainter,
+    QPainterPath,
+    QPixmap,
+)
 from PySide6.QtWidgets import (
     QButtonGroup,
     QApplication,
@@ -94,6 +102,7 @@ class MainWindow(QMainWindow):
         self.hide_o2o3 = False
         self.network_stages: list[dict] = []
         self.network_stage_index = 0
+        self._movies: list[QMovie] = []
         self.network_timer = QTimer(self)
         self.network_timer.setInterval(950)
         self.network_timer.timeout.connect(self._advance_network_stage)
@@ -620,10 +629,10 @@ class MainWindow(QMainWindow):
         ilay.setContentsMargins(18, 14, 18, 14)
         info = QLabel(
             "<b style='color:#1a2334;'>Side-by-side retrieval</b> "
-            "<span style='color:#5a6478;'>·  Run both telescopes on tab 2. "
-            "Values are scaled by truth so a perfect retrieval lands on the "
-            "dotted line at 1.0. This view is for test-set examples with "
-            "known truth.</span>"
+            "<span style='color:#5a6478;'>·  Run both telescopes on tab 3. "
+            "Physical parameters and chemical abundances use separate axes so "
+            "their very different numerical ranges stay readable. This view is "
+            "for test-set examples with known truth.</span>"
         )
         info.setWordWrap(True)
         ilay.addWidget(info)
@@ -646,7 +655,7 @@ class MainWindow(QMainWindow):
         info = QLabel(
             "<b style='color:#1a2334;'>Custom-spectrum uncertainty</b> "
             "<span style='color:#5a6478;'>·  When a pasted spectrum is retrieved, "
-            "this panel shows the corner plot from bootstrap noise s"
+            "this panel shows the corner plot from bootstrap noise "
             "realizations and MC Dropout samples.</span>"
         )
         info.setWordWrap(True)
@@ -710,91 +719,7 @@ class MainWindow(QMainWindow):
         metrics.addWidget(self._about_metric("2", "TELESCOPES"), 0, 4)
         outer.addLayout(metrics)
 
-        cards = QGridLayout()
-        cards.setHorizontalSpacing(14)
-        cards.setVerticalSpacing(14)
-        cards.addWidget(
-            self._about_card(
-                "Scientific mission",
-                "Direct-imaging missions such as the Habitable Worlds Observatory will "
-                "rely on low-resolution reflected-light spectroscopy to characterize "
-                "Earth-analogue planets across multiple geological epochs. geeXHP "
-                "addresses the atmospheric retrieval problem end-to-end: from "
-                "PSG-generated synthetic spectra to simultaneous recovery of six "
-                "atmospheric mixing ratios and four planetary parameters.",
-            ),
-            0,
-            0,
-        )
-        cards.addWidget(
-            self._about_card(
-                "Synthetic dataset",
-                "Each of the 108,246 spectra is generated with NASA's Planetary "
-                "Spectrum Generator under realistic LUVOIR-B and HabEx/SS instrument "
-                "noise, at distances 5–16 pc around F and G stars. Atmospheric "
-                "compositions follow literature-based templates for Archean (2.5–4.0 Ga), "
-                "Proterozoic (0.5–2.5 Ga), and Modern Earth, with log-space perturbations "
-                "in CH₄, CO₂, H₂O, N₂, O₂, and O₃.",
-            ),
-            0,
-            1,
-        )
-        cards.addWidget(
-            self._about_card(
-                "1D CNN architecture",
-                "Three parallel 1D convolutional sub-networks process UV, Visible, and "
-                "NIR spectral bands independently; merged dense layers retrieve all "
-                "10 parameters simultaneously. Integrated Gradients attribution "
-                "identifies UV/blue wavelengths as carrying the strongest O₂ and O₃ "
-                "signal, with secondary contributions from optical and near-infrared "
-                "windows for CH₄, CO₂, and H₂O.",
-            ),
-            1,
-            0,
-        )
-        cards.addWidget(
-            self._about_card(
-                "Uncertainty quantification",
-                "σ_total combines model uncertainty (MC Dropout, pre-computed across "
-                "the test set) and data-noise uncertainty (spectral bootstrapping). "
-                "At the default noise level, chemical species are predominantly "
-                "model-limited rather than photon-limited, future gains will depend "
-                "on improved inference as much as on increased photon collection.",
-            ),
-            1,
-            1,
-        )
-        outer.addLayout(cards)
-
-        ref_row = QHBoxLayout()
-        ref_row.setSpacing(16)
-
-        reference = QFrame()
-        reference.setObjectName("AboutCard")
-        rlay = QVBoxLayout(reference)
-        rlay.setContentsMargins(20, 18, 20, 18)
-        rlay.setSpacing(10)
-        rtitle = QLabel("Reference")
-        rtitle.setObjectName("AboutCardTitle")
-        rbody = QLabel(
-            "<b style='color:#1a2334;'>Barbosa, S. G. A., Estrela, R., "
-            "da Silva Filho, P. C. F., Mugnai, L. V., &amp; de Freitas, D. B. (2026).</b>"
-            "<br><i>Towards the Habitable Worlds Observatory: Retrieval of Reflection "
-            "Spectra from Evolving Earth Analogues using 1D CNNs.</i>"
-            "<br>RASTI 000, 1–22."
-            "<br><br>Data, trained models, and normalization artifacts:"
-            "<br><b style='color:#1a2334;'>Zenodo · DOI 10.5281/zenodo.15648637</b>"
-            "<br>BSD 2-Clause License."
-        )
-        rbody.setObjectName("AboutBody")
-        rbody.setWordWrap(True)
-        rbody.setTextFormat(Qt.RichText)
-        rlay.addWidget(rtitle)
-        rlay.addWidget(rbody)
-        rlay.addStretch(1)
-        ref_row.addWidget(reference, 1)
-        ref_row.addWidget(self._stellar_identity_block())
-        outer.addLayout(ref_row)
+        outer.addWidget(self._build_science_overview_block())
 
         outer.addStretch(1)
         scroll.setWidget(page)
@@ -833,7 +758,7 @@ class MainWindow(QMainWindow):
         painter.setPen(Qt.PenStyle.NoPen)
         painter.drawEllipse(0, 0, size, size)
         font = QFont("Inter", size // 3)
-        font.setWeight(700)
+        font.setWeight(QFont.Weight.Bold)
         painter.setFont(font)
         painter.setPen(QColor("white"))
         painter.drawText(QRect(0, 0, size, size), Qt.AlignCenter, initials)
@@ -851,7 +776,7 @@ class MainWindow(QMainWindow):
         atitle.setObjectName("AboutCardTitle")
         outer.addWidget(atitle)
 
-        AVATAR = 72
+        AVATAR = 88
         # (display_name, photo_file_or_None, initials, avatar_color, affiliation, corresponding)
         authors = [
             (
@@ -1020,6 +945,134 @@ class MainWindow(QMainWindow):
         lay.addWidget(b)
         lay.addStretch(1)
         return card
+
+    def _build_science_overview_block(self) -> QWidget:
+        card = QFrame()
+        card.setObjectName("AboutCard")
+        lay = QVBoxLayout(card)
+        lay.setContentsMargins(22, 20, 22, 20)
+        lay.setSpacing(14)
+
+        lay.addWidget(
+            self._about_text_section(
+                "Scientific mission",
+                "Direct-imaging missions such as the Habitable Worlds Observatory will "
+                "rely on low-resolution reflected-light spectroscopy to characterize "
+                "Earth-analogue planets across multiple geological epochs. geeXHP "
+                "addresses the atmospheric retrieval problem end-to-end: from "
+                "PSG-generated synthetic spectra to simultaneous recovery of six "
+                "atmospheric mixing ratios and four planetary parameters.",
+            )
+        )
+        lay.addWidget(
+            self._about_text_section(
+                "Synthetic dataset",
+                "Each of the 108,246 spectra is generated with NASA's Planetary "
+                "Spectrum Generator under realistic LUVOIR-B and HabEx/SS instrument "
+                "noise, at distances 5–16 pc around F and G stars. Atmospheric "
+                "compositions follow literature-based templates for Archean (2.5–4.0 Ga), "
+                "Proterozoic (0.5–2.5 Ga), and Modern Earth, with log-space perturbations "
+                "in CH4, CO2, H2O, N2, O2, and O3.",
+            )
+        )
+        lay.addWidget(
+            self._about_text_section(
+                "1D CNN architecture",
+                "Three parallel spectral inputs are merged into a 1D CNN with residual "
+                "convolutional blocks, attention, global pooling, and dense output "
+                "heads that retrieve all 10 parameters simultaneously. Integrated "
+                "Gradients attribution identifies UV/blue wavelengths as carrying "
+                "the strongest O2 and O3 signal, with secondary contributions from "
+                "optical and near-infrared windows for CH4, CO2, and H2O.",
+            )
+        )
+        lay.addWidget(
+            self._about_text_section(
+                "Uncertainty quantification",
+                "sigma_total combines model uncertainty (MC Dropout, pre-computed "
+                "across the test set) and data-noise uncertainty (spectral "
+                "bootstrapping). At the default noise level, chemical species are "
+                "predominantly model-limited rather than photon-limited, future gains "
+                "will depend on improved inference as much as on increased photon collection.",
+            )
+        )
+
+        ref_line = QFrame()
+        ref_line.setFrameShape(QFrame.HLine)
+        ref_line.setStyleSheet(f"color:{theme.BORDER};")
+        lay.addWidget(ref_line)
+
+        ref = QHBoxLayout()
+        ref.setSpacing(18)
+        logo = self._about_gif_logo(
+            "stellar_team_logo_white_bg_24s_24fps.gif", 150, 170
+        )
+        if logo is None:
+            logo = self._about_logo("stellar_team.png", 230, 110, framed=False)
+        if logo is not None:
+            ref.addWidget(logo, 0, Qt.AlignTop | Qt.AlignLeft)
+
+        ref_copy = QVBoxLayout()
+        ref_copy.setSpacing(7)
+        rtitle = QLabel("Reference")
+        rtitle.setObjectName("AboutCardTitle")
+        rbody = QLabel(
+            "<b style='color:#1a2334;'>Barbosa, S. G. A., Estrela, R., "
+            "da Silva Filho, P. C. F., Mugnai, L. V., &amp; de Freitas, D. B. (2026).</b>"
+            "<br><i>Towards the Habitable Worlds Observatory: Retrieval of Reflection "
+            "Spectra from Evolving Earth Analogues using 1D CNNs.</i>"
+            "<br>RASTI SUBMISSION."
+            "<br><br>Data, trained models, and normalization artifacts:"
+            "<br><b style='color:#1a2334;'>Zenodo · DOI 10.5281/zenodo.15648637</b>"
+            "<br>BSD 2-Clause License."
+        )
+        rbody.setObjectName("AboutBody")
+        rbody.setWordWrap(True)
+        rbody.setTextFormat(Qt.RichText)
+        ref_copy.addWidget(rtitle)
+        ref_copy.addWidget(rbody)
+        ref.addLayout(ref_copy, 1)
+        lay.addLayout(ref)
+        return card
+
+    @staticmethod
+    def _about_text_section(title: str, body: str) -> QWidget:
+        section = QWidget()
+        lay = QVBoxLayout(section)
+        lay.setContentsMargins(0, 0, 0, 0)
+        lay.setSpacing(5)
+        t = QLabel(title)
+        t.setObjectName("AboutCardTitle")
+        b = QLabel(body)
+        b.setObjectName("AboutBody")
+        b.setWordWrap(True)
+        lay.addWidget(t)
+        lay.addWidget(b)
+        return section
+
+    def _about_gif_logo(
+        self, filename: str, width: int, height: int
+    ) -> Optional[QLabel]:
+        path = self.store.project_root / "desktop_app" / "assets" / filename
+        if not path.exists():
+            return None
+        movie = QMovie(str(path))
+        if not movie.isValid():
+            return None
+        natural = QImageReader(str(path)).size()
+        if natural.isEmpty():
+            natural = movie.frameRect().size()
+        if natural.isEmpty():
+            natural = QSize(width, height)
+        scaled = natural.scaled(QSize(width, height), Qt.KeepAspectRatio)
+        movie.setScaledSize(scaled)
+        label = QLabel()
+        label.setFixedSize(scaled)
+        label.setAlignment(Qt.AlignCenter)
+        label.setMovie(movie)
+        self._movies.append(movie)
+        movie.start()
+        return label
 
     def start_loading(self) -> None:
         self._kick_off_loading()

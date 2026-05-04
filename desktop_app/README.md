@@ -2,7 +2,16 @@
 
 An offline PySide6 application for exploring the results of **"Towards the Habitable Worlds Observatory: Retrieval of Reflection Spectra from Evolving Earth Analogues using 1D CNNs"** (Barbosa et al. 2026, *RASTI* 000, 1–22).
 
-The app lets you navigate the full 10,826-sample held-out test set, run the LUVOIR-B and HabEx/SS Keras models interactively, inspect $\sigma_\text{total}$ uncertainties, compare telescopes side-by-side, and explore Integrated Gradients sensitivity maps, without writing a single line of code.
+The app lets you navigate the full 10,826-sample held-out test set, run the LUVOIR-B and HabEx/SS Keras models interactively, inspect $\sigma_\text{total}$ uncertainties, compare telescopes side-by-side, explore Integrated Gradients sensitivity maps, and inspect how a spectrum moves through the neural network, without writing a single line of code.
+
+## Interface highlights
+
+- **Target**: filter the held-out test set or paste a custom spectrum.
+- **Network**: follow a spectrum through normalization, residual Conv1D blocks, attention, global pooling, dense layers, and the final retrieval heads. Hover over the architecture to inspect tensor shapes and activation statistics, or click a layer to display the live tensor below.
+- **Retrieve**: run LUVOIR-B or HabEx/SS retrievals and inspect uncertainties.
+- **Sensitivity**: view era-specific Integrated Gradients heatmaps.
+- **Compare**: compare LUVOIR-B and HabEx/SS with physical parameters on independent scales and chemistry in log-space.
+- **Corner**: inspect custom-spectrum bootstrap and MC Dropout posteriors in the same contour style used in the paper notebooks.
 
 ## Requirements
 

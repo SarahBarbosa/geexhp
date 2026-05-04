@@ -82,7 +82,7 @@ Instrument options include:
 
 ## Desktop App
 
-This repository includes an offline PySide6 desktop app for exploring the trained LUVOIR-B and HabEx/SS retrieval models, inspecting reflected-light spectra, visualizing Integrated-Gradients sensitivity maps, comparing retrievals, and running custom pasted spectra through the models.
+This repository includes an offline PySide6 desktop app for exploring the trained LUVOIR-B and HabEx/SS retrieval models, inspecting reflected-light spectra, visualizing Integrated-Gradients sensitivity maps, comparing retrievals, and running custom pasted spectra through the models. The app also includes an interactive neural-network walkthrough that shows a selected spectrum moving through normalization, convolutional blocks, attention, latent embeddings, and the final retrieval heads, with hover/click inspection of live tensors.
 
 The app lives in `desktop_app/`. For installation, double-click launcher, environment setup, Git LFS requirements, and usage details, see [`desktop_app/README.md`](desktop_app/README.md).
 
