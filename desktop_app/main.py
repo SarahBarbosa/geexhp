@@ -1,11 +1,3 @@
-"""
-geeXHP Desktop — entry point.
-
-Run from the project root:
-    python -m desktop_app.main
-or:
-    python desktop_app/main.py
-"""
 import os
 import sys
 from pathlib import Path
@@ -17,9 +9,6 @@ ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-# Expose the bundled share/ directory so the desktop environment can find the
-# app icon (taskbar, app menu) even when launched directly instead of via
-# run_geexhp.sh (which sets XDG_DATA_DIRS itself).
 _share = ROOT / "desktop_app" / "share"
 if _share.exists():
     _existing = os.environ.get("XDG_DATA_DIRS", "/usr/local/share:/usr/share")
@@ -51,8 +40,7 @@ class LoadingWindow(QWidget):
         palette = self.palette()
         palette.setColor(QPalette.Window, QColor("#0b1424"))
         self.setPalette(palette)
-        self.setStyleSheet(
-            """
+        self.setStyleSheet("""
             QWidget#LoadingWindow {
                 background-color: #0b1424;
             }
@@ -93,8 +81,7 @@ class LoadingWindow(QWidget):
                 background-color: #3fbfb0;
                 border-radius: 4px;
             }
-            """
-        )
+            """)
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
@@ -215,9 +202,15 @@ def main() -> int:
         win.startupReady.connect(show_main_window)
         win.start_loading()
 
-    QTimer.singleShot(500, lambda: set_loading_message("Checking Python environment..."))
-    QTimer.singleShot(1700, lambda: set_loading_message("Preparing scientific libraries..."))
-    QTimer.singleShot(3000, lambda: set_loading_message("Loading spectra and interface assets..."))
+    QTimer.singleShot(
+        500, lambda: set_loading_message("Checking Python environment...")
+    )
+    QTimer.singleShot(
+        1700, lambda: set_loading_message("Preparing scientific libraries...")
+    )
+    QTimer.singleShot(
+        3000, lambda: set_loading_message("Loading spectra and interface assets...")
+    )
     QTimer.singleShot(4200, lambda: set_loading_message("Almost ready..."))
     QTimer.singleShot(5000, load_application)
     return app.exec()
