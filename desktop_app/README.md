@@ -62,62 +62,6 @@ source .venv/bin/activate          # or psg-venv
 python -m desktop_app.main
 ```
 
-## What the app does
-
-Six tabs walk through one complete retrieval workflow:
-
-### 1 · Target
-
-Choose a spectrum two ways:
-
-- **Filter test set:** narrow the 10,826 held-out spectra by star type (F / G), geological era (Modern / Proterozoic / Archean), and distance (5-16 pc). The test set mirrors the full training distribution: 34 % Archean, 39 % Proterozoic, 33 % Modern, with F and G host stars.
-- **Paste spectrum:** supply a custom apparent-albedo spectrum as a plain-text flux column, a flattened vector, or `wavelength_um, noisy_albedo, noise_1sigma` rows. The app converts it to the model's normalised input tensors and runs a live retrieval.
-
-The selected target's spectrum is shown below the picker with each instrumental band (UV / Vis / NIR) colour-tinted.
-
-### 2 · Retrieve
-
-Run the LUVOIR-B or HabEx/SS Keras model and inspect the results:
-
-- Retrieved values for all 10 parameters are denormalised and displayed with  error bars (combined from the pre-computed  `combined_uncertainty.npy`).
-- A **3$\sigma$ detection panel** reports per-species significance.
-- A sortable table shows truth vs. predicted vs. $\pm \sigma_{\text{total}}$ for each parameter.
-
-Key test-set performance (Table 4 of the paper):
-
-| Parameter           | R² (LUVOIR-B) | R² (HabEx/SS) |
-| ------------------- | -------------- | -------------- |
-| O₃                 | 0.996          | 0.996          |
-| CH₄                | 0.983          | 0.980          |
-| H₂O                | 0.973          | 0.964          |
-| CO₂                | 0.951          | 0.957          |
-| O₂                 | 0.982          | 0.980          |
-| Radius              | 0.831          | 0.837          |
-| Gravity             | 0.829          | 0.833          |
-| Surface pressure    | 0.818          | 0.826          |
-| Surface temperature | 0.500          | 0.377          |
-
-Surface temperature is the least reliable parameter: reflected-light spectra encode very limited thermal information under an isothermal vertical structure assumption.
-
-### 3 · Sensitivity
-
-Integrated Gradients heatmap (from `ig_heatmaps.npy`): for the selected telescope and geological era, shows which wavelengths the network relies on for each chemical species.
-
-- **Rows** = O₂, O₃, CH₄, CO₂, H₂O, N₂
-- **Warm cells** = positive retrieval leverage; **cool** = suppression
-
-### 4 · Compare
-
-Overlay LUVOIR-B and HabEx/SS retrievals scaled by ground truth (perfect retrieval = 1.0). Intended for test-set samples where truth is known.
-
-### 5 · Corner
-
-For pasted custom spectra: generate a corner plot from B = 5,000 bootstrap noise realisations and N_MC = 5,000 MC Dropout samples, showing joint posterior distributions for all retrieved parameters.
-
-### 6 · About
-
-Project summary: authors, scientific context, dataset statistics, paper citation, and Zenodo DOI.
-
 ## Dataset & models
 
 |                  | LUVOIR-B                | HabEx/SS                |

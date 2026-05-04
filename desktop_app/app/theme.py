@@ -129,7 +129,8 @@ def stylesheet() -> str:
     }}
 
     QFrame#ToolbarCard, QFrame#CanvasCard, QFrame#InfoCard, QFrame#AboutCard,
-    QFrame#AboutHero, QFrame#MetricCard, QFrame#IdentityBlock {{
+    QFrame#AboutHero, QFrame#MetricCard, QFrame#IdentityBlock,
+    QFrame#NetworkInspector {{
         background-color: {SURFACE};
         border: 1px solid {BORDER};
         border-radius: 8px;
@@ -156,6 +157,11 @@ def stylesheet() -> str:
         background-color: #f4f8fd;
         border: 1px solid {BORDER};
         border-radius: 10px;
+    }}
+    QFrame#NetworkInspector {{
+        background-color: #f9fbfd;
+        border: 1px solid {BORDER};
+        border-radius: 8px;
     }}
 
     QLabel#PageTitle {{
@@ -215,6 +221,21 @@ def stylesheet() -> str:
         font-size: 10px;
         font-weight: 700;
         letter-spacing: 1.1px;
+    }}
+    QLabel#NetworkInspectorTitle {{
+        color: {NAVY_800};
+        font-size: 13px;
+        font-weight: 800;
+    }}
+    QLabel#NetworkInspectorBody {{
+        color: {INK};
+        font-size: 12px;
+        line-height: 1.35;
+    }}
+    QLabel#NetworkInspectorStats {{
+        color: {NAVY_700};
+        font-size: 11px;
+        line-height: 1.35;
     }}
 
     /* ---------- inputs ---------- */
