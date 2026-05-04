@@ -48,12 +48,14 @@ examples/15-snr_distribution_and_detection.ipynb
 # Data and model artifacts
 data/*.parquet
 data/*.tfrecord
+!data/test.tfrecord
 data/tfrecords/
 data/distances/
 data/tests/
 data/TFRecord_data/
 data/old/
-models/
+!models/
+!models/*.keras
 models/*.pkl
 models/*.npy
 models/*.joblib
