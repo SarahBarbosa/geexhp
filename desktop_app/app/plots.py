@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 from matplotlib.backends.backend_qtagg import NavigationToolbar2QT as NavToolbar
 from matplotlib.figure import Figure
+from PySide6.QtCore import QSize, Qt
 from PySide6.QtWidgets import QVBoxLayout, QWidget
 
 from geexhp import datavis
@@ -66,17 +67,50 @@ plt.rcParams.update(
 
 
 class _CanvasBase(QWidget):
-    def __init__(self, figsize=(9, 4), parent=None, show_toolbar: bool = False):
+    def __init__(self, figsize=(9, 4), parent=None, show_toolbar: bool = True):
         super().__init__(parent)
         self.fig = Figure(figsize=figsize, layout="tight", facecolor=theme.SURFACE)
         self.canvas = FigureCanvasQTAgg(self.fig)
         self.canvas.setStyleSheet(f"background:{theme.SURFACE};")
+        self.canvas.setFocusPolicy(Qt.ClickFocus)
+        self.canvas.setMouseTracking(True)
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(0)
+        layout.setSpacing(4)
         if show_toolbar:
             self.toolbar = NavToolbar(self.canvas, self)
-            self.toolbar.setStyleSheet(f"background:{theme.SURFACE}; border:none;")
+            self.toolbar.setIconSize(QSize(16, 16))
+            self.toolbar.setMovable(False)
+            self.toolbar.setFloatable(False)
+            self.toolbar.setStyleSheet(
+                f"""
+                QToolBar {{
+                    background: {theme.SURFACE_2};
+                    border: 1px solid {theme.BORDER};
+                    border-radius: 6px;
+                    spacing: 3px;
+                    padding: 3px 6px;
+                }}
+                QToolButton {{
+                    background: transparent;
+                    border: 1px solid transparent;
+                    border-radius: 4px;
+                    padding: 3px;
+                }}
+                QToolButton:hover {{
+                    background: #edf4fb;
+                    border-color: {theme.BORDER_2};
+                }}
+                QToolButton:checked {{
+                    background: #e5f5f3;
+                    border-color: {theme.CYAN};
+                }}
+                QLabel {{
+                    color: {theme.INK_FAINT};
+                    font-size: 11px;
+                }}
+                """
+            )
             layout.addWidget(self.toolbar)
         layout.addWidget(self.canvas)
 
@@ -474,6 +508,7 @@ class NetworkCanvas(_CanvasBase):
         stages: list[dict],
         active_index: int,
         hide: tuple[str, ...] = (),
+        truth_z: Optional[np.ndarray] = None,
     ) -> None:
         if not stages:
             self.show_placeholder()
@@ -486,7 +521,7 @@ class NetworkCanvas(_CanvasBase):
 
         self.fig.clear()
         ax_detail = self.fig.add_subplot(1, 1, 1)
-        self._draw_detail(ax_detail, stage, color, hide)
+        self._draw_detail(ax_detail, stage, color, hide, truth_z=truth_z)
 
         self.fig.suptitle(
             f"Network walkthrough  ·  {tel_label}",
@@ -565,7 +600,14 @@ class NetworkCanvas(_CanvasBase):
                     ),
                 )
 
-    def _draw_detail(self, ax, stage: dict, color: str, hide: tuple[str, ...]) -> None:
+    def _draw_detail(
+        self,
+        ax,
+        stage: dict,
+        color: str,
+        hide: tuple[str, ...],
+        truth_z: Optional[np.ndarray] = None,
+    ) -> None:
         kind = stage["kind"]
         values = np.asarray(stage["values"], dtype=float)
         ax.set_title(
@@ -604,7 +646,19 @@ class NetworkCanvas(_CanvasBase):
                 origin="lower",
                 interpolation="nearest",
             )
-            ax.set_xlabel("Compressed spectral position")
+            tel = stage.get("telescope", "LUVOIR")
+            ranges = TELESCOPE_CONFIG.get(tel, {}).get("ranges_um", {})
+            if ranges:
+                wmin = ranges["UV"][0]
+                wmax = ranges["NIR"][1]
+                nx = data.shape[1]
+                tick_pos = np.linspace(0, nx - 1, 5)
+                tick_lbl = [f"{w:.2f}" for w in np.linspace(wmin, wmax, 5)]
+                ax.set_xticks(tick_pos)
+                ax.set_xticklabels(tick_lbl)
+                ax.set_xlabel(r"Wavelength position [$\mu$m, approx.]")
+            else:
+                ax.set_xlabel("Compressed spectral position")
             ax.set_ylabel("Feature channel")
             ax.grid(False)
             cbar = self.fig.colorbar(im, ax=ax, pad=0.012, fraction=0.032)
@@ -662,11 +716,47 @@ class NetworkCanvas(_CanvasBase):
                 out_colors.append(theme.GOLD_DARK)
             else:
                 out_colors.append(theme.SKY)
-        ax.bar(x, shown, color=out_colors, alpha=0.88, width=0.72)
+        ax.bar(x, shown, color=out_colors, alpha=0.88, width=0.72, label="_nolegend_")
         ax.set_xticks(x)
         ax.set_xticklabels(labels, fontsize=11)
         ax.set_ylabel("Normalized model output")
-        ax.set_ylim(0.0, max(1.05, float(np.nanmax(shown)) * 1.18))
+
+        ymax = max(1.05, float(np.nanmax(shown)) * 1.18)
+        if truth_z is not None and truth_z.size == len(ALL_PARAMS):
+            truth_show = truth_z[keep]
+            for xi, t in zip(x, truth_show):
+                if not np.isfinite(t):
+                    continue
+                ax.hlines(
+                    t,
+                    xi - 0.36,
+                    xi + 0.36,
+                    colors=theme.NAVY_700,
+                    lw=1.8,
+                    zorder=5,
+                )
+                ymax = max(ymax, float(t) * 1.08)
+            ax.plot(
+                [], [], color=theme.NAVY_700, lw=1.8, label="Truth (normalized)"
+            )
+            ax.legend(loc="upper right", fontsize=8.5, frameon=False)
+
+        phys_end = sum(1 for i in keep if i < len(PHYS_PARAMS))
+        main_end = sum(
+            1 for i in keep if i < len(PHYS_PARAMS) + len(MAIN_CHEM)
+        )
+        for boundary in (phys_end, main_end):
+            if 0 < boundary < len(keep):
+                ax.axvline(
+                    boundary - 0.5,
+                    color=theme.BORDER_2,
+                    lw=0.9,
+                    ls=":",
+                    alpha=0.85,
+                    zorder=1,
+                )
+
+        ax.set_ylim(0.0, ymax)
         ax.grid(axis="y", color=theme.BORDER, lw=0.6, alpha=0.7)
         ax.set_axisbelow(True)
         _clean_axes(ax)
