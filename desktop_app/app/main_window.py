@@ -46,9 +46,12 @@ from desktop_app.app.constants import (
     ALL_PARAMS,
     DETECTION_SIGMA,
     ERA_ORDER,
+    MAIN_CHEM,
+    OTHER_CHEM,
     PARAM_LABELS,
     PARAM_PLAIN,
     PARAM_UNITS_TEXT,
+    PHYS_PARAMS,
     TELESCOPES,
     TELESCOPE_CONFIG,
 )
@@ -56,6 +59,7 @@ from desktop_app.app.data import DataStore, SampleMeta, Spectrum
 from desktop_app.app.inference import Retriever
 from desktop_app.app.network_view import NetworkDiagramView
 from desktop_app.app.param_editor import ParameterEditor
+from desktop_app.app.system_view import SystemView
 from desktop_app.app.plots import (
     CompareCanvas,
     CornerCanvas,
@@ -217,10 +221,22 @@ class MainWindow(QMainWindow):
         bottom = QHBoxLayout()
         bottom.setSpacing(14)
         bottom.addWidget(self._build_target_info())
+        self.system_view = SystemView()
+        bottom.addWidget(self._wrap_system_view(self.system_view))
         self.spectrum_canvas = SpectrumCanvas()
         bottom.addWidget(self._wrap_canvas(self.spectrum_canvas), 1)
         outer.addLayout(bottom, 1)
         return page
+
+    @staticmethod
+    def _wrap_system_view(view: QWidget) -> QWidget:
+        frame = QFrame()
+        frame.setObjectName("CanvasCard")
+        l = QVBoxLayout(frame)
+        l.setContentsMargins(0, 0, 0, 0)
+        l.setSpacing(0)
+        l.addWidget(view)
+        return frame
 
     def _build_target_toolbar(self) -> QWidget:
         bar = QFrame()
@@ -294,9 +310,7 @@ class MainWindow(QMainWindow):
         self.cmb_era.currentIndexChanged.connect(self._refresh_sample_list)
 
         self.cmb_distance = QComboBox()
-        self.cmb_distance.addItems(
-            ["Any", "Near (≤ 8 pc)", "Mid (8–12 pc)", "Far (> 12 pc)"]
-        )
+        self.cmb_distance.addItems(["Any", "Near (≤ 8 pc)", "Mid (8–12 pc)"])
         self.cmb_distance.currentIndexChanged.connect(self._refresh_sample_list)
 
         for cmb in (self.cmb_star, self.cmb_era, self.cmb_distance):
@@ -725,11 +739,8 @@ class MainWindow(QMainWindow):
         scroll.setWidget(page)
         return scroll
 
-    # ── Author photo helpers ──────────────────────────────────────────────────
-
     @staticmethod
     def _round_pixmap(pm: QPixmap, size: int) -> QPixmap:
-        """Scale + center-crop a pixmap and apply a circular mask."""
         scaled = pm.scaled(
             size, size, Qt.KeepAspectRatioByExpanding, Qt.SmoothTransformation
         )
@@ -749,7 +760,6 @@ class MainWindow(QMainWindow):
 
     @staticmethod
     def _initials_pixmap(initials: str, size: int, color: str) -> QPixmap:
-        """Create a circular avatar with initials for authors without a photo."""
         pm = QPixmap(size, size)
         pm.fill(Qt.GlobalColor.transparent)
         painter = QPainter(pm)
@@ -776,8 +786,7 @@ class MainWindow(QMainWindow):
         atitle.setObjectName("AboutCardTitle")
         outer.addWidget(atitle)
 
-        AVATAR = 88
-        # (display_name, photo_file_or_None, initials, avatar_color, affiliation, corresponding)
+        AVATAR = 90
         authors = [
             (
                 "Sarah G. A. Barbosa",
@@ -969,9 +978,9 @@ class MainWindow(QMainWindow):
                 "Synthetic dataset",
                 "Each of the 108,246 spectra is generated with NASA's Planetary "
                 "Spectrum Generator under realistic LUVOIR-B and HabEx/SS instrument "
-                "noise, at distances 5–16 pc around F and G stars. Atmospheric "
-                "compositions follow literature-based templates for Archean (2.5–4.0 Ga), "
-                "Proterozoic (0.5–2.5 Ga), and Modern Earth, with log-space perturbations "
+                "noise, at distances 5-16 pc around F and G stars. Atmospheric "
+                "compositions follow literature-based templates for Archean (2.5-4.0 Ga), "
+                "Proterozoic (0.5-2.5 Ga), and Modern Earth, with log-space perturbations "
                 "in CH4, CO2, H2O, N2, O2, and O3.",
             )
         )
@@ -1210,8 +1219,40 @@ class MainWindow(QMainWindow):
             self.network_stages,
             index,
             hide=self._hidden_set(),
+            truth_z=self._current_truth_z(),
         )
         self.network_diagram.set_active_index(index)
+
+    def _current_truth_z(self) -> Optional[np.ndarray]:
+        if self.current_index is None:
+            return None
+        meta = self.metas[self.current_index]
+        if not meta.truth:
+            return None
+        return self._truth_to_z(meta.truth)
+
+    def _truth_to_z(self, truth: dict) -> np.ndarray:
+        z = np.full(len(ALL_PARAMS), np.nan, dtype=float)
+        stats = self.store.norm_stats["outputs"]
+        for j, name in enumerate(PHYS_PARAMS):
+            s = stats.get(name)
+            x = truth.get(name)
+            if s is None or x is None or not np.isfinite(x):
+                continue
+            denom = s["max"] - s["min"]
+            if denom <= 0:
+                continue
+            zlin = max(0.0, min(1.0, (float(x) - s["min"]) / denom))
+            n = s.get("best_n", 1)
+            z[j] = zlin ** (1.0 / n) if n else zlin
+        for j, name in enumerate(MAIN_CHEM + OTHER_CHEM):
+            s = stats.get(name)
+            x = truth.get(name)
+            if s is None or x is None or not np.isfinite(x) or x <= 0:
+                continue
+            n = s.get("best_n", 1)
+            z[len(PHYS_PARAMS) + j] = float(x) ** (1.0 / n) if n else float(x)
+        return z
 
     def _update_network_inspector(self, stage: dict) -> None:
         values = np.asarray(stage.get("values"), dtype=float)
@@ -1304,8 +1345,6 @@ class MainWindow(QMainWindow):
                 continue
             if dist == "Mid (8–12 pc)" and not (8 < m.distance_pc <= 12):
                 continue
-            if dist == "Far (> 12 pc)" and not (m.distance_pc > 12):
-                continue
             out.append(m)
         return out
 
@@ -1394,6 +1433,7 @@ class MainWindow(QMainWindow):
         self.lbl_era.setText("Unknown")
         self.lbl_snr_l.setText("—")
         self.lbl_snr_h.setText("—")
+        self.system_view.clear()
         self.last_results.clear()
         self.last_truth = None
         self.compare_canvas.clear()
@@ -1414,6 +1454,7 @@ class MainWindow(QMainWindow):
         self.lbl_era.setText(meta.era.capitalize())
         self.lbl_snr_l.setText(f"{meta.snr_luvoir_vis:.1f}")
         self.lbl_snr_h.setText(f"{meta.snr_habex_vis:.1f}")
+        self.system_view.set_target(meta)
 
         if meta.era.lower() == "archean" and not self.chk_hide_o2o3.isChecked():
             self.chk_hide_o2o3.setChecked(True)

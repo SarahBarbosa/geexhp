@@ -1,6 +1,6 @@
 # geeXHP Desktop
 
-An offline PySide6 application for exploring the results of **"Towards the Habitable Worlds Observatory: Retrieval of Reflection Spectra from Evolving Earth Analogues using 1D CNNs"** (Barbosa et al. 2026, *RASTI* 000, 1–22).
+An offline PySide6 application for exploring the results of **"Towards the Habitable Worlds Observatory: Retrieval of Reflection Spectra from Evolving Earth Analogues using 1D CNNs"** (Barbosa et al. 2026, *RASTI* SUBMISSION).
 
 The app lets you navigate the full 10,826-sample held-out test set, run the LUVOIR-B and HabEx/SS Keras models interactively, inspect $\sigma_\text{total}$ uncertainties, compare telescopes side-by-side, explore Integrated Gradients sensitivity maps, and inspect how a spectrum moves through the neural network, without writing a single line of code.
 

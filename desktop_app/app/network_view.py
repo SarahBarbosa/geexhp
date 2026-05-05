@@ -19,64 +19,67 @@ class NetworkDiagramView(QWidget):
             "label": "Spectrum",
             "kind": "Input",
             "stage": 0,
-            "body": "Observed reflected-light bins in UV, Visible, and NIR.",
+            "body": "Reflected-light albedo across UV / Vis / NIR bands.",
         },
         {
             "label": "Normalize",
             "kind": "Preprocess",
             "stage": 1,
-            "body": "Band-wise standardization with training statistics.",
+            "body": "Per-band z-score with training mean and std.",
         },
         {
             "label": "Residual Conv",
             "kind": "Conv1D block",
             "stage": 2,
-            "body": "Local spectral shapes become learned feature channels.",
+            "body": "Residual Conv1D — 16 channels over local wavelengths.",
         },
         {
             "label": "Downsample",
             "kind": "Stride Conv",
             "stage": 3,
-            "body": "The wavelength axis is compressed into wider contexts.",
+            "body": "Strided conv halves the wavelength axis.",
         },
         {
             "label": "Attention",
-            "kind": "MHA + norm",
+            "kind": "MHA + Norm",
             "stage": 4,
-            "body": "Distant wavelengths can exchange information.",
+            "body": "Self-attention lets wavelengths interact globally.",
         },
         {
             "label": "Global Pool",
             "kind": "Embedding",
             "stage": 5,
-            "body": "The sequence becomes a compact spectral fingerprint.",
+            "body": "Average pooling — fixed-length spectral fingerprint.",
         },
         {
             "label": "Dense Trunk",
             "kind": "Dropout MLP",
             "stage": 6,
-            "body": "A shared latent context feeds the retrieval heads.",
+            "body": "Dense + dropout — shared latent for the 3 heads.",
         },
     )
 
     HEADS = (
         {
             "label": "Physical",
-            "kind": "4 targets",
-            "body": "Radius, gravity, temperature, and pressure.",
+            "kind": "R⊕ · g · T · P",
+            "body": "Radius, gravity, surface T and P.",
             "color": theme.CYAN_DARK,
+            "slice": (0, 4),
         },
         {
-            "label": "O2 / O3",
-            "kind": "2 targets",
+            "label": "O₂ / O₃",
+            "kind": "Biosignatures",
             "body": "Main biosignature chemical head.",
             "color": theme.GOLD_DARK,
+            "slice": (4, 6),
         },
         {
             "label": "Trace gases",
-            "kind": "4 targets",
-            "body": "CH4, CO2, H2O, and N2.",
+            "kind": "CH₄ · CO₂ · H₂O · N₂",
+            "body": "Other atmospheric mixing ratios.",
             "color": theme.SKY,
+            "slice": (6, 10),
         },
     )
 
@@ -94,6 +97,7 @@ class NetworkDiagramView(QWidget):
         self._active_index = 0
         self._hover: Optional[int] = None
         self._regions: list[dict] = []
+        self._head_values: Optional[np.ndarray] = None
         self._phase = 0.0
         self._timer = QTimer(self)
         self._timer.setInterval(32)
@@ -106,6 +110,7 @@ class NetworkDiagramView(QWidget):
         self._stages = stages
         self._active_index = active_index
         self._hover = None
+        self._head_values = self._extract_head_values(stages)
         if stages and not self._timer.isActive():
             self._timer.start()
         self.update()
@@ -119,7 +124,17 @@ class NetworkDiagramView(QWidget):
         self._stages = []
         self._active_index = 0
         self._hover = None
+        self._head_values = None
         self.update()
+
+    @staticmethod
+    def _extract_head_values(stages: list[dict]) -> Optional[np.ndarray]:
+        for stage in stages:
+            if stage.get("kind") == "output":
+                vals = np.asarray(stage.get("values"), dtype=float).reshape(-1)
+                if vals.size:
+                    return vals
+        return None
 
     def mouseMoveEvent(self, event) -> None:
         pos = event.position()
@@ -277,7 +292,9 @@ class NetworkDiagramView(QWidget):
         font = QFont("Inter", 11)
         font.setWeight(QFont.Weight.ExtraBold)
         painter.setFont(font)
-        painter.drawText(rect, Qt.AlignLeft | Qt.AlignVCenter, f"{tel_label} live graph")
+        painter.drawText(
+            rect, Qt.AlignLeft | Qt.AlignVCenter, f"{tel_label} model architecture"
+        )
 
         painter.setPen(QColor(theme.INK_FAINT))
         small = QFont("Inter", 8)
@@ -420,7 +437,38 @@ class NetworkDiagramView(QWidget):
         x = rect.left() + 12
         y = rect.top() + 9
         self._draw_card_text(painter, rect, item["label"], item["kind"], x, y, compact=True)
+        if self._active_index >= 7 and self._head_values is not None:
+            self._draw_head_bars(painter, rect, item)
         self._register_region(rect, {**item, "stage": 7}, region_index)
+
+    def _draw_head_bars(self, painter: QPainter, rect: QRectF, item: dict) -> None:
+        lo, hi = item["slice"]
+        values = self._head_values[lo:hi]
+        if values.size == 0:
+            return
+        clipped = np.clip(np.nan_to_num(values, nan=0.0), 0.0, 1.0)
+        bar_top = rect.bottom() - 11.0
+        bar_area = QRectF(
+            rect.left() + 10,
+            bar_top,
+            rect.width() - 20,
+            4.0,
+        )
+        gap = 2.0
+        n = clipped.size
+        slot_w = (bar_area.width() - gap * (n - 1)) / max(n, 1)
+        color = QColor(item["color"])
+        painter.setPen(Qt.NoPen)
+        for i, v in enumerate(clipped):
+            x = bar_area.left() + i * (slot_w + gap)
+            track = QRectF(x, bar_area.top(), slot_w, bar_area.height())
+            painter.setBrush(QColor(theme.BORDER))
+            painter.drawRoundedRect(track, 2, 2)
+            fill_w = max(2.0, float(v) * slot_w)
+            fill = QColor(color)
+            fill.setAlpha(225)
+            painter.setBrush(fill)
+            painter.drawRoundedRect(QRectF(x, bar_area.top(), fill_w, bar_area.height()), 2, 2)
 
     def _draw_card_shell(
         self,
