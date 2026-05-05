@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=geeXHP
+GenericName=Exoplanet Atmospheric Retrieval
+Comment=Retrieve atmospheric parameters from reflected-light spectra
+Exec=geeXHP
+Icon=geexhp
+Terminal=false
+Categories=Science;Astronomy;Education;
+Keywords=exoplanet;astronomy;atmosphere;ML;retrieval;
+StartupWMClass=geexhp
