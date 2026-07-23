@@ -20,35 +20,30 @@ class TFRecordConfig:
         "ALBEDO_B-NIR",
         "ALBEDO_B-UV",
         "ALBEDO_B-Vis",
-
         "ALBEDO_SS-NIR",
         "ALBEDO_SS-UV",
         "ALBEDO_SS-Vis",
-
         "NOISY_ALBEDO_B-NIR",
         "NOISY_ALBEDO_B-UV",
         "NOISY_ALBEDO_B-Vis",
-
         "NOISY_ALBEDO_SS-NIR",
         "NOISY_ALBEDO_SS-UV",
         "NOISY_ALBEDO_SS-Vis",
-
         "NOISE_B-NIR",
         "NOISE_B-UV",
         "NOISE_B-Vis",
-
         "NOISE_SS-NIR",
         "NOISE_SS-UV",
         "NOISE_SS-Vis",
-
         "OBJECT-DIAMETER",
         "OBJECT-GRAVITY",
         "ATMOSPHERE-TEMPERATURE",
         "ATMOSPHERE-PRESSURE",
-        
         "Earth_type",
         "OBJECT-STAR-TYPE",
-        "GEOMETRY-OBS-ALTITUDE"
+        "GEOMETRY-OBS-ALTITUDE",
+        "OBJECT-INCLINATION",
+        "OBJECT-SEASON",
     ]
 
     MOLECULES: List[str] = [
@@ -77,13 +72,16 @@ def _bytes_feature(value: str) -> tf.train.Feature:
     """Returns a bytes_list from a string / byte."""
     return tf.train.Feature(bytes_list=tf.train.BytesList(value=[value.encode()]))
 
+
 def _float_feature(value: float) -> tf.train.Feature:
     """Returns a float_list from a float / list of floats."""
     return tf.train.Feature(float_list=tf.train.FloatList(value=[value]))
 
+
 def _float_feature_list(value: List[float]) -> tf.train.Feature:
     """Returns a float_list from a float / list of floats."""
     return tf.train.Feature(float_list=tf.train.FloatList(value=value))
+
 
 def _serialize_sample(row: Dict[str, Union[str, float, List[float]]]) -> bytes:
     """
@@ -94,62 +92,50 @@ def _serialize_sample(row: Dict[str, Union[str, float, List[float]]]) -> bytes:
         "ALBEDO_B-NIR": _float_feature_list(row["ALBEDO_B-NIR"]),
         "ALBEDO_B-UV": _float_feature_list(row["ALBEDO_B-UV"]),
         "ALBEDO_B-Vis": _float_feature_list(row["ALBEDO_B-Vis"]),
-
         "ALBEDO_SS-NIR": _float_feature_list(row["ALBEDO_SS-NIR"]),
         "ALBEDO_SS-UV": _float_feature_list(row["ALBEDO_SS-UV"]),
         "ALBEDO_SS-Vis": _float_feature_list(row["ALBEDO_SS-Vis"]),
-
         "NOISY_ALBEDO_B-NIR": _float_feature_list(row["NOISY_ALBEDO_B-NIR"]),
         "NOISY_ALBEDO_B-UV": _float_feature_list(row["NOISY_ALBEDO_B-UV"]),
         "NOISY_ALBEDO_B-Vis": _float_feature_list(row["NOISY_ALBEDO_B-Vis"]),
-
         "NOISY_ALBEDO_SS-NIR": _float_feature_list(row["NOISY_ALBEDO_SS-NIR"]),
         "NOISY_ALBEDO_SS-UV": _float_feature_list(row["NOISY_ALBEDO_SS-UV"]),
         "NOISY_ALBEDO_SS-Vis": _float_feature_list(row["NOISY_ALBEDO_SS-Vis"]),
-
         "NOISE_B-NIR": _float_feature_list(row["NOISE_B-NIR"]),
         "NOISE_B-UV": _float_feature_list(row["NOISE_B-UV"]),
         "NOISE_B-Vis": _float_feature_list(row["NOISE_B-Vis"]),
-
         "NOISE_SS-NIR": _float_feature_list(row["NOISE_SS-NIR"]),
         "NOISE_SS-UV": _float_feature_list(row["NOISE_SS-UV"]),
         "NOISE_SS-Vis": _float_feature_list(row["NOISE_SS-Vis"]),
-
         "SNR_B-NIR": _float_feature_list(row["SNR_B-NIR"]),
         "SNR_B-UV": _float_feature_list(row["SNR_B-UV"]),
         "SNR_B-Vis": _float_feature_list(row["SNR_B-Vis"]),
-
         "SNR_SS-NIR": _float_feature_list(row["SNR_SS-NIR"]),
         "SNR_SS-UV": _float_feature_list(row["SNR_SS-UV"]),
         "SNR_SS-Vis": _float_feature_list(row["SNR_SS-Vis"]),
-
         "SNR_FEATURE_B-NIR": _float_feature(row["SNR_FEATURE_B-NIR"]),
         "SNR_FEATURE_B-UV": _float_feature(row["SNR_FEATURE_B-UV"]),
         "SNR_FEATURE_B-Vis": _float_feature(row["SNR_FEATURE_B-Vis"]),
-
         "SNR_FEATURE_SS-NIR": _float_feature(row["SNR_FEATURE_SS-NIR"]),
         "SNR_FEATURE_SS-UV": _float_feature(row["SNR_FEATURE_SS-UV"]),
         "SNR_FEATURE_SS-Vis": _float_feature(row["SNR_FEATURE_SS-Vis"]),
-
         "SNR_FEATURE_PCTL_B-NIR": _float_feature(row["SNR_FEATURE_PCTL_B-NIR"]),
         "SNR_FEATURE_PCTL_B-UV": _float_feature(row["SNR_FEATURE_PCTL_B-UV"]),
         "SNR_FEATURE_PCTL_B-Vis": _float_feature(row["SNR_FEATURE_PCTL_B-Vis"]),
-
         "SNR_FEATURE_PCTL_SS-NIR": _float_feature(row["SNR_FEATURE_PCTL_SS-NIR"]),
         "SNR_FEATURE_PCTL_SS-UV": _float_feature(row["SNR_FEATURE_PCTL_SS-UV"]),
         "SNR_FEATURE_PCTL_SS-Vis": _float_feature(row["SNR_FEATURE_PCTL_SS-Vis"]),
-
         # Main Features
         "OBJECT-RADIUS-REL-EARTH": _float_feature(row["OBJECT-RADIUS-REL-EARTH"]),
         "OBJECT-DIAMETER": _float_feature(row["OBJECT-DIAMETER"]),
         "OBJECT-GRAVITY": _float_feature(row["OBJECT-GRAVITY"]),
         "ATMOSPHERE-TEMPERATURE": _float_feature(row["ATMOSPHERE-TEMPERATURE"]),
         "ATMOSPHERE-PRESSURE": _float_feature(row["ATMOSPHERE-PRESSURE"]),
-
         "Earth_type": _bytes_feature(row["Earth_type"]),
         "OBJECT-STAR-TYPE": _bytes_feature(row["OBJECT-STAR-TYPE"]),
         "GEOMETRY-OBS-ALTITUDE": _float_feature(row["GEOMETRY-OBS-ALTITUDE"]),
-
+        "OBJECT-INCLINATION": _float_feature(row["OBJECT-INCLINATION"]),
+        "OBJECT-SEASON": _float_feature(row["OBJECT-SEASON"]),
         # Molecules
         "C2H6": _float_feature(row["C2H6"]),
         "CH4": _float_feature(row["CH4"]),
@@ -172,17 +158,19 @@ def _convert_to_earth_radius(data: float) -> float:
     """
     return data / (2 * R_earth.to("km").value)
 
+
 def _calculate_feature_snr(signal_array, noise_array):
     s = np.array(signal_array, dtype=np.float32)
     n = np.array(noise_array, dtype=np.float32)
-    
+
     amplitude = np.max(s) - np.min(s)
     avg_noise = np.mean(n)
-    
+
     if avg_noise == 0:
         return 0.0
-        
+
     return amplitude / avg_noise
+
 
 def _calculate_feature_snr(signal_array, noise_array):
     """
@@ -208,6 +196,7 @@ def _calculate_feature_snr(signal_array, noise_array):
     denom = np.sqrt(n_max**2 + n_min**2)
 
     return amplitude / denom
+
 
 def _calculate_feature_snr_percentile(signal_array, noise_array, p_low=10, p_high=90):
     """
@@ -236,7 +225,8 @@ def _calculate_feature_snr_percentile(signal_array, noise_array, p_low=10, p_hig
 def _safe_vector_snr(signal_array, noise_array):
     s = np.array(signal_array, dtype=np.float32)
     n = np.array(noise_array, dtype=np.float32)
-    return np.divide(s, n, out=np.zeros_like(s), where=n!=0)
+    return np.divide(s, n, out=np.zeros_like(s), where=n != 0)
+
 
 def create_tfrecords(root_folder: str, save_root: str) -> None:
     """
@@ -264,7 +254,7 @@ def create_tfrecords(root_folder: str, save_root: str) -> None:
         desc="🌍 Progress",
         dynamic_ncols=True,
         colour="cyan",
-        bar_format="{desc}: |{bar:30}| {percentage:3.0f}% ({n_fmt}/{total_fmt} files) ⏳ [{elapsed} elapsed]"
+        bar_format="{desc}: |{bar:30}| {percentage:3.0f}% ({n_fmt}/{total_fmt} files) ⏳ [{elapsed} elapsed]",
     ) as pbar:
         # Iterate through each subfolder
         for folder in os.listdir(root_folder):
@@ -285,9 +275,11 @@ def create_tfrecords(root_folder: str, save_root: str) -> None:
 
                 # Read parquet file
                 df = pd.read_parquet(file_path)
-                
+
                 df["Earth_type"] = earth_type
-                df["OBJECT-RADIUS-REL-EARTH"] = df["OBJECT-DIAMETER"].apply(_convert_to_earth_radius)
+                df["OBJECT-RADIUS-REL-EARTH"] = df["OBJECT-DIAMETER"].apply(
+                    _convert_to_earth_radius
+                )
 
                 df_abundances = dset.extract_abundances(df)
                 for molecule in TFRecordConfig.MOLECULES:
@@ -300,9 +292,9 @@ def create_tfrecords(root_folder: str, save_root: str) -> None:
                 # noise_columns = [col for col in df.columns if "NOISE_" in col]
                 # mask = ~df[noise_columns].map(lambda x: any(value > 3 for value in x)).any(axis=1)
                 # df = df[mask]
-                
-                telescopes = ['B', 'SS']
-                bands = ['UV', 'Vis', 'NIR']
+
+                telescopes = ["B", "SS"]
+                bands = ["UV", "Vis", "NIR"]
 
                 new_vector_cols = []
                 new_scalar_cols = []
@@ -347,12 +339,11 @@ def create_tfrecords(root_folder: str, save_root: str) -> None:
                 cols_to_keep.extend(new_scalar_cols)
                 cols_to_keep.extend(TFRecordConfig.MOLECULES)
 
-                
                 if "OBJECT-RADIUS-REL-EARTH" not in cols_to_keep:
                     cols_to_keep.append("OBJECT-RADIUS-REL-EARTH")
-                
+
                 final_cols = [c for c in cols_to_keep if c in df.columns]
-                
+
                 filtered_df = df[final_cols].copy()
 
                 record_dict = filtered_df.to_dict(orient="records")

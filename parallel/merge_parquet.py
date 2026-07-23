@@ -1,20 +1,3 @@
-"""
-Merge all parquet files under parallel/data* into a single parquet file.
-
-Strategy (memory-safe):
-  Pass 1 — read only ATMOSPHERE-LAYERS-MOLECULES to collect all unique molecules
-            across ALL files and earth types (archean has C2H6 but not O2/O3;
-            modern/proterozoic have O2/O3/N2O). Missing molecules are filled with 0.
-  Pass 2 — process one file at a time: add Earth_type column, expand molecule
-            abundances via fast list-comprehension, write to output via
-            ParquetWriter (incremental append).
-
-Never loads more than one source file into memory at a time.
-
-Usage:
-    python merge_parquet.py [--output PATH] [--compression snappy|zstd|none]
-"""
-
 import argparse
 import glob
 import os
@@ -38,7 +21,7 @@ def _detect_earth_type(filepath: str) -> str:
 
 def fast_extract_abundances(df: pd.DataFrame, sorted_molecules: list) -> pd.DataFrame:
     """
-    Vectorized abundance extraction — ~20x faster than row-wise apply.
+    Vectorized abundance extraction.
     Pre-splits both columns as Series of lists, then builds records via
     list comprehension (avoids per-row pd.Series overhead).
 
@@ -46,14 +29,16 @@ def fast_extract_abundances(df: pd.DataFrame, sorted_molecules: list) -> pd.Data
     are filled with 0.0 so all rows share the same schema.
     """
     mol_series = df["ATMOSPHERE-LAYERS-MOLECULES"].str.split(",")
-    # ATMOSPHERE-LAYER-1 format: T, P, abun1, abun2, ...  → skip first 2
+    # ATMOSPHERE-LAYER-1 format: T, P, abun1, abun2, ...  skip first 2
     layer_series = df["ATMOSPHERE-LAYER-1"].str.split(",").apply(lambda x: x[2:])
 
     records = [
         {mol: float(abun) for mol, abun in zip(mols, abuns)}
         for mols, abuns in zip(mol_series, layer_series)
     ]
-    abun_df = pd.DataFrame(records, columns=sorted_molecules, index=df.index).fillna(0.0)
+    abun_df = pd.DataFrame(records, columns=sorted_molecules, index=df.index).fillna(
+        0.0
+    )
     return pd.concat([df, abun_df], axis=1)
 
 
@@ -72,12 +57,18 @@ def pass1_collect_molecules(files: list) -> list:
     for i, f in enumerate(files, 1):
         if i % 100 == 0 or i == total:
             print(f"  Pass 1: {i}/{total}", flush=True)
-        df = pd.read_parquet(f, columns=["ATMOSPHERE-LAYERS-MOLECULES"], engine="pyarrow")
-        df["ATMOSPHERE-LAYERS-MOLECULES"].apply(lambda x: molecules.update(x.split(",")))
+        df = pd.read_parquet(
+            f, columns=["ATMOSPHERE-LAYERS-MOLECULES"], engine="pyarrow"
+        )
+        df["ATMOSPHERE-LAYERS-MOLECULES"].apply(
+            lambda x: molecules.update(x.split(","))
+        )
     return sorted(molecules)
 
 
-def pass2_write_output(files: list, sorted_molecules: list, output_path: str, compression: str):
+def pass2_write_output(
+    files: list, sorted_molecules: list, output_path: str, compression: str
+):
     """Process one file at a time and write incrementally to output parquet."""
     writer = None
     total = len(files)
@@ -95,7 +86,9 @@ def pass2_write_output(files: list, sorted_molecules: list, output_path: str, co
             table = pa.Table.from_pandas(df, preserve_index=False)
 
             if writer is None:
-                writer = pq.ParquetWriter(output_path, table.schema, compression=compression)
+                writer = pq.ParquetWriter(
+                    output_path, table.schema, compression=compression
+                )
 
             writer.write_table(table)
 
@@ -108,7 +101,12 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--output",
-        default=os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "data", "combined_parallel.parquet"),
+        default=os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "..",
+            "data",
+            "combined_parallel.parquet",
+        ),
         help="Output parquet file path (default: data/combined_parallel.parquet)",
     )
     parser.add_argument(
