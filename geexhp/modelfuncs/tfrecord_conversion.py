@@ -44,6 +44,9 @@ class TFRecordConfig:
         "GEOMETRY-OBS-ALTITUDE",
         "OBJECT-INCLINATION",
         "OBJECT-SEASON",
+        "OBJECT-SOLAR-LONGITUDE",
+        "OBJECT-SOLAR-LATITUDE",
+        "OBJECT-PHASE-ANGLE",
     ]
 
     MOLECULES: List[str] = [
@@ -136,6 +139,9 @@ def _serialize_sample(row: Dict[str, Union[str, float, List[float]]]) -> bytes:
         "GEOMETRY-OBS-ALTITUDE": _float_feature(row["GEOMETRY-OBS-ALTITUDE"]),
         "OBJECT-INCLINATION": _float_feature(row["OBJECT-INCLINATION"]),
         "OBJECT-SEASON": _float_feature(row["OBJECT-SEASON"]),
+        "OBJECT-SOLAR-LONGITUDE": _float_feature(row["OBJECT-SOLAR-LONGITUDE"]),
+        "OBJECT-SOLAR-LATITUDE": _float_feature(row["OBJECT-SOLAR-LATITUDE"]),
+        "OBJECT-PHASE-ANGLE": _float_feature(row["OBJECT-PHASE-ANGLE"]),
         # Molecules
         "C2H6": _float_feature(row["C2H6"]),
         "CH4": _float_feature(row["CH4"]),

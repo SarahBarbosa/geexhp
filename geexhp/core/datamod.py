@@ -56,18 +56,18 @@ _MAIN_SEQUENCE = {
             dtype=float,
         ),
     },
-    "K": {
-        "spt": np.array(
-            ["K9V", "K8V", "K7V", "K6V", "K5V", "K4V", "K3V", "K2V", "K1V", "K0V"]
-        ),
-        "teff": np.array(
-            [3930, 3990, 4100, 4300, 4440, 4600, 4830, 5100, 5170, 5270], dtype=float
-        ),
-        "radius": np.array(
-            [0.608, 0.615, 0.630, 0.669, 0.701, 0.713, 0.755, 0.783, 0.797, 0.813],
-            dtype=float,
-        ),
-    },
+    # "K": {
+    #     "spt": np.array(
+    #         ["K9V", "K8V", "K7V", "K6V", "K5V", "K4V", "K3V", "K2V", "K1V", "K0V"]
+    #     ),
+    #     "teff": np.array(
+    #         [3930, 3990, 4100, 4300, 4440, 4600, 4830, 5100, 5170, 5270], dtype=float
+    #     ),
+    #     "radius": np.array(
+    #         [0.608, 0.615, 0.630, 0.669, 0.701, 0.713, 0.755, 0.783, 0.797, 0.813],
+    #         dtype=float,
+    #     ),
+    # },
 }
 
 
@@ -373,9 +373,17 @@ def set_spectral_type(config: dict) -> None:
     """
     Sets the spectral type of the star and updates the dictionary with star and
     occultation class.
+
+    [REVISION 5 -- drop K-type hosts]
+    ``spectral_types`` defaults to ``SPECTRAL_TYPES`` (see the module header),
+    which excludes K.  K-type hosts do not survive the SNR > 3 cut -- the 3000
+    spectrum test run retained roughly 235 F and 70 G and no K at all, which is
+    also what Section 5 of the manuscript reports -- so every K draw is a full
+    set of PSG calls thrown away after the fact.
     """
     # spectral_type = ['F', 'G', 'K', 'M']
-    spectral_type = ["F", "G", "K"]
+    # spectral_type = ["F", "G", "K"]
+    spectral_type = ["F", "G"]
     class_star = np.random.choice(spectral_type)
     config["OBJECT-STAR-TYPE"] = class_star
     # config["GEOMETRY-STELLAR-TYPE"] = class_star
@@ -387,6 +395,16 @@ def set_stellar_parameters(config: dict, max_inclination_deg: float = 50.0) -> N
 
     Effective temperature is uniform within the selected F, G, or K class.
     Radius is interpolated conditionally along the frozen Pecaut--Mamajek main-sequence locus.
+
+    [REVISION 5 -- truncated distance prior]
+    ``distance_pc_range`` defaults to ``DISTANCE_PC_RANGE`` (see the module
+    header).  The previous version hard-coded 5-20 pc, but nothing beyond about
+    16 pc survives the SNR > 3 cut because the planet flux falls as 1/d^2, so
+    those draws are full sets of PSG calls discarded after the fact.
+
+    [REVISION 4 -- record the draw]
+    Returns the sampled quantities, including the nearest tabulated spectral
+    subtype, which the previous version computed and then discarded.
     """
     star_class = config.get("OBJECT-STAR-TYPE")
 
@@ -398,22 +416,22 @@ def set_stellar_parameters(config: dict, max_inclination_deg: float = 50.0) -> N
     radius = float(
         np.exp(np.interp(teff, sequence["teff"], np.log(sequence["radius"])))
     )
-    nearest = int(np.argmin(np.abs(sequence["teff"] - teff)))
 
-    distance_pc = float(np.random.uniform(5.0, 20.0))
+    distance_pc = float(np.random.uniform(5.0, 16.0))
 
     if not 0.0 < max_inclination_deg <= 90.0:
         raise ValueError("max_inclination_deg must lie in (0, 90].")
 
     cos_i = np.random.uniform(np.cos(np.radians(max_inclination_deg)), 1.0)
     inclination = float(np.degrees(np.arccos(cos_i)))
+    season = float(np.random.uniform(0.0, 360.0))
 
     config["OBJECT-STAR-RADIUS"] = radius
     config["OBJECT-STAR-TEMPERATURE"] = teff
     config["GEOMETRY-OBS-ALTITUDE"] = distance_pc
     config["GEOMETRY-ALTITUDE-UNIT"] = "pc"
     config["OBJECT-INCLINATION"] = inclination
-    config["OBJECT-SEASON"] = float(np.random.uniform(0.0, 360.0))
+    config["OBJECT-SEASON"] = season
 
     config.pop("GEOMETRY-STELLAR-TYPE", None)
     config.pop("GEOMETRY-STELLAR-TEMPERATURE", None)
@@ -426,14 +444,85 @@ def set_stellar_parameters(config: dict, max_inclination_deg: float = 50.0) -> N
     # config["OBJECT-STAR-METALLICITY"] = round(np.random.uniform(-1, 1), 3)
 
 
-def set_solar_coordinates(config: dict) -> None:
+def set_solar_coordinates(config: dict, obliquity_deg: float = 0.0) -> None:
     """
-    Randomly sets the sub-solar longitude and latitude.
+    Set the sub-solar point and record the resulting phase angle.
+
+    [REVISION 1 -- geometry]
+    PSG does not treat the sub-solar latitude, the inclination and the season as
+    three independent parameters.  For exoplanets it derives the sub-observer
+    point from the sub-solar point (PSG documentation, "Defining the object",
+    https://psg.gsfc.nasa.gov/help.php#object):
+
+        olat = slat - inclination + 90.0        olon = slon - season
+
+    The previous version drew the sub-solar latitude uniformly in sine over the
+    whole sphere while ``set_stellar_parameters`` caps the inclination at 50 deg.
+    ``olat`` then stays inside PSG's legal [-90, +90] range only when
+    ``slat <= inclination``, which fails for 23.3% of realizations and reaches
+    175 deg in the worst case.
+
+    An explicit obliquity convention is used instead, and the phase is carried by
+    OBJECT-SEASON alone.  With ``obliquity_deg = 0`` the phase angle is exactly
+
+        alpha = arccos( sin(i) * cos(season) )
+
+    which for i <= 50 deg spans 40-140 deg with a median of 90 deg.  That is the
+    quantity Referee 2 asks about in R2.6, and it is returned here so it can be
+    stored per target.
+
+    The sub-solar longitude is still randomized.  It is inert for the spatially
+    uniform Lambertian surface used here (SURFACE-MODEL = Lambert, NSURF = 0),
+    since it only rotates the planet's own longitude system, but it is kept for
+    continuity and recorded.
+
+    Parameters
+    ----------
+    config : dict
+        Configuration dictionary. OBJECT-INCLINATION and OBJECT-SEASON must
+        already be set, i.e. ``set_stellar_parameters`` must run first.
+    obliquity_deg : float, optional
+        Half-width of the sub-solar latitude interval, in degrees. The draw is
+        additionally clipped to the inclination so that ``olat`` cannot leave
+        PSG's legal range. Default 0.0 (zero-obliquity convention).
+
+    Returns
+    -------
+    None
+        Updates the config dictionary with the sub-solar and sub-observer coordinates and the phase angle.
     """
-    config["OBJECT-SOLAR-LONGITUDE"] = float(np.random.uniform(0.0, 360.0))
-    config["OBJECT-SOLAR-LATITUDE"] = float(
-        np.degrees(np.arcsin(np.random.uniform(-1.0, 1.0)))
-    )
+    inclination = float(config["OBJECT-INCLINATION"])
+    season = float(config["OBJECT-SEASON"])
+
+    if obliquity_deg < 0.0:
+        raise ValueError("obliquity_deg must be non-negative.")
+
+    limit = min(float(obliquity_deg), inclination)
+    sub_solar_latitude = float(np.random.uniform(-limit, limit)) if limit > 0.0 else 0.0
+    sub_solar_longitude = float(np.random.uniform(0.0, 360.0))
+
+    config["OBJECT-SOLAR-LONGITUDE"] = sub_solar_longitude
+    config["OBJECT-SOLAR-LATITUDE"] = sub_solar_latitude
+
+    # PSG will derive these; computed here to validate and to record the phase.
+    sub_observer_latitude = sub_solar_latitude - inclination + 90.0
+    sub_observer_longitude = sub_solar_longitude - season
+
+    if not -90.0 <= sub_observer_latitude <= 90.0:
+        raise ValueError(
+            f"Derived sub-observer latitude {sub_observer_latitude:.3f} deg lies "
+            f"outside PSG's legal range; slat={sub_solar_latitude:.3f}, "
+            f"inclination={inclination:.3f}."
+        )
+
+    slat_rad = np.radians(sub_solar_latitude)
+    olat_rad = np.radians(sub_observer_latitude)
+    cos_phase = np.sin(slat_rad) * np.sin(olat_rad) + np.cos(slat_rad) * np.cos(
+        olat_rad
+    ) * np.cos(np.radians(sub_solar_longitude - sub_observer_longitude))
+
+    phase_angle = float(np.degrees(np.arccos(np.clip(cos_phase, -1.0, 1.0))))
+    config["OBJECT-PHASE-ANGLE"] = phase_angle
 
 
 def calculate_luminosity(config: dict) -> float:
@@ -622,7 +711,18 @@ def maintain_planetary_atmosphere(
         if real_insolation >= cosmic_shoreline:
             continue
 
-        pressure_exponent = 3.168 + float(np.random.uniform(-0.232, 0.232))
+        # [REVISION 2 -- mass-radius exponent]
+        # The surface-pressure exponent is DERIVED from the mass-radius exponent
+        # drawn above, not sampled a second time.  Combining Eq. 4 (R ~ M^q) with
+        # Eq. 5 (P ~ M^2 / R^4) gives P ~ R^(2/q - 4), so for q = 0.279 the
+        # exponent is 2/0.279 - 4 = 3.168, and propagating the 0.009 uncertainty
+        # gives (2/0.279^2) * 0.009 = 0.231.  The previous version drew
+        # 3.168 +/- 0.232 independently, which gave corr(q, exponent_P) = 0 where
+        # Eq. 6 requires -1 (the exponent is decreasing in q).  Physically, that
+        # allowed a planet to receive the mass, gravity, escape velocity and
+        # cosmic-shoreline verdict of a denser body together with the surface
+        # pressure of a lighter one.
+        pressure_exponent = 2.0 / mass_radius_exponent - 4.0
         pressure_mbar = float(1013.25 * planet_radius**pressure_exponent)
         climate = _sample_surface_temperature(real_insolation, pressure_mbar)
         if climate is None:
