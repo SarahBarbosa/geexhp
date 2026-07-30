@@ -61,6 +61,22 @@ class TFRecordConfig:
         "O3",
     ]
 
+    TELESCOPES: List[str] = ["B", "SS"]
+    BANDS: List[str] = ["UV", "Vis", "NIR"]
+    BASES: List[str] = [
+        "B-UV",
+        "B-Vis",
+        "B-NIR",
+        "SS-UV",
+        "SS-Vis",
+        "SS-NIR",
+    ]
+
+    # Albedo below this is treated as a PSG underflow rather than a dark planet.
+    # Sits ~2 orders below the faintest legitimate albedo measured in the set
+    # (2.5e-6, B-NIR water band); see _albedo_is_valid.
+    ALBEDO_FLOOR: float = 1e-8
+
     # SPECTRA: List[str] = [
     #     "NOISY_ALBEDO_B-NIR",
     #     "NOISY_ALBEDO_B-UV",
@@ -228,13 +244,55 @@ def _calculate_feature_snr_percentile(signal_array, noise_array, p_low=10, p_hig
     return amplitude / denom
 
 
+def _albedo_is_valid(df, bases=None, floor=None):
+    """
+    Boolean mask, one entry per planet: True when every albedo channel in every
+    band is finite and above ``floor``.
+
+    PSG's reflected-light output underflows at extreme crescent phase
+    (alpha >~ 136 deg), returning channels that are exactly 0 or as small as
+    ~1e-17. These are numerical failures, not dark planets: the median peak
+    albedo drops ~20 orders of magnitude between alpha = 135.9 deg and
+    alpha = 136.1 deg, where a Lambert phase function predicts a 6% drop.
+
+    The default ``floor`` separates the two populations cleanly. Measured over a
+    sample of the generated set, no planet below alpha = 130 deg has a single
+    channel under 1e-8 (0 of 7.5e6 channels, all six bands), and the faintest
+    legitimate albedo is 2.5e-6, in B-NIR inside the water band — so the floor
+    keeps ~2 orders of magnitude of headroom against real data. Conversely every
+    planet above alpha = 136 deg has its entire UV range under the floor, so none
+    escape. Note the underflowed values themselves are spread continuously across
+    1e-8 rather than piled up at 1e-17: the floor is a separator between planets,
+    not between channels, which is why the mask is reduced with ``.all(axis=1)``.
+
+    A planet is rejected whole rather than having its bad channels masked,
+    because partially collapsed spectra are the dangerous case: a P10 dragged
+    down to zero inflates the P90-P10 amplitude, so a half-dead spectrum can
+    score a *higher* SNR_FEATURE_PCTL than a healthy one and survive the
+    downstream selection cut.
+    """
+    bases = TFRecordConfig.BASES if bases is None else bases
+    floor = TFRecordConfig.ALBEDO_FLOOR if floor is None else floor
+
+    ok = np.ones(len(df), dtype=bool)
+    for base in bases:
+        col = f"ALBEDO_{base}"
+        if col not in df.columns:
+            continue
+        a = np.vstack(df[col].apply(np.asarray)).astype(np.float64)
+        ok &= np.isfinite(a).all(axis=1) & (a > floor).all(axis=1)
+    return ok
+
+
 def _safe_vector_snr(signal_array, noise_array):
     s = np.array(signal_array, dtype=np.float32)
     n = np.array(noise_array, dtype=np.float32)
     return np.divide(s, n, out=np.zeros_like(s), where=n != 0)
 
 
-def create_tfrecords(root_folder: str, save_root: str) -> None:
+def create_tfrecords(
+    root_folder: str, save_root: str, drop_underflow: bool = True
+) -> None:
     """
     Traverse a root folder containing subfolders of .parquet files, filter/transform
     the data, and write each filtered DataFrame to TFRecord files.
@@ -245,7 +303,17 @@ def create_tfrecords(root_folder: str, save_root: str) -> None:
         The path to the root directory containing subfolders with .parquet files.
     save_root : str
         The path to the directory where the TFRecord files will be saved.
+    drop_underflow : bool, optional
+        Reject planets whose albedo underflowed in PSG, via ``_albedo_is_valid``.
+        Kept separate from the downstream SNR selection on purpose: this is a
+        validity test (the sample is corrupt), while the SNR cut is a detectability
+        selection (the sample is real but too faint). The SNR cut happens to remove
+        these as well, since a zeroed spectrum has zero P90-P10 amplitude, but that
+        is incidental and would stop holding if the threshold were lowered.
+        Set False to reproduce the previous behaviour. Default True.
     """
+
+    dropped: Dict[str, int] = {}
 
     file_count = sum(
         len([file for file in files if file.endswith(".parquet")])
@@ -294,13 +362,24 @@ def create_tfrecords(root_folder: str, save_root: str) -> None:
                     else:
                         df[molecule] = 0.0
 
+                # Reject PSG underflows before anything is computed from them.
+                if drop_underflow:
+                    valid = _albedo_is_valid(df)
+                    n_drop = int((~valid).sum())
+                    if n_drop:
+                        dropped[earth_type] = dropped.get(earth_type, 0) + n_drop
+                        df = df[valid].reset_index(drop=True)
+                    if df.empty:
+                        pbar.update(1)
+                        continue
+
                 # Filter out rows with noise > 3
                 # noise_columns = [col for col in df.columns if "NOISE_" in col]
                 # mask = ~df[noise_columns].map(lambda x: any(value > 3 for value in x)).any(axis=1)
                 # df = df[mask]
 
-                telescopes = ["B", "SS"]
-                bands = ["UV", "Vis", "NIR"]
+                telescopes = TFRecordConfig.TELESCOPES
+                bands = TFRecordConfig.BANDS
 
                 new_vector_cols = []
                 new_scalar_cols = []
@@ -363,3 +442,20 @@ def create_tfrecords(root_folder: str, save_root: str) -> None:
                         writer.write(serialized_sample)
 
                 pbar.update(1)
+
+    if not drop_underflow:
+        print("\nUnderflow rejection disabled (drop_underflow=False).")
+    elif dropped:
+        total = sum(dropped.values())
+        print(
+            f"\nDropped {total} planet(s) with underflowed albedo "
+            f"(any channel non-finite or <= {TFRecordConfig.ALBEDO_FLOOR:g}):"
+        )
+        for era, n in sorted(dropped.items()):
+            print(f"    {era}: {n}")
+        print(
+            "  These are PSG underflows at extreme crescent phase "
+            "(alpha >~ 136 deg), not dark planets."
+        )
+    else:
+        print("\nNo underflowed albedo spectra found.")
